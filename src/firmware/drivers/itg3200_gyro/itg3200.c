@@ -1,7 +1,6 @@
 // i2g3200.c
 // gyro.c
 #include "itg3200.h"
-#include "i2c.h"
 #include "i2c_driver.h"
 #include <util/delay.h>
 #include <stdbool.h>
@@ -31,7 +30,7 @@ void ITG3200_ReadGyro(float *temp, float *g_x, float *g_y, float *g_z);
 
 void InitializeITG3200(void)
 {
-    InitializeI2C();
+    i2c_init();
 
     i2c_start(ITG3200_ADDR);
     i2c_read_ack();

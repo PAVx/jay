@@ -23,21 +23,21 @@ CSOURCE						= main.c
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/uart_driver
 # BUFFER
 SEARCHABLE_HEADER_FILE_DIRS += -I drivers/buffer
-# TWI
-SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/twi
 # I2C DRIVER
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/i2c_driver
 # CLOCK
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/clock
 # ITG3200
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/itg3200_gyro
+# MAG
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/hmc5883l_mag
 
 ####################
 # PROTOCOL HEADERS #
 # UART #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/uart
-# I2C #
-SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/i2c
+# MAG #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/mag
 # GYRO #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/gyro
 # TEMP #
@@ -53,22 +53,22 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/temperature
 CSOURCE						+= drivers/uart_driver/uart_driver.c
 # BUFFER #
 CSOURCE						+= drivers/buffer/buffer.c
-# TWI #
-CSOURCE						+= drivers/twi/twi.c
 # CLOCK #
 CSOURCE						+= drivers/clock/clock.c
 # I2C #
 CSOURCE						+= drivers/i2c_driver/i2c_driver.c
 # ITG3200 #
 CSOURCE						+= drivers/itg3200_gyro/itg3200.c
+# HMC5883L #
+CSOURCE						+= drivers/hmc5883l_mag/hmc5883l_mag.c
 ####################
 
 ####################
 # PROTOCOL SOURCES #
 # UART #
 CSOURCE						+= protocols/uart/uart.c
-# I2C #
-CSOURCE						+= protocols/i2c/i2c.c
+# MAG #
+CSOURCE						+= protocols/mag/mag.c
 # GYRO #
 CSOURCE						+= protocols/gyro/gyro.c
 # TEMP #
@@ -80,7 +80,7 @@ CSOURCE						+= protocols/temperature/temperature.c
 C_STD						= gnu99
 
 OBJECTS	 					= ./*.o
-EXECUTABLE					= Pigeon
+EXECUTABLE					= jay
 
 ########### COMPILER OPTIONS ##############
 CFLAGS						+= -Wall
@@ -122,10 +122,3 @@ all:
 	#${BURNER} -F -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 	${BURNER} -F -p m328p -c usbasp -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex 
 
-eight:
-	#${CC} -fno-tree-scev-cprop -ffunction-sections -fdata-sections -ffreestanding
-	${CC} -Os -mmcu=atmega328p -DF_CPU=16000000UL ${CFLAGS} -c ${CSOURCE}
-	${CC} -mmcu=atmega328p -Wl,-u,vfprintf -lprintf_flt -lm -o${EXECUTABLE}.elf ${OBJECTS}
-	${OBJECT_COPY} -j .text -j .data -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
-	${BURNER} -F -p m328p -c usbasp -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
-	rm -f ${OBJECTS} ${EXECUTABLE}.elf ${EXECUTABLE}.hex
