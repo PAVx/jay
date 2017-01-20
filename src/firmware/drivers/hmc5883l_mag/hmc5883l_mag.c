@@ -6,7 +6,8 @@
 #include <math.h>
 
 void HMC5883L_init(void){
-
+	i2c_init();
+	
 	i2c_start(HMC5883L_WRITE);
 	i2c_write(0x00); // set pointer to CRA
 	i2c_write(0x70); // write 0x70 to CRA
