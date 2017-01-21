@@ -5,7 +5,7 @@
 
 
 #define SOFTUART_BAUD_RATE      38400
-#define SOFTUART_CHANNELS       3
+#define SOFTUART_CHANNELS       1
 
 /****************************************************************************/
 // These are the definitions for Software UART Channel 1

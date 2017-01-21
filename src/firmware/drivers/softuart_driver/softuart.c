@@ -62,7 +62,7 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include <util/delay.h>
-
+#include "uart_driver.h"
 #include "softuart.h"
 
 #define SU_TRUE    1
@@ -193,8 +193,9 @@ static void _timer_init(void)
 	unsigned char sreg_tmp;
 
 	sreg_tmp = SREG;
+	//_uart_driver_SendByte(0x32);
 	cli();
-
+	//_uart_driver_SendByte(0x33);
 	SOFTUART_T_COMP_REG = SOFTUART_TIMERTOP;     /* set top */
 
 	SOFTUART_T_CONTR_REGA = SOFTUART_CTC_MASKA | SOFTUART_PRESC_MASKA;
@@ -257,6 +258,8 @@ void _softuart_init( softUART *softUART )
 	softUART_array[3].pins.txddr = SOFTUART_TXDDR_4;
 	softUART_array[3].pins.txbit = SOFTUART_TXBIT_4;
 	#endif
+
+	//_uart_driver_SendByte(0x31);
 
 	int i = 0;
 	for(i = 0; i < SOFTUART_CHANNELS; i++){
