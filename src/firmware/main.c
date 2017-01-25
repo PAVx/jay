@@ -11,6 +11,7 @@
 #include "gyro.h"
 #include "mag.h"
 #include "temperature.h"
+#include "accel.h"
 
 #ifndef F_CPU
 	#define F_CPU 16000000UL
@@ -25,7 +26,7 @@ int main (void) {
 	InitializeMag();
 	InitializeGyro();
 	InitializeTemperature();
-
+    InitializeAccel();
 	memset(buffer, '\0', 128);
 
   	DDRB |= (1<<DDB5);  //Set the 6th bit on PORTB (i.e. PB5) to 1 => output
@@ -44,6 +45,13 @@ int main (void) {
 
 		UART_SendString(buffer);
 		memset(buffer, '\0', 128);
+	    
+        Accel_Update();
+    	sprintf(buffer, "A(x,y,z) = %f,%f,%f\n", Accel_GetX(), Accel_GetY(), Accel_GetZ());
+
+		UART_SendString(buffer);
+		memset(buffer, '\0', 128);
+
     	_delay_ms(200);          //Delay for 1000ms => 1 sec
 		
 
