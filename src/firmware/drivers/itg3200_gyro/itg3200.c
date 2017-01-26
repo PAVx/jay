@@ -32,36 +32,24 @@ void InitializeITG3200(void)
 {
     i2c_init();
 
-    i2c_start(ITG3200_ADDR);
-    i2c_read_ack();
+    i2c_start(ITG3200_ADDR<<1);
     i2c_write(0x3E);
-    i2c_read_ack();
     i2c_write(0x00);
-    i2c_read_ack();
     i2c_stop();
 
-    i2c_start(ITG3200_ADDR);
-    i2c_read_ack();
+    i2c_start(ITG3200_ADDR<<1);
     i2c_write(0x15);
-    i2c_read_ack();
     i2c_write(0x07);
-    i2c_read_ack();
     i2c_stop();
 
-    i2c_start(ITG3200_ADDR);
-    i2c_read_ack();
+    i2c_start(ITG3200_ADDR<<1);
     i2c_write(0x16);
-    i2c_read_ack();
     i2c_write(0x1E);
-    i2c_read_ack();
     i2c_stop();
 
-    i2c_start(ITG3200_ADDR);
-    i2c_read_ack();
+    i2c_start(ITG3200_ADDR<<1);
     i2c_write(0x17);
-    i2c_read_ack();
     i2c_write(0x00);
-    i2c_read_ack();
     i2c_stop();
 
 //    ITG3200_Calibrate();
@@ -106,16 +94,9 @@ void ITG3200_ReadGyro(float *temp, float *g_x, float *g_y, float *g_z)
 {
     uint8_t buff[8];
 
-    i2c_start(ITG3200_ADDR);
+    i2c_start(ITG3200_ADDR<<1);
     i2c_write(0x1B);
     i2c_stop();
-
-    i2c_start(ITG3200_ADDR);
-    i2c_read_ack();
-    i2c_write(0x1B);
-    i2c_read_ack();
-    i2c_stop();
-
 
     i2c_receive(ITG3200_ADDR<<1, buff, 8);
     

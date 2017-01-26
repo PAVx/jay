@@ -35,24 +35,26 @@ int main (void) {
     	_delay_ms(200);          //Delay for 1000ms => 1 sec
 
     	PORTB &= ~(1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 0 => off
-
+        
 		sprintf(buffer, "M = %f\n", Mag_Get());
 		UART_SendString(buffer);
 		memset(buffer, '\0', 128);
 
 		Gyro_Update();
-    	sprintf(buffer, "G(x,y,z) = %f,%f,%f\ntemp=%f\n\n", Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Temperature_Get());
+    	sprintf(buffer, "G(x,y,z) = %f,%f,%f\ntemp=%f\n", Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Temperature_Get());
 
 		UART_SendString(buffer);
 		memset(buffer, '\0', 128);
 	    
         Accel_Update();
-    	sprintf(buffer, "A(x,y,z) = %f,%f,%f\n", Accel_GetX(), Accel_GetY(), Accel_GetZ());
+        _delay_ms(2);
+    	sprintf(buffer, "A(x,y,z) = %04x,%04x,%04x\n", (uint8_t)Accel_GetX(),  (uint8_t)Accel_GetY(),  (uint8_t)Accel_GetZ());
 
 		UART_SendString(buffer);
 		memset(buffer, '\0', 128);
+        UART_SendString("\nHI_THERE\n");
 
-    	_delay_ms(200);          //Delay for 1000ms => 1 sec
+    	_delay_ms(1000);          //Delay for 1000ms => 1 sec
 		
 
 	}
