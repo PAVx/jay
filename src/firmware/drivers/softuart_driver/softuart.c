@@ -56,8 +56,14 @@
 		-	Fix init (I don't think all the members of the struct are
 			being initialized).
 		-	Test :(
+		-	ISR is broken, not too sure what's going on.
+		-	The #defined values are the actual registers. When I put them in a struct,
+			they are no longer refering to a register.
+		-	Once the porgram frreezes, the interrupt doesn't get called again.
 */
 
+#include <stdio.h>
+#include <string.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
@@ -83,20 +89,91 @@
 // static unsigned char  bits_left_in_tx;							//CHANGE: have this in the struct
 // static unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */		//CHANGE: have this in the struct
 
+//extern softUART softUART_array[SOFTUART_CHANNELS];
+static softUART softUART_array[SOFTUART_CHANNELS];
+
 /* HELPER FUNCTION*/
 void isr_routine(softUART *softUART);
 
-void _set_tx_pin_high(softUART *softUART)
-{
-	softUART->pins.txport |=  ( 1 << softUART->pins.txbit );		//CHANGE: make this into a functino with pin struct
+void _set_tx_pin_high(uint8_t i){
+
+	#ifdef SOFTUART_TXPORT_1
+	if(i == 1) {
+		( SOFTUART_TXPORT_1 |=  ( 1 << SOFTUART_TXBIT_1 ) );
+	}
+	#endif
+
+	#ifdef SOFTUART_TXPORT_2
+	else if(i == 2){
+		( SOFTUART_TXPORT_2 |=  ( 1 << SOFTUART_TXBIT_2 ) );
+	}
+	#endif
+
+	#ifdef SOFTUART_TXPORT_3
+	else if(i == 3){
+		( SOFTUART_TXPORT_3 |=  ( 1 << SOFTUART_TXBIT_3 ) );
+	}
+	#endif
+
+	#ifdef SOFTUART_TXPORT_4
+	else if(i == 4){
+		( SOFTUART_TXPORT_4 |=  ( 1 << SOFTUART_TXBIT_4 ) );
+	}
+	#endif
 }
-void _set_tx_pin_low(softUART *softUART)
-{
-	softUART->pins.txport &= ~( 1 << softUART->pins.txbit );
+
+void _set_tx_pin_low(uint8_t i){
+
+	#ifdef SOFTUART_TXPORT_1
+	if(i == 1) {
+		( SOFTUART_TXPORT_1 &= ~( 1 << SOFTUART_TXBIT_1 ) );
+	}
+	#endif
+
+	#ifdef SOFTUART_TXPORT_2
+	else if(i == 2){
+		( SOFTUART_TXPORT_2 &= ~( 1 << SOFTUART_TXBIT_2 ) );
+	}
+	#endif
+
+	#ifdef SOFTUART_TXPORT_3
+	else if(i == 3){
+		( SOFTUART_TXPORT_3 &= ~( 1 << SOFTUART_TXBIT_3 ) );
+	}
+	#endif
+
+	#ifdef SOFTUART_TXPORT_4
+	else if(i == 4){
+		( SOFTUART_TXPORT_4 &= ~( 1 << SOFTUART_TXBIT_4 ) );
+	}
+	#endif
 }
-uint8_t _get_rx_pin_status(softUART *softUART)
-{
-	return softUART->pins.rxpin & ( 1 << softUART->pins.rxbit );
+
+uint8_t _get_rx_pin_status(uint8_t i){
+
+	if(i == 1) {
+		return ( SOFTUART_RXPIN_1  &   ( 1 << SOFTUART_RXBIT_1 ) );
+	}
+
+	#ifdef SOFTUART_RXPIN_2
+	else if(i == 2){
+		return ( SOFTUART_RXPIN_2  &   ( 1 << SOFTUART_RXBIT_2 ) );
+	}
+	#endif
+
+	#ifdef SOFTUART_RXPIN_3
+	else if(i == 3){
+		return ( SOFTUART_RXPIN_3  &   ( 1 << SOFTUART_RXBIT_3 ) );
+	}
+	#endif
+
+	#ifdef SOFTUART_RXPIN_4
+	else if(i == 4){
+		return ( SOFTUART_RXPIN_4  &   ( 1 << SOFTUART_RXBIT_4 ) );
+	}
+	#endif
+
+	return 0;
 }
 
 ISR(SOFTUART_T_COMP_LABEL)
@@ -104,88 +181,49 @@ ISR(SOFTUART_T_COMP_LABEL)
 	int i = 0;
 	for(i = 0; i < SOFTUART_CHANNELS; i++)
 	{
-		isr_routine(&softUART_array[i]);
+		isr_routine(&(softUART_array[i]));
 	}
-	// // static unsigned char flag_rx_waiting_for_stop_bit = SU_FALSE;
-	// // static unsigned char rx_mask;
-	// //
-	// // static unsigned char timer_rx_ctr;
-	// // static unsigned char bits_left_in_rx;
-	// // static unsigned char internal_rx_buffer;
-	// //
-	// // unsigned char start_bit, flag_in;
-	// // unsigned char tmp;
-	//
-	// // Transmitter Section
-	// if ( flag_tx_busy == SU_TRUE ) {
-	// 	tmp = timer_tx_ctr;
-	// 	if ( --tmp == 0 ) { // if ( --timer_tx_ctr <= 0 )
-	// 		if ( internal_tx_buffer & 0x01 ) {
-	// 			_set_tx_pin_high();
-	// 		}
-	// 		else {
-	// 			_set_tx_pin_low();
-	// 		}
-	// 		internal_tx_buffer >>= 1;
-	// 		tmp = 3; // timer_tx_ctr = 3;
-	// 		if ( --bits_left_in_tx == 0 ) {
-	// 			flag_tx_busy = SU_FALSE;
-	// 		}
-	// 	}
-	// 	timer_tx_ctr = tmp;
-	// }
-	//
-	// // Receiver Section
-	// if ( flag_rx_off == SU_FALSE ) {
-	// 	if ( flag_rx_waiting_for_stop_bit ) {
-	// 		if ( --timer_rx_ctr == 0 ) {
-	// 			flag_rx_waiting_for_stop_bit = SU_FALSE;
-	// 			flag_rx_ready = SU_FALSE;
-	// 			inbuf[qin] = internal_rx_buffer;
-	// 			if ( ++qin >= SOFTUART_IN_BUF_SIZE ) {
-	// 				// overflow - reset inbuf-index
-	// 				qin = 0;
-	// 			}
-	// 		}
-	// 	}
-	// 	else {  // rx_test_busy
-	// 		if ( flag_rx_ready == SU_FALSE ) {
-	// 			start_bit = _get_rx_pin_status();
-	// 			// test for start bit
-	// 			if ( start_bit == 0 ) {
-	// 				flag_rx_ready      = SU_TRUE;
-	// 				internal_rx_buffer = 0;
-	// 				timer_rx_ctr       = 4;
-	// 				bits_left_in_rx    = RX_NUM_OF_BITS;
-	// 				rx_mask            = 1;
-	// 			}
-	// 		}
-	// 		else {  // rx_busy
-	// 			tmp = timer_rx_ctr;
-	// 			if ( --tmp == 0 ) { // if ( --timer_rx_ctr == 0 ) {
-	// 				// rcv
-	// 				tmp = 3;
-	// 				flag_in = _get_rx_pin_status();
-	// 				if ( flag_in ) {
-	// 					internal_rx_buffer |= rx_mask;
-	// 				}
-	// 				rx_mask <<= 1;
-	// 				if ( --bits_left_in_rx == 0 ) {
-	// 					flag_rx_waiting_for_stop_bit = SU_TRUE;
-	// 				}
-	// 			}
-	// 			timer_rx_ctr = tmp;
-	// 		}
-	// 	}
-	// }
+	//PORTB |= (1<<PORTB5);     //Turn 6th bit on PORTB (i.e. PB5) to 1 => onma
 }
 
-static void _io_init(softUART *container)
+static void _io_init(void)
 {
+	/****************************************************************************/
+	// These are the initialization for Software UART Channel 1
+	#if SOFTUART_CHANNELS > 0
 	// TX-Pin as output
-	container->pins.txddr |=  ( 1 << container->pins.txbit );
+	SOFTUART_TXDDR_1 |= ( 1 << SOFTUART_TXBIT_1 );
 	// RX-Pin as input
-	container->pins.rxddr &= ~( 1 << container->pins.rxbit );
+	SOFTUART_RXDDR_1 &= ~( 1 << SOFTUART_RXBIT_1 );
+	#endif
+
+	/****************************************************************************/
+	// These are the initialization for Software UART Channel 2
+	#if SOFTUART_CHANNELS > 1
+	// TX-Pin as output
+	SOFTUART_TXDDR_2 |= ( 1 << SOFTUART_TXBIT_2 );
+	// RX-Pin as input
+	SOFTUART_RXDDR_2 &= ~( 1 << SOFTUART_RXBIT_2 );
+	#endif
+
+	/****************************************************************************/
+	// These are the initialization for Software UART Channel 3
+	#if SOFTUART_CHANNELS > 2
+	// TX-Pin as output
+	SOFTUART_TXDDR_3 |= ( 1 << SOFTUART_TXBIT_3 );
+	// RX-Pin as input
+	SOFTUART_RXDDR_3 &= ~( 1 << SOFTUART_RXBIT_3 );
+	#endif
+
+	/****************************************************************************/
+	// These are the initialization for Software UART Channel 4
+	#if SOFTUART_CHANNELS > 3
+	// TX-Pin as output
+	SOFTUART_TXDDR_4 |= ( 1 << SOFTUART_TXBIT_4 );
+	// RX-Pin as input
+	SOFTUART_RXDDR_4 &= ~( 1 << SOFTUART_RXBIT_4 );
+	#endif
+
 }
 
 static void _timer_init(void)
@@ -208,69 +246,18 @@ static void _timer_init(void)
 	SREG = sreg_tmp;
 }
 
-void _softuart_init( softUART *softUART )
+void _softuart_init( void )
 {
-
-	/****************************************************************************/
-	// These are the initialization for Software UART Channel 1
-	#if SOFTUART_CHANNELS > 0
-	softUART_array[0].pins.rxpin = SOFTUART_RXPIN_1;
-	softUART_array[0].pins.rxddr = SOFTUART_RXDDR_1;
-	softUART_array[0].pins.rxbit = SOFTUART_RXBIT_1;
-
-	softUART_array[0].pins.txport = SOFTUART_TXPORT_1;
-	softUART_array[0].pins.txddr = SOFTUART_TXDDR_1;
-	softUART_array[0].pins.txbit = SOFTUART_TXBIT_1;
-	#endif
-
-	/****************************************************************************/
-	// These are the initialization for Software UART Channel 2
-	#if SOFTUART_CHANNELS > 1
-	softUART_array[1].pins.rxpin = SOFTUART_RXPIN_2;
-	softUART_array[1].pins.rxddr = SOFTUART_RXDDR_2;
-	softUART_array[1].pins.rxbit = SOFTUART_RXBIT_2;
-
-	softUART_array[1].pins.txport = SOFTUART_TXPORT_2;
-	softUART_array[1].pins.txddr = SOFTUART_TXDDR_2;
-	softUART_array[1].pins.txbit = SOFTUART_TXBIT_2;
-	#endif
-
-	/****************************************************************************/
-	// These are the initialization for Software UART Channel 3
-	#if SOFTUART_CHANNELS > 2
-	softUART_array[2].pins.rxpin = SOFTUART_RXPIN_3;
-	softUART_array[2].pins.rxddr = SOFTUART_RXDDR_3;
-	softUART_array[2].pins.rxbit = SOFTUART_RXBIT_3;
-
-	softUART_array[2].pins.txport = SOFTUART_TXPORT_3;
-	softUART_array[2].pins.txddr = SOFTUART_TXDDR_3;
-	softUART_array[2].pins.txbit = SOFTUART_TXBIT_3;
-	#endif
-
-	/****************************************************************************/
-	// These are the initialization for Software UART Channel 4
-	#if SOFTUART_CHANNELS > 3
-	softUART_array[3].pins.rxpin = SOFTUART_RXPIN_4;
-	softUART_array[3].pins.rxddr = SOFTUART_RXDDR_4;
-	softUART_array[3].pins.rxbit = SOFTUART_RXBIT_4;
-
-	softUART_array[3].pins.txport = SOFTUART_TXPORT_4;
-	softUART_array[3].pins.txddr = SOFTUART_TXDDR_4;
-	softUART_array[3].pins.txbit = SOFTUART_TXBIT_4;
-	#endif
-
-	//_uart_driver_SendByte(0x31);
-
 	int i = 0;
 	for(i = 0; i < SOFTUART_CHANNELS; i++){
-		softUART[i].tx.flag_tx_busy  = SU_FALSE;
-		softUART[i].rx.flag_rx_ready = SU_FALSE;
-		softUART[i].rx.flag_rx_off   = SU_FALSE;
-
-		_set_tx_pin_high(&softUART[i]); /* mt: set to high to avoid garbage on init */
-		_io_init(&softUART[i]);
+		softUART_array[i].tx.flag_tx_busy  = SU_FALSE;
+		softUART_array[i].rx.flag_rx_ready = SU_FALSE;
+		softUART_array[i].rx.flag_rx_off   = SU_FALSE;
+		softUART_array[i].id = i + 1;
+		_set_tx_pin_high(i + 1); /* mt: set to high to avoid garbage on init */
 	}
 
+	_io_init();
 	_timer_init();
 }
 
@@ -281,108 +268,124 @@ static void _idle(void)
 	// add watchdog-reset here if needed
 }
 
-void _softuart_turn_rx_on( softUART *softUART )
+void _softuart_turn_rx_on( uint8_t id )
 {
-	softUART->rx.flag_rx_off = SU_FALSE;
+	softUART_array[id].rx.flag_rx_off = SU_FALSE;
 }
 
-void _softuart_turn_rx_off( softUART *softUART )
+void _softuart_turn_rx_off( uint8_t id )
 {
-	softUART->rx.flag_rx_off = SU_TRUE;
+	softUART_array[id].rx.flag_rx_off = SU_TRUE;
 }
 
-char _softuart_getchar( softUART *softUART )
+char _softuart_getchar( uint8_t id )
 {
 	char ch;
 
-	while ( softUART->rx.qout == softUART->rx.qin ) {
+	while ( softUART_array[id].rx.qout == softUART_array[id].rx.qin ) {
 		_idle();
 	}
-	ch = softUART->rx.inbuf[softUART->rx.qout];
-	if ( ++(softUART->rx.qout) >= SOFTUART_IN_BUF_SIZE ) {
-		softUART->rx.qout = 0;
+	ch = softUART_array[id].rx.inbuf[softUART_array[id].rx.qout];
+	if ( ++(softUART_array[id].rx.qout) >= SOFTUART_IN_BUF_SIZE ) {
+		softUART_array[id].rx.qout = 0;
 	}
 
 	return( ch );
 }
 
-unsigned char _softuart_kbhit( softUART *softUART )
+unsigned char _softuart_kbhit( uint8_t id )
 {
-	return( softUART->rx.qin != softUART->rx.qout );
+	return( softUART_array[id].rx.qin != softUART_array[id].rx.qout );
 }
 
-void _softuart_flush_input_buffer( softUART *softUART )
+void _softuart_flush_input_buffer( uint8_t id )
 {
-	softUART->rx.qin  = 0;
-	softUART->rx.qout = 0;
+	softUART_array[id].rx.qin  = 0;
+	softUART_array[id].rx.qout = 0;
 }
 
-unsigned char _softuart_transmit_busy( softUART *softUART )
+unsigned char _softuart_transmit_busy( uint8_t id )
 {
-	return ( softUART->tx.flag_tx_busy == SU_TRUE ) ? 1 : 0;
+	return ( softUART_array[id].tx.flag_tx_busy == SU_TRUE ) ? 1 : 0;
 }
 
-void _softuart_putchar( const char ch, softUART *softUART )
+void _softuart_putchar( const char ch, uint8_t id )
 {
-	while ( softUART->tx.flag_tx_busy == SU_TRUE ) {
-		; // wait for transmitter ready
+	while ( softUART_array[id].tx.flag_tx_busy == SU_TRUE ) {
+		PORTB |= (1<<PORTB5);     //Turn 6th bit on PORTB (i.e. PB5) to 1 => on; // wait for transmitter ready
 		  // add watchdog-reset here if needed;
 	}
-
+	PORTB &= ~(1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 0 => off
 	// invoke_UART_transmit
-	softUART->tx.timer_tx_ctr       = 3;
-	softUART->tx.bits_left_in_tx    = TX_NUM_OF_BITS;
-	softUART->tx.internal_tx_buffer = ( ch << 1 ) | 0x200;
-	softUART->tx.flag_tx_busy       = SU_TRUE;
+	softUART_array[id].tx.timer_tx_ctr       = 3;
+	softUART_array[id].tx.bits_left_in_tx    = TX_NUM_OF_BITS;
+	softUART_array[id].tx.internal_tx_buffer = ( ch << 1 ) | 0x200;
+	softUART_array[id].tx.flag_tx_busy       = SU_TRUE;
 }
 
-void _softuart_puts( const char *s, softUART *softUART )
+void _softuart_puts( const char *s, uint8_t id )
 {
 	while ( *s ) {
-		_softuart_putchar( *s, softUART );
+		_softuart_putchar( *s, id );
 		s++;
 		_delay_us(113);
 	}
 }
 
-void _softuart_puts_p( const char *prg_s, softUART *softUART )
+void _softuart_puts_p( const char *prg_s, uint8_t id )
 {
 	char c;
 
 	while ( ( c = pgm_read_byte( prg_s++ ) ) ) {
-		_softuart_putchar(c, softUART);
+		_softuart_putchar(c, id);
 	}
 }
 
 void isr_routine(softUART *softUART){
-	softUART->isr.flag_rx_waiting_for_stop_bit = SU_FALSE;
+	PORTB &= ~(1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 0 => off
+	static unsigned char flag_rx_waiting_for_stop_bit[4];
+	memset(flag_rx_waiting_for_stop_bit, SU_FALSE, 4 * sizeof(char));
+
+	static unsigned char rx_mask[4];
+
+	static unsigned char timer_rx_ctr[4];
+	static unsigned char bits_left_in_rx[4];
+	static unsigned char internal_rx_buffer[4];
+
+	unsigned char start_bit, flag_in;
+	unsigned char tmp;
+
+	// softUART->isr.flag_rx_waiting_for_stop_bit = SU_FALSE;
+	// softUART->isr.start_bit = 0;
+	// softUART->isr.flag_in = 0;
+	// softUART->isr.tmp = 0;
 
 	// Transmitter Section
 	if ( softUART->tx.flag_tx_busy == SU_TRUE ) {
-		softUART->isr.tmp = softUART->tx.timer_tx_ctr;
-		if ( --(softUART->isr.tmp) == 0 ) { // if ( --timer_tx_ctr <= 0 )
+		tmp = softUART->tx.timer_tx_ctr;
+		if ( --(tmp) == 0 ) { // if ( --timer_tx_ctr <= 0 )
 			if ( softUART->tx.internal_tx_buffer & 0x01 ) {
-				_set_tx_pin_high(softUART);
+				_set_tx_pin_high(softUART->id);
 			}
 			else {
-				_set_tx_pin_low(softUART);
+				_set_tx_pin_low(softUART->id);
 			}
 			softUART->tx.internal_tx_buffer >>= 1;
-			softUART->isr.tmp = 3; // timer_tx_ctr = 3;
+			tmp = 3; // timer_tx_ctr = 3;
 			if ( --(softUART->tx.bits_left_in_tx) == 0 ) {
 				softUART->tx.flag_tx_busy = SU_FALSE;
 			}
 		}
-		softUART->tx.timer_tx_ctr = softUART->isr.tmp;
+		softUART->tx.timer_tx_ctr = tmp;
 	}
 
 	// Receiver Section
 	if ( softUART->rx.flag_rx_off == SU_FALSE ) {
-		if ( softUART->isr.flag_rx_waiting_for_stop_bit ) {
-			if ( --(softUART->isr.timer_rx_ctr) == 0 ) {
-				softUART->isr.flag_rx_waiting_for_stop_bit = SU_FALSE;
+		if ( flag_rx_waiting_for_stop_bit[(softUART->id) - 1] ) {
+			if ( --(timer_rx_ctr[(softUART->id) - 1]) == 0 ) {
+				flag_rx_waiting_for_stop_bit[(softUART->id) - 1] = SU_FALSE;
 				softUART->rx.flag_rx_ready = SU_FALSE;
-				softUART->rx.inbuf[softUART->rx.qin] = softUART->isr.internal_rx_buffer;
+				softUART->rx.inbuf[softUART->rx.qin] = internal_rx_buffer[(softUART->id) - 1];
 				if ( ++(softUART->rx.qin) >= SOFTUART_IN_BUF_SIZE ) {
 					// overflow - reset inbuf-index
 					softUART->rx.qin = 0;
@@ -391,31 +394,31 @@ void isr_routine(softUART *softUART){
 		}
 		else {  // rx_test_busy
 			if ( softUART->rx.flag_rx_ready == SU_FALSE ) {
-				softUART->isr.start_bit = _get_rx_pin_status(softUART);
+				start_bit = _get_rx_pin_status(softUART->id);
 				// test for start bit
-				if ( softUART->isr.start_bit == 0 ) {
+				if ( start_bit == 0 ) {
 					softUART->rx.flag_rx_ready      = SU_TRUE;
-					softUART->isr.internal_rx_buffer = 0;
-					softUART->isr.timer_rx_ctr       = 4;
-					softUART->isr.bits_left_in_rx    = RX_NUM_OF_BITS;
-					softUART->isr.rx_mask            = 1;
+					internal_rx_buffer[(softUART->id) - 1] = 0;
+					timer_rx_ctr[(softUART->id) - 1]       = 4;
+					bits_left_in_rx[(softUART->id) - 1]    = RX_NUM_OF_BITS;
+					rx_mask[(softUART->id) - 1]            = 1;
 				}
 			}
 			else {  // rx_busy
-				softUART->isr.tmp = softUART->isr.timer_rx_ctr;
-				if ( --(softUART->isr.tmp) == 0 ) { // if ( --timer_rx_ctr == 0 ) {
+				tmp = timer_rx_ctr[(softUART->id) - 1];
+				if ( --(tmp) == 0 ) { // if ( --timer_rx_ctr == 0 ) {
 					// rcv
-					softUART->isr.tmp = 3;
-					softUART->isr.flag_in = _get_rx_pin_status(softUART);
-					if ( softUART->isr.flag_in ) {
-						softUART->isr.internal_rx_buffer |= softUART->isr.rx_mask;
+					tmp = 3;
+					flag_in = _get_rx_pin_status(softUART->id);
+					if ( flag_in ) {
+						internal_rx_buffer[(softUART->id) - 1] |= rx_mask[(softUART->id) - 1];
 					}
-					softUART->isr.rx_mask <<= 1;
-					if ( --(softUART->isr.bits_left_in_rx) == 0 ) {
-						softUART->isr.flag_rx_waiting_for_stop_bit = SU_TRUE;
+					rx_mask[(softUART->id) - 1] <<= 1;
+					if ( --(bits_left_in_rx[(softUART->id) - 1]) == 0 ) {
+						flag_rx_waiting_for_stop_bit[(softUART->id) - 1] = SU_TRUE;
 					}
 				}
-				softUART->isr.timer_rx_ctr = softUART->isr.tmp;
+				timer_rx_ctr[(softUART->id) - 1] = tmp;
 			}
 		}
 	}

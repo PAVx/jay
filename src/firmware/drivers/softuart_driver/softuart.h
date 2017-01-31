@@ -4,8 +4,8 @@
 #endif
 
 
-#define SOFTUART_BAUD_RATE      38400
-#define SOFTUART_CHANNELS       1
+#define SOFTUART_BAUD_RATE      14400
+#define SOFTUART_CHANNELS       2
 
 /****************************************************************************/
 // These are the definitions for Software UART Channel 1
@@ -56,13 +56,13 @@
 #endif
 
 
-#define SOFTUART_T_COMP_LABEL      TIMER0_COMPA_vect
-#define SOFTUART_T_COMP_REG        OCR0A
-#define SOFTUART_T_CONTR_REGA      TCCR0A
-#define SOFTUART_T_CONTR_REGB      TCCR0B
-#define SOFTUART_T_CNT_REG         TCNT0
-#define SOFTUART_T_INTCTL_REG      TIMSK0
-#define SOFTUART_CMPINT_EN_MASK    (1 << OCIE0A)
+#define SOFTUART_T_COMP_LABEL      TIMER0_COMPA_vect    // checking compare value
+#define SOFTUART_T_COMP_REG        OCR0A                // output compare register
+#define SOFTUART_T_CONTR_REGA      TCCR0A               // control register
+#define SOFTUART_T_CONTR_REGB      TCCR0B               // control register
+#define SOFTUART_T_CNT_REG         TCNT0                // the current count
+#define SOFTUART_T_INTCTL_REG      TIMSK0               // interrupt enable register
+#define SOFTUART_CMPINT_EN_MASK    (1 << OCIE0A)        // compare interrupt enable
 #define SOFTUART_CTC_MASKA         (1 << WGM01)
 #define SOFTUART_CTC_MASKB         (0)
 
@@ -90,15 +90,15 @@
 
 #define SOFTUART_IN_BUF_SIZE     32
 
-typedef struct softuartPins_t{
-  uint8_t rxpin;
-  uint8_t rxddr;
-  uint8_t rxbit;
-
-  uint8_t txport;
-  uint8_t txddr;
-  uint8_t txbit;
-} softuartPins;
+// typedef struct softuartPins_t{
+//   uint8_t rxpin;
+//   uint8_t rxddr;
+//   uint8_t rxbit;
+//
+//   uint8_t txport;
+//   uint8_t txddr;
+//   uint8_t txbit;
+// } softuartPins;
 
 typedef struct softuartRX_t{
   char           inbuf[SOFTUART_IN_BUF_SIZE];
@@ -115,59 +115,58 @@ typedef struct softuartTX_t{
   unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */
 } softuartTX;
 
-typedef struct softuartISR_t{
-  unsigned char flag_rx_waiting_for_stop_bit; // = SU_FALSE;
-  unsigned char rx_mask;
-
-  unsigned char timer_rx_ctr;
-  unsigned char bits_left_in_rx;
-  unsigned char internal_rx_buffer;
-
-  unsigned char start_bit, flag_in;   //initialize this
-  unsigned char tmp;                  //initialize this
-} softuartISR;
+// typedef struct softuartISR_t{
+//   unsigned char flag_rx_waiting_for_stop_bit; // = SU_FALSE;
+//   unsigned char rx_mask;
+//
+//   unsigned char timer_rx_ctr;
+//   unsigned char bits_left_in_rx;
+//   unsigned char internal_rx_buffer;
+//
+//   unsigned char start_bit, flag_in;   //initialize this
+//   unsigned char tmp;                  //initialize this
+// } softuartISR;
 
 typedef struct softUART_t{
-  softuartPins pins;
+  //softuartPins pins;
   softuartRX rx;
   softuartTX tx;
-  softuartISR isr;
+  //softuartISR isr;
   uint32_t baud;
   uint8_t type;
+  uint8_t id;
 } softUART;
 
-softUART softUART_array[SOFTUART_CHANNELS];
-
 // Init the Software Uart
-void _softuart_init(softUART *softUART);
+void _softuart_init(void);
 
 // Clears the contents of the input buffer.
-void _softuart_flush_input_buffer( softUART *softUART );
+void _softuart_flush_input_buffer( uint8_t id );
 
 // Tests whether an input character has been received.
-unsigned char _softuart_kbhit( softUART *softUART );
+unsigned char _softuart_kbhit( uint8_t id );
 
 // Reads a character from the input buffer, waiting if necessary.
-char _softuart_getchar( softUART *softUART );
+char _softuart_getchar( uint8_t id );
 
 // To check if transmitter is busy
-unsigned char _softuart_transmit_busy( softUART *softUART );
+unsigned char _softuart_transmit_busy( uint8_t id );
 
 // Writes a character to the serial port.
-void _softuart_putchar( const char, softUART *softUART );
+void _softuart_putchar( const char, uint8_t id );
 
 // Turns on the receive function.
-void _softuart_turn_rx_on( softUART *softUART );
+void _softuart_turn_rx_on( uint8_t id );
 
 // Turns off the receive function.
-void _softuart_turn_rx_off( softUART *softUART );
+void _softuart_turn_rx_off( uint8_t id );
 
 // Write a NULL-terminated string from RAM to the serial port
-void _softuart_puts( const char *s, softUART *softUART );
+void _softuart_puts( const char *s, uint8_t id );
 
 // Write a NULL-terminated string from program-space (flash)
 // to the serial port. example: softuart_puts_p(PSTR("test"))
-void _softuart_puts_p( const char *prg_s, softUART *softUART );
+void _softuart_puts_p( const char *prg_s, uint8_t id );
 
 // Helper-Macro - "automatically" inserts PSTR
 // when used: include avr/pgmspace.h before this include-file
