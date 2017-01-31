@@ -51,6 +51,10 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/temperature
 # DRIVER SOURCES #
 # UART #
 CSOURCE						+= drivers/uart_driver/uart_driver.c
+# SOFTUART #
+CSOURCE						+= drivers/softuart_driver/Queue.c
+# SOFTUART #
+CSOURCE						+= drivers/softuart_driver/softuart.c
 # BUFFER #
 CSOURCE						+= drivers/buffer/buffer.c
 # I2C #
@@ -65,8 +69,6 @@ CSOURCE						+= drivers/hmc5883l_mag/hmc5883l_mag.c
 # PROTOCOL SOURCES #
 # UART #
 CSOURCE						+= protocols/uart/uart.c
-# SOFTUART #
-CSOURCE						+= drivers/softuart_driver/softuart.c
 # MAG #
 CSOURCE						+= protocols/mag/mag.c
 # GYRO #
@@ -119,6 +121,10 @@ all:
 	${CC} ${CC_LN_OPTIONS}
 
 	${OBJECT_COPY} -j .text -j .data -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
-	${BURNER} -F -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
-	#${BURNER} -F -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex 
+	${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
+	#${BURNER} -F -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 
+clean:
+	rm *.o
+	rm *.hex
+	rm *.elf

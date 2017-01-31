@@ -56,6 +56,7 @@
 #include <util/delay.h>
 
 #include "softuart.h"
+#include "Queue.h"
 
 #define SU_TRUE    1
 #define SU_FALSE   0
@@ -73,7 +74,11 @@ static unsigned char  flag_rx_ready;
 static unsigned char  flag_tx_busy;
 static unsigned char  timer_tx_ctr;
 static unsigned char  bits_left_in_tx;
-static unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */
+static unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */	// V2: This shouldn't be static
+
+// Niraj Flags
+static unsigned char 	flag_ok_to_pop;
+Queue tx_buffer;
 
 #define set_tx_pin_high()      ( SOFTUART_TXPORT |=  ( 1 << SOFTUART_TXBIT ) )
 #define set_tx_pin_low()       ( SOFTUART_TXPORT &= ~( 1 << SOFTUART_TXBIT ) )
@@ -88,23 +93,36 @@ ISR(SOFTUART_T_COMP_LABEL)
 	static unsigned char bits_left_in_rx;
 	static unsigned char internal_rx_buffer;
 
+	static int tx_byte;
+
 	unsigned char start_bit, flag_in;
 	unsigned char tmp;
 
 	// Transmitter Section
 	if ( flag_tx_busy == SU_TRUE ) {
+
+		if(flag_ok_to_pop == SU_TRUE){
+			tx_byte = getFront(tx_buffer);
+			Dequeue(tx_buffer);
+			flag_ok_to_pop = SU_FALSE;
+		}
+
 		tmp = timer_tx_ctr;
 		if ( --tmp == 0 ) { // if ( --timer_tx_ctr <= 0 )
-			if ( internal_tx_buffer & 0x01 ) {
+			if ( tx_byte & 0x01 ) {
 				set_tx_pin_high();
 			}
 			else {
 				set_tx_pin_low();
 			}
-			internal_tx_buffer >>= 1;
+
+			tx_byte >>= 1;
 			tmp = 3; // timer_tx_ctr = 3;
 			if ( --bits_left_in_tx == 0 ) {
 				flag_tx_busy = SU_FALSE;
+				flag_ok_to_pop = SU_TRUE;
+			} else if ( bits_left_in_tx%TX_NUM_OF_BITS == 0 ) {
+				flag_ok_to_pop = SU_TRUE;
 			}
 		}
 		timer_tx_ctr = tmp;
@@ -187,6 +205,9 @@ void softuart_init( void )
 	flag_tx_busy  = SU_FALSE;
 	flag_rx_ready = SU_FALSE;
 	flag_rx_off   = SU_FALSE;
+	flag_ok_to_pop = SU_TRUE;
+
+	tx_buffer = newQueue();
 
 	set_tx_pin_high(); /* mt: set to high to avoid garbage on init */
 
@@ -244,16 +265,18 @@ unsigned char softuart_transmit_busy( void )
 
 void softuart_putchar( const char ch )
 {
-	while ( flag_tx_busy == SU_TRUE ) {
+	while ( getLength(tx_buffer) >= SOFTUART_OUT_BUF_SIZE-1) {
 		; // wait for transmitter ready
 		  // add watchdog-reset here if needed;
 	}
 
 	// invoke_UART_transmit
 	timer_tx_ctr       = 3;
-	bits_left_in_tx    = TX_NUM_OF_BITS;
+	bits_left_in_tx    = bits_left_in_tx + TX_NUM_OF_BITS;			// V2: add number of bits to total needed to empty
 	internal_tx_buffer = ( ch << 1 ) | 0x200;
 	flag_tx_busy       = SU_TRUE;
+
+	Enqueue(tx_buffer, (int)internal_tx_buffer);								// V2: added a queue as a buffer.
 }
 
 void softuart_puts( const char *s )
@@ -261,7 +284,6 @@ void softuart_puts( const char *s )
 	while ( *s ) {
 		softuart_putchar( *s );
 		s++;
-		_delay_us(113);
 	}
 }
 
