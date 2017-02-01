@@ -48,7 +48,8 @@ int main (void) {
 	    
         Accel_Update();
         _delay_ms(2);
-    	sprintf(buffer, "A(x,y,z) = %04x,%04x,%04x\n", (uint8_t)Accel_GetX(),  (uint8_t)Accel_GetY(),  (uint8_t)Accel_GetZ());
+    	sprintf(buffer, "A(x,y,z) = %f,%f,%f\n", Accel_GetX(), Accel_GetY(), Accel_GetZ());
+       
 
 		UART_SendString(buffer);
 		memset(buffer, '\0', 128);

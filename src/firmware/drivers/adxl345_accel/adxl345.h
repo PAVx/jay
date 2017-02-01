@@ -3,7 +3,7 @@
 #ifndef _ADXL345_H_
 #define _ADXL345_H_
 
-#define ADXL345_ADDR (0x53)
+#define ADXL345_ADDR (0xA6)
 
 void InitializeADXL345(void);
 void ADXL345_UpdateData(void);
