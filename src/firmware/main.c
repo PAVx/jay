@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
+
 #include <avr/interrupt.h>
 #include <inttypes.h>
 #include <avr/io.h>
@@ -7,7 +9,6 @@
 #include <string.h>
 
 #include "uart.h"
-
 #include "gyro.h"
 #include "mag.h"
 #include "temperature.h"
@@ -16,6 +17,8 @@
 #ifndef F_CPU
 	#define F_CPU 16000000UL
 #endif
+
+void _main_delay(long x);
 
 char buffer[256];
 
@@ -30,10 +33,17 @@ int main (void) {
 
 	while(1){
     PORTB |= (1<<PORTB5);     //Turn 6th bit on PORTB (i.e. PB5) to 1 => on
-    //_delay_ms(1000);          //Delay for 1000ms => 1 sec
+    //sleep(1);          //Delay for 1000ms => 1 sec
     PORTB &= ~(1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 0 => off
-    //_delay_ms(1000);          //Delay for 1000ms => 1 sec
+    //sleep(1);          //Delay for 1000ms => 1 sec
 
 		softuart_puts("hey\n");
+	}
+}
+
+void _main_delay(long x){
+	for(int i = 0; i < x; i++){
+		for(int j = 0; i < x; j++){
+		}
 	}
 }
