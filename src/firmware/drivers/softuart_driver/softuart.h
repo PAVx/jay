@@ -6,7 +6,7 @@
 
 #endif
 
-#define SOFTUART_BAUD_RATE      4800
+#define SOFTUART_BAUD_RATE      2400m
 #define SOFTUART_CHANNELS       2
 
 /****************************************************************************/
@@ -14,7 +14,7 @@
 #if SOFTUART_CHANNELS > 0
 #define SOFTUART_RXPIN_1      PIND
 #define SOFTUART_RXDDR_1      DDRD
-#define SOFTUART_RXBIT_1      PD2
+#define SOFTUART_RXBIT_1      PD5
 
 #define SOFTUART_TXPORT_1     PORTD
 #define SOFTUART_TXDDR_1      DDRD
@@ -30,7 +30,7 @@
 
 #define SOFTUART_TXPORT_2     PORTD
 #define SOFTUART_TXDDR_2      DDRD
-#define SOFTUART_TXBIT_2      PD5
+#define SOFTUART_TXBIT_2      PD2
 #endif
 
 /****************************************************************************/
@@ -141,32 +141,32 @@ typedef struct softUART_t{
 void softuart_init(void);
 
 // Clears the contents of the input buffer.
-void softuart_flush_input_buffer( void );
+void softuart_flush_input_buffer( int i ) ;
 
 // Tests whether an input character has been received.
-unsigned char softuart_kbhit( void );
+unsigned char softuart_kbhit( int i );
 
 // Reads a character from the input buffer, waiting if necessary.
-char softuart_getchar( void );
+char softuart_getchar( int i );
 
 // To check if transmitter is busy
-unsigned char softuart_transmit_busy( void );
+unsigned char softuart_transmit_busy( int i );
 
 // Writes a character to the serial port.
-void softuart_putchar( const char );
+void softuart_putchar( const char, int i );
 
 // Turns on the receive function.
-void softuart_turn_rx_on( void );
+void softuart_turn_rx_on( int i );
 
 // Turns off the receive function.
-void softuart_turn_rx_off( void );
+void softuart_turn_rx_off( int i );
 
 // Write a NULL-terminated string from RAM to the serial port
-void softuart_puts( const char *s );
+void softuart_puts( const char *s, int i );
 
 // Write a NULL-terminated string from program-space (flash)
 // to the serial port. example: softuart_puts_p(PSTR("test"))
-void softuart_puts_p( const char *prg_s );
+void softuart_puts_p( const char *prg_s, int i );
 
 // Helper-Macro - "automatically" inserts PSTR
 // when used: include avr/pgmspace.h before this include-file

@@ -37,7 +37,8 @@ int main (void) {
     PORTB &= ~(1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 0 => off
     //sleep(1);          //Delay for 1000ms => 1 sec
 
-		softuart_puts("hey\n");
+		softuart_puts("hey\n", 0);
+		softuart_puts("sup\n", 1);
 	}
 }
 
