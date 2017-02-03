@@ -6,7 +6,7 @@
 
 #endif
 
-#define SOFTUART_BAUD_RATE      2400m
+#define SOFTUART_BAUD_RATE      600
 #define SOFTUART_CHANNELS       2
 
 /****************************************************************************/
@@ -14,7 +14,7 @@
 #if SOFTUART_CHANNELS > 0
 #define SOFTUART_RXPIN_1      PIND
 #define SOFTUART_RXDDR_1      DDRD
-#define SOFTUART_RXBIT_1      PD5
+#define SOFTUART_RXBIT_1      PD2
 
 #define SOFTUART_TXPORT_1     PORTD
 #define SOFTUART_TXDDR_1      DDRD
@@ -30,7 +30,7 @@
 
 #define SOFTUART_TXPORT_2     PORTD
 #define SOFTUART_TXDDR_2      DDRD
-#define SOFTUART_TXBIT_2      PD2
+#define SOFTUART_TXBIT_2      PD5
 #endif
 
 /****************************************************************************/
@@ -77,7 +77,7 @@
 
     /* "A timer interrupt must be set to interrupt at three times
        the required baud rate." */
-    #define SOFTUART_PRESCALE (8)
+    #define SOFTUART_PRESCALE (64)
     // #define SOFTUART_PRESCALE (1)
 
     #if (SOFTUART_PRESCALE == 8)
@@ -86,6 +86,9 @@
     #elif (SOFTUART_PRESCALE==1)
         #define SOFTUART_PRESC_MASKA         (0)
         #define SOFTUART_PRESC_MASKB         (1 << CS00)
+    #elif (SOFTUART_PRESCALE==64)
+        #define SOFTUART_PRESC_MASKA         (0)
+        #define SOFTUART_PRESC_MASKB         (1 << CS01)|(1 << CS00)
     #else
         #error "prescale unsupported"
     #endif
