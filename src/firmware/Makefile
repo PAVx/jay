@@ -31,7 +31,10 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/i2c_driver
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/itg3200_gyro
 # MAG
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/hmc5883l_mag
-
+# PWM #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/pwm
+# CLOCK #
+#SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/clock
 ####################
 # PROTOCOL HEADERS #
 # UART #
@@ -59,6 +62,10 @@ CSOURCE						+= drivers/i2c_driver/i2c_driver.c
 CSOURCE						+= drivers/itg3200_gyro/itg3200.c
 # HMC5883L #
 CSOURCE						+= drivers/hmc5883l_mag/hmc5883l_mag.c
+# PWM #
+CSOURCE						+= drivers/pwm/pwm_driver.c
+# CLOCK #
+#CSOURCE						+= drivers/clock/clock.c
 ####################
 
 ####################
@@ -119,6 +126,6 @@ all:
 	${CC} ${CC_LN_OPTIONS}
 
 	${OBJECT_COPY} -j .text -j .data -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
-	${BURNER} -F -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
-	#${BURNER} -F -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex 
+	#${BURNER} -F -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
+	${BURNER} -F -P /dev/tty.usbmodem* -p ${BURNER_AVR} -c arduino -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex 
 
