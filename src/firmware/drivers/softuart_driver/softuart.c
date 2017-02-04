@@ -1,14 +1,6 @@
 // softuart.c
 // AVR-port of the generic software uart written in C
 //
-// Generic code from
-// Colin Gittins, Software Engineer, Halliburton Energy Services
-// (has been available from iar.com web-site -> application notes)
-//
-// Generic software uart written in C, requiring a timer set to 3 times
-// the baud rate, and two software read/write pins for the receive and
-// transmit functions.
-//
 // * Received characters are buffered
 // * putchar(), getchar(), kbhit() and flush_input_buffer() are available
 // * There is a facility for background processing while waiting for input
@@ -63,22 +55,11 @@
 
 // startbit and stopbit parsed internally (see ISR)
 #define RX_NUM_OF_BITS (8)
-// static char           inbuf[SOFTUART_IN_BUF_SIZE];
-// static unsigned char  qin;
-// static unsigned char           qout;
-// static unsigned char  flag_rx_off;
-// static unsigned char  flag_rx_ready;
 
 // 1 Startbit, 8 Databits, 1 Stopbit = 10 Bits/Frame
 #define TX_NUM_OF_BITS (10)
-// static unsigned char  flag_tx_busy;
-// static unsigned char  timer_tx_ctr;
-// static unsigned char  bits_left_in_tx;
-// static unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */	// V2: This shouldn't be static
 
-// Niraj Flags
-// static unsigned char 	flag_ok_to_pop;
-// Queue tx_buffer;
+static softUART channel[SOFTUART_CHANNELS];
 
 void set_tx_pin_high(int i) {
 		#ifdef SOFTUART_TXPORT_1
@@ -157,9 +138,6 @@ int get_rx_pin_status(int i) {
 
 	return 0;
 }
-
-static softUART channel[SOFTUART_CHANNELS];
-
 
 ISR(SOFTUART_T_COMP_LABEL)
 {
