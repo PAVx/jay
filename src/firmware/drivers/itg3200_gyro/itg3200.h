@@ -3,11 +3,7 @@
 #ifndef _ITG3200_H_
 #define _ITG3200_H_
 
-#define ITG3200_ADDR (0x68)
-
-#define G_WRITE (ITG3200_ADDR)
-#define G_READ (ITG3200_ADDR)
-
+#define ITG3200_ADDR (0xD0)
 
 #define G_SMPLRT_DIV 0x15
 #define G_DLPF_FS 0x16

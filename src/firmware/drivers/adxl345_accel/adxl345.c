@@ -42,7 +42,8 @@ void InitializeADXL345(void)
     _a_x = 0;
     _a_y = 0;
     _a_z = 0;
-    _delay_ms(20);
+
+    _delay_ms(2); // Arbitrary delay amount
     ADXL345_Calibrate();
 
 }
@@ -65,13 +66,16 @@ void ADXL345_Calibrate(void)
         tmpx += _a_x;
         tmpy += _a_y;
         tmpz += _a_z;
-        _delay_ms(20);
+        _delay_ms(20); // Arbitrary delay amount
     }
-
+    
+    // Each LSB of output in full-resolution is one-quarter of an 
+    // LSB of the offset register. (Datasheet: Offset Calibration)
     a_offx = -round(tmpx / 10 / 4);
     a_offy = -round(tmpy / 10 / 4) ;
     a_offz = -round(((tmpz / 10) - 256) / 4) ;
-
+    
+    // Set calibrated offset values
     i2c_writeReg(ADXL345_ADDR, 0x1E, &a_offx, 1);
     i2c_writeReg(ADXL345_ADDR, 0x1F, &a_offy, 1);
     i2c_writeReg(ADXL345_ADDR, 0x20, &a_offz, 1);
