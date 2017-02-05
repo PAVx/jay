@@ -31,8 +31,9 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/i2c_driver
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/itg3200_gyro
 # MAG
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/hmc5883l_mag
+# PWM #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/pwm
 
-####################
 # PROTOCOL HEADERS #
 # UART #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/uart
@@ -42,7 +43,8 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/mag
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/gyro
 # TEMP #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/temperature
-
+# MOTORS #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/motors
 ####################
 
 ######################################################
@@ -63,6 +65,8 @@ CSOURCE						+= drivers/i2c_driver/i2c_driver.c
 CSOURCE						+= drivers/itg3200_gyro/itg3200.c
 # HMC5883L #
 CSOURCE						+= drivers/hmc5883l_mag/hmc5883l_mag.c
+# PWM #
+CSOURCE						+= drivers/pwm/pwm_driver.c
 ####################
 
 ####################
@@ -75,6 +79,8 @@ CSOURCE						+= protocols/mag/mag.c
 CSOURCE						+= protocols/gyro/gyro.c
 # TEMP #
 CSOURCE						+= protocols/temperature/temperature.c
+# MOTORS #
+CSOURCE						+= protocols/motors/motors.c
 ####################
 
 ######################################################
