@@ -1,6 +1,8 @@
 // PAVx jay packet protocol
 // Sargis S Yonan -- jan. 26 2017
 
+#include <string.h>
+
 #include "packet.h"
 #include "uart.h"
 
@@ -30,14 +32,14 @@ void receive_packet(void) {
 	uint8_t bytes_received = 0;
 
 	if (!UART_IsEmpty()) {
-		memset(__rx_packet, 0, PACKET_SIZE)
+		memset(__rx_packet, 0, PACKET_SIZE_BYTES);
 
-		for(i = 0; (received_byte = (uint8_t)UART_GetByte()) != NUL; bytes_received++) {
+		for(bytes_received = 0; (received_byte = (uint8_t)UART_GetByte()) != NUL; bytes_received++) {
 
 			// waiting for SOH
 			if (state == 0) {
 				if (received_byte == SOH) {
-					__rx_packet[SOH_POS] = SOH
+					__rx_packet[SOH_POS] = SOH;
 					state = 1;
 				}
 			}
@@ -75,7 +77,7 @@ void receive_packet(void) {
 			}
 			// receiving time
 			else if (state == 5) {
-				__rx_packet[TIME_START_POS + inner_state] = received_byte;
+				__rx_packet[TIME_BYTE_START_POS + inner_state] = received_byte;
 				inner_state++;
 				if (inner_state == 8) {
 					inner_state = 0;
@@ -101,7 +103,7 @@ void receive_packet(void) {
 			}
 
 			if (bytes_received > BYTE_RECEIVE_SIZEOUT) {
-				memset(__rx_packet, 0, PACKET_SIZE);
+				memset(__rx_packet, 0, PACKET_SIZE_BYTES);
 				break;
 			}
 
@@ -110,11 +112,11 @@ void receive_packet(void) {
 }
 
 bool packet_send(void) {
-	return UART_SendBuffer((char*)_tx_packet, PACKET_SIZE_BYTES);
+	return UART_SendBuffer((char*)__tx_packet, PACKET_SIZE_BYTES);
 }
 
 void packet_init(void) {
-	memset(_tx_packet, 0, PACKET_SIZE_BYTES);
+	memset(__tx_packet, 0, PACKET_SIZE_BYTES);
 	__tx_packet[SOH_POS] = SOH;
 	__tx_packet[STX_POS] = STX;
 	__tx_packet[EOT_POS] = EOT;
@@ -129,7 +131,7 @@ void packet_update_longitude(uint64_t longitude) {
 	for (i = 0; i < 8; i++) {
 		__tx_packet[LONGITUDE_BYTE_START_POS + i] = 
 		(uint8_t)((uint64_t)(longitude & 0x00000000000000FF));
-		(uint64_t)longitude = (uint64_t)longitude >> 8;
+		longitude = (uint64_t)longitude >> 8;
 	}
 }
 
@@ -138,7 +140,7 @@ void packet_update_latitude(uint64_t latitude) {
 	for (i = 0; i < 8; i++) {
 		__tx_packet[LATITUDE_BYTE_START_POS + i] = 
 		(uint8_t)((uint64_t)latitude & 0x00000000000000FF);
-		(uint64_t)latitude = (uint64_t)latitude >> 8;
+		latitude = (uint64_t)latitude >> 8;
 	}
 }
 
@@ -147,7 +149,7 @@ void packet_update_time(uint64_t time) {
 	for (i = 0; i < 8; i++) {
 		__tx_packet[TIME_BYTE_START_POS + i] = 
 		(uint8_t)((uint64_t)time & 0x00000000000000FF);
-		(uint64_t)time = (uint64_t)time >> 8;
+		time = (uint64_t)time >> 8;
 	}
 }
 
@@ -156,6 +158,6 @@ void packet_update_status(uint64_t status) {
 	for (i = 0; i < 8; i++) {
 		__tx_packet[STATUS_BYTE_START_POS + i] = 
 		(uint8_t)((uint64_t)status & 0x00000000000000FF);
-		(uint64_t)status = (uint64_t)status >> 8;
+		status = (uint64_t)status >> 8;
 	}
 }
