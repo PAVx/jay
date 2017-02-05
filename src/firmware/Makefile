@@ -45,7 +45,8 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/mag
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/gyro
 # TEMP #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/temperature
-
+# MOTORS #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/motors
 ####################
 
 ######################################################
@@ -64,8 +65,6 @@ CSOURCE						+= drivers/itg3200_gyro/itg3200.c
 CSOURCE						+= drivers/hmc5883l_mag/hmc5883l_mag.c
 # PWM #
 CSOURCE						+= drivers/pwm/pwm_driver.c
-# CLOCK #
-#CSOURCE						+= drivers/clock/clock.c
 ####################
 
 ####################
@@ -80,6 +79,8 @@ CSOURCE						+= protocols/mag/mag.c
 CSOURCE						+= protocols/gyro/gyro.c
 # TEMP #
 CSOURCE						+= protocols/temperature/temperature.c
+# MOTORS #
+CSOURCE						+= protocols/motors/motors.c
 ####################
 
 ######################################################
