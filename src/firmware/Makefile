@@ -45,6 +45,8 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/gyro
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/temperature
 # MOTORS #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/motors
+# COMMUNICATION #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/com
 ####################
 
 ######################################################
@@ -81,6 +83,8 @@ CSOURCE						+= protocols/gyro/gyro.c
 CSOURCE						+= protocols/temperature/temperature.c
 # MOTORS #
 CSOURCE						+= protocols/motors/motors.c
+# COMMUNICATION #
+CSOURCE 					+= protocols/com/packet.c
 ####################
 
 ######################################################
