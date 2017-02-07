@@ -16,8 +16,6 @@ uint8_t system_initialize(void) {
 		#define UART (1)
 		InitializeUART(HW_UART_BAUD);
 		packet_init();
-
-		UART_SendString("PAVx Jay UAV initialized\n\n");
 	#endif
 
 	#ifdef MOTORS
