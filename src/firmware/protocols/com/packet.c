@@ -22,6 +22,16 @@
 #define STATUS_BYTE_START_POS (28)
 #define EOT_POS (36)
 
+#ifndef TRUE
+	#define TRUE (1)
+#endif 
+
+#ifndef FALSE
+	#define FALSE (0)
+#endif
+
+static uint8_t __new_tx = FALSE;
+
 uint8_t __tx_packet[PACKET_SIZE_BYTES];
 uint8_t __rx_packet[PACKET_SIZE_BYTES];
 
@@ -112,7 +122,12 @@ void receive_packet(void) {
 }
 
 bool packet_send(void) {
-	return UART_SendBuffer((char*)__tx_packet, PACKET_SIZE_BYTES);
+
+	if (__new_tx == TRUE) {
+		return UART_SendBuffer((char*)__tx_packet, PACKET_SIZE_BYTES);
+		__new_tx = FALSE;
+	}
+	return true;
 }
 
 void packet_init(void) {
@@ -124,6 +139,8 @@ void packet_init(void) {
 
 void packet_update_device_id(uint8_t device_id) {
 	__tx_packet[DEVICE_ID_POS] = device_id;
+
+	__new_tx = TRUE;
 }
 
 void packet_update_longitude(uint64_t longitude) {
@@ -133,6 +150,7 @@ void packet_update_longitude(uint64_t longitude) {
 		(uint8_t)((uint64_t)(longitude & 0x00000000000000FF));
 		longitude = (uint64_t)longitude >> 8;
 	}
+	__new_tx = TRUE;
 }
 
 void packet_update_latitude(uint64_t latitude) {
@@ -142,6 +160,7 @@ void packet_update_latitude(uint64_t latitude) {
 		(uint8_t)((uint64_t)latitude & 0x00000000000000FF);
 		latitude = (uint64_t)latitude >> 8;
 	}
+	__new_tx = TRUE;
 }
 
 void packet_update_time(uint64_t time) {
@@ -151,6 +170,7 @@ void packet_update_time(uint64_t time) {
 		(uint8_t)((uint64_t)time & 0x00000000000000FF);
 		time = (uint64_t)time >> 8;
 	}
+	__new_tx = TRUE;
 }
 
 void packet_update_status(uint64_t status) {
@@ -160,4 +180,5 @@ void packet_update_status(uint64_t status) {
 		(uint8_t)((uint64_t)status & 0x00000000000000FF);
 		status = (uint64_t)status >> 8;
 	}
+	__new_tx = TRUE;
 }

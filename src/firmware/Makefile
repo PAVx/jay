@@ -19,6 +19,7 @@ CSOURCE						= main.c
 
 ####################
 # DRIVER HEADERS #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/
 # UART DRIVER
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/uart_driver
 # SOFTUART DRIVER
@@ -33,8 +34,10 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/itg3200_gyro
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/hmc5883l_mag
 # PWM #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/pwm
+####################
 
 # PROTOCOL HEADERS #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/
 # UART #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/uart
 # MAG #
@@ -47,6 +50,16 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/temperature
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/motors
 # COMMUNICATION #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/com
+####################
+
+# SYSTEM HEADERS #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I system/
+# TICK #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I system/tick
+# INIT #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I system/init
+# LEDS #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I system/leds
 ####################
 
 ######################################################
@@ -87,6 +100,15 @@ CSOURCE						+= protocols/motors/motors.c
 CSOURCE 					+= protocols/com/packet.c
 ####################
 
+####################
+# SYSTEM #
+# TICK #
+CSOURCE						+= system/tick/system_tick.c
+# INIT #
+CSOURCE						+= system/init/system_init.c
+# LEDS #
+CSOURCE						+= system/leds/leds.c
+####################
 ######################################################
 
 C_STD						= gnu99
@@ -131,8 +153,8 @@ all:
 	${CC} ${CC_LN_OPTIONS}
 
 	${OBJECT_COPY} -j .text -j .data -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
-	${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
-	#${BURNER} -F -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
+	#${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
+	${BURNER} -F -p ${BURNER_AVR} -P /dev/tty.usbmodem* -carduino -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 
 clean:
 	rm *.o
