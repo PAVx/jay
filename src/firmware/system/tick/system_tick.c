@@ -11,6 +11,8 @@ volatile unsigned long timer0_overflow_count = 0;
 volatile unsigned long timer0_millis = 0;
 static unsigned char timer0_fract = 0;
 
+static volatile uint8_t _ticked;
+
 void clock_init()
 {
 	// timer mode
@@ -25,6 +27,8 @@ void clock_init()
 	TIMSK0 = _BV(TOIE0);
 
 	sei();
+
+	_ticked = FALSE;
 }
 
 clock_time_t clock_time()
@@ -62,6 +66,13 @@ clock_time_t clock_time_micros()
 	return ((m << 8) + t) * (64 / clockCyclesPerMicrosecond());
 }
 
+uint8_t system_ticked(void) {
+	return _ticked;
+}
+
+void system_untick(void) {
+	_ticked = FALSE;
+}
 
 ISR(TIMER0_OVF_vect)
 {
@@ -87,8 +98,13 @@ ISR(TIMER0_OVF_vect)
 /****************************************/
 	if (lapsed > SYSTEM_TIMEOUT) {
 		#ifdef GYRO
-    		ITG3200_UpdateData();
+    		Gyro_Update();
     	#endif
+    	
+    	#ifdef ACCEL
+    		Accel_Update();
+    	#endif
+    	
     	#ifdef COM
 	    	receive_packet();
     		packet_send();
@@ -105,6 +121,7 @@ ISR(TIMER0_OVF_vect)
 		// (???if crashing)(enable all other interrupts)
 
 		lapsed = 0;
+		_ticked = TRUE;
 	}
 
 }

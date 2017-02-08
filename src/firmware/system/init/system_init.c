@@ -5,6 +5,8 @@
 #define COM (1)
 #define MOTORS (1)
 #define SYSTEM_TICK (1)
+#define GYRO (1)
+#define ACCEL (1)
 
 uint8_t system_initialize(void) {
 	// initialize protcols 
@@ -12,6 +14,10 @@ uint8_t system_initialize(void) {
 		InitializeGyro();
 	#endif
 	
+	#ifdef ACCEL
+		InitializeAccel();
+	#endif
+
 	#ifdef COM
 		#define UART (1)
 		InitializeUART(HW_UART_BAUD);
@@ -23,10 +29,6 @@ uint8_t system_initialize(void) {
 	#endif
 
 	// initialize system components
-	#ifdef SYSTEM_TICK
-		clock_init();
-	#endif
-
 	#ifdef LEDS
 		led_init();
 	#endif
@@ -34,6 +36,10 @@ uint8_t system_initialize(void) {
 	#ifdef UART
 		UART_SendString("PAVx Jay UAV initialized\n\n");
 	#endif 
+
+	#ifdef SYSTEM_TICK
+		clock_init();
+	#endif
 
 	return TRUE;
 }
