@@ -163,8 +163,9 @@ all:
 	${CC} ${CC_LN_OPTIONS}
 
 	${OBJECT_COPY} -j .text -j .data -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
-	${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
-	#${BURNER} -F -p ${BURNER_AVR} -P /dev/tty.usbmodem* -carduino -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
+
+  #${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
+	${BURNER} -V -p ${BURNER_AVR} -P ${COMPILER_PATH} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 
 clean:
 	rm *.o
