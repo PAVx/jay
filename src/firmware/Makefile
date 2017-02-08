@@ -42,7 +42,8 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/mag
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/gyro
 # TEMP #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/temperature
-
+# COM #
+SEARCHABLE_HEADER_FILE_DIRS += -I protocols/com
 ####################
 
 ######################################################
@@ -73,6 +74,8 @@ CSOURCE						+= protocols/mag/mag.c
 CSOURCE						+= protocols/gyro/gyro.c
 # TEMP #
 CSOURCE						+= protocols/temperature/temperature.c
+# XBEE #
+CSOURCE						+= protocols/com/xbee.c
 ####################
 
 ######################################################
