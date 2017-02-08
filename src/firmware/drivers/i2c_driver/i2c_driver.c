@@ -12,9 +12,14 @@
 #define Prescaler 1
 #define TWBR_val ((((F_CPU / F_SCL) / Prescaler) - 16 ) / 2)
 
+static uint8_t _init = 0;
+
 void i2c_init(void)
 {
-    TWBR = (uint8_t)TWBR_val;
+    if (_init == 0) {
+        TWBR = (uint8_t)TWBR_val;
+        _init = 1;
+    }
 }
 
 uint8_t i2c_start(uint8_t address)
@@ -64,7 +69,7 @@ uint8_t i2c_read_ack(void)
     // start TWI module and acknowledge data after reception
     TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWEA);
     // wait for end of transmission
-   while( !(TWCR & (1<<TWINT)) );
+    while(!(TWCR & (1<<TWINT)));
     
     // return received data from TWDR
     return TWDR;

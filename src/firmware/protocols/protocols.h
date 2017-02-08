@@ -3,6 +3,7 @@
 
 #include "packet.h"
 #include "gyro.h"
+#include "accel.h"
 #include "mag.h"
 #include "motors.h"
 #include "temperature.h"
