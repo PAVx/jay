@@ -51,8 +51,7 @@ uint8_t i2c_write(uint8_t data)
     TWCR = (1<<TWINT) | (1<<TWEN);
     // wait for end of transmission
  
-    _delay_ms(1);
-    //   while( !(TWCR & (1<<TWINT)) );
+    while( !(TWCR & (1<<TWINT)) );
 
     if( (TWSR & 0xF8) != TW_MT_DATA_ACK ){ return 1; }
 
@@ -65,9 +64,8 @@ uint8_t i2c_read_ack(void)
     // start TWI module and acknowledge data after reception
     TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWEA);
     // wait for end of transmission
-  //  while( !(TWCR & (1<<TWINT)) );
+   while( !(TWCR & (1<<TWINT)) );
     
-    _delay_ms(1);
     // return received data from TWDR
     return TWDR;
 }
@@ -76,10 +74,9 @@ uint8_t i2c_read_nack(void)
 {
 
     // start receiving without acknowledging reception
-    TWCR = (1<<TWINT) | (1<<TWEN);
+   TWCR = (1<<TWINT) | (1<<TWEN);
     // wait for end of transmission
-  //  while( !(TWCR & (1<<TWINT)) );
-    _delay_ms(1);
+    while( !(TWCR & (1<<TWINT)) );
     
     // return received data from TWDR
     return TWDR;

@@ -4,8 +4,8 @@ BURNER						= avrdude
 CC_AVR						= atmega328p
 F_CPU						= 16000000UL
 BURNER_AVR					= ATMEGA328P
-BURNER_PROGRAMMER			= usbasp
-COMPILER_PATH				= /dev/tty.usbmodem*
+BURNER_PROGRAMMER			= arduino
+COMPILER_PATH				= COM3
 OBJECT_COPY					= avr-objcopy
 BAUDRATE					= 115200
 ###########################################
@@ -34,6 +34,10 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/itg3200_gyro
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/hmc5883l_mag
 # PWM #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/pwm
+# ACCEL
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adxl345_accel
+
+
 ####################
 
 # PROTOCOL HEADERS #
@@ -50,7 +54,9 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/temperature
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/motors
 # COMMUNICATION #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/com
-####################
+# ACCEL #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/accel
+
 
 # SYSTEM HEADERS #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I system/
@@ -82,6 +88,8 @@ CSOURCE						+= drivers/itg3200_gyro/itg3200.c
 CSOURCE						+= drivers/hmc5883l_mag/hmc5883l_mag.c
 # PWM #
 CSOURCE						+= drivers/pwm/pwm_driver.c
+# ADXL345 #
+CSOURCE						+= drivers/adxl345_accel/adxl345.c
 ####################
 
 ####################
@@ -98,6 +106,8 @@ CSOURCE						+= protocols/temperature/temperature.c
 CSOURCE						+= protocols/motors/motors.c
 # COMMUNICATION #
 CSOURCE 					+= protocols/com/packet.c
+# ACCEL #
+CSOURCE						+= protocols/accel/accel.c
 ####################
 
 ####################
