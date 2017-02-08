@@ -4,8 +4,8 @@ BURNER						= avrdude
 CC_AVR						= atmega328p
 F_CPU						= 16000000UL
 BURNER_AVR					= ATMEGA328P
-BURNER_PROGRAMMER			= arduino
-COMPILER_PATH				= COM3
+BURNER_PROGRAMMER			= usbasp
+COMPILER_PATH				= /dev/tty.usbmodem
 OBJECT_COPY					= avr-objcopy
 BAUDRATE					= 115200
 ###########################################
@@ -163,8 +163,8 @@ all:
 	${CC} ${CC_LN_OPTIONS}
 
 	${OBJECT_COPY} -j .text -j .data -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
-	#${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
-	${BURNER} -F -p ${BURNER_AVR} -P /dev/tty.usbmodem* -carduino -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
+	${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
+	#${BURNER} -F -p ${BURNER_AVR} -P /dev/tty.usbmodem* -carduino -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 
 clean:
 	rm *.o

@@ -29,5 +29,7 @@ void clock_init();
 clock_time_t clock_time();
 clock_time_t clock_time_micros();
 void isr_tick();
+uint8_t system_ticked(void);
+void system_untick(void);
 
 #endif /* _SYSTEM_TICK_H_ */
