@@ -20,22 +20,23 @@
 char buffer[256];
 
 int main (void) {
-	InitializeUART(38400);
-
+	InitializeUART(9600);
+    int i =0;
+    /*
 	UART_SendString("RESET\n");
 	InitializeMag();
 	InitializeGyro();
 	InitializeTemperature();
     InitializeAccel();
+    */
 	memset(buffer, '\0', 128);
-
   	DDRB |= (1<<DDB5);  //Set the 6th bit on PORTB (i.e. PB5) to 1 => output
   	while(1){
     	PORTB |= (1<<PORTB5);     //Turn 6th bit on PORTB (i.e. PB5) to 1 => on
-    	_delay_ms(200);          //Delay for 1000ms => 1 sec
+    	//_delay_ms(200);          //Delay for 1000ms => 1 sec
 
     	PORTB &= ~(1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 0 => off
-        
+        /* 
 		sprintf(buffer, "M = %f\n", Mag_Get());
 		UART_SendString(buffer);
 		memset(buffer, '\0', 128);
@@ -56,8 +57,19 @@ int main (void) {
         UART_SendString("\nHI_THERE\n");
 
     	_delay_ms(1000);          //Delay for 1000ms => 1 sec
-		
+		*/
+        i=0;
+        while (!UART_IsEmpty()){
+            buffer[i] = UART_GetByte();
+            i++;
+           
+        }
+         if(i ){
 
-  	while(1);
+               UART_SendString(buffer);
+            }
+           
+        
+    }
 }
 
