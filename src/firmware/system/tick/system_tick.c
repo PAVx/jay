@@ -1,9 +1,10 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include "system.h"
 #include "system_tick.h"
 
 #include "protocols.h"
-#define SYSTEM_TIMEOUT (125)
+#define SYSTEM_TIMEOUT (1250)
 
 volatile clock_time_t clock_millis;
 
@@ -26,7 +27,7 @@ void clock_init()
 	// Enable overflow interrupt
 	TIMSK0 = _BV(TOIE0);
 
-	sei();
+//	sei();
 
 	_ticked = FALSE;
 }
@@ -106,11 +107,11 @@ ISR(TIMER0_OVF_vect)
     	#endif
     	
     	#ifdef COM
-	    	receive_packet();
-    		packet_send();
+	    //	receive_packet();
+    	//	packet_send();
     	#endif
     	#ifdef LEDS
-    		toggle_led(SYSTEM_LED);
+    	//	toggle_led(SYSTEM_LED);
     	#endif
 
 	// todo:
