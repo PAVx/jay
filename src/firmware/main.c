@@ -12,7 +12,7 @@
 #include "mag.h"
 #include "temperature.h"
 #include "accel.h"
-
+#include "nmea.h"
 #ifndef F_CPU
 	#define F_CPU 16000000UL
 #endif
@@ -21,14 +21,27 @@ char buffer[256];
 
 int main (void) {
 	InitializeUART(9600);
-    int i =0;
+    _delay_ms(500);
+    
+    NMEA_TypeRMC rmc;
+    while (1) {
+        memset(buffer, '\0', 128);
+        if (NMEA_GetMessage() == NMEA_TYPE_RMC) { 
+            
+            rmc = NMEA_ParseRMC();
+            sprintf(buffer, "time: %f \nstatus: %c \nlat: %f \n", rmc.time, rmc.status, rmc.Lat);
+            UART_SendString(buffer);
+            
+        }
+        _delay_ms(50);
+    }
     /*
 	UART_SendString("RESET\n");
 	InitializeMag();
 	InitializeGyro();
 	InitializeTemperature();
     InitializeAccel();
-    */
+    
 	memset(buffer, '\0', 128);
   	DDRB |= (1<<DDB5);  //Set the 6th bit on PORTB (i.e. PB5) to 1 => output
   	while(1){
@@ -36,7 +49,7 @@ int main (void) {
     	//_delay_ms(200);          //Delay for 1000ms => 1 sec
 
     	PORTB &= ~(1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 0 => off
-        /* 
+         
 		sprintf(buffer, "M = %f\n", Mag_Get());
 		UART_SendString(buffer);
 		memset(buffer, '\0', 128);
@@ -57,7 +70,7 @@ int main (void) {
         UART_SendString("\nHI_THERE\n");
 
     	_delay_ms(1000);          //Delay for 1000ms => 1 sec
-		*/
+		
         i=0;
         while (!UART_IsEmpty()){
             buffer[i] = UART_GetByte();
@@ -70,6 +83,6 @@ int main (void) {
             }
            
         
-    }
+    }*/
 }
 

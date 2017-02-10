@@ -33,6 +33,9 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/itg3200_gyro
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/hmc5883l_mag
 # ACCEL
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adxl345_accel
+# GPS
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/gps
+
 
 
 ####################
@@ -67,6 +70,10 @@ CSOURCE						+= drivers/itg3200_gyro/itg3200.c
 CSOURCE						+= drivers/hmc5883l_mag/hmc5883l_mag.c
 # ADXL345 #
 CSOURCE						+= drivers/adxl345_accel/adxl345.c
+# NMEA #
+CSOURCE						+= drivers/gps/nmea.c
+# GPS #
+#CSOURCE                     += drivers/gps/gps_driver.c
 ####################
 
 ####################
