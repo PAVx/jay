@@ -11,10 +11,8 @@ typedef struct {
     double Lat;
     double Long;
     double speed;
-    double angle;
-    double date;
-    double Mag;
-} NMEA_TypeRMC;
+    double altitude;
+} GPS_DATA;
 typedef enum {
     NMEA_TYPE_GSV,
     NMEA_TYPE_RMC,
@@ -26,7 +24,7 @@ typedef enum {
 } NMEA_DataType;
 
 NMEA_DataType NMEA_GetMessage(void);
-NMEA_TypeRMC NMEA_ParseRMC(void);
+void NMEA_ParseRMC(NMEA_DataType type, GPS_DATA *data);
 
 
 #endif
