@@ -3,13 +3,15 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 #define BUFFER_SIZE 90
 #define GPS_DATA(type, field) ((type << 4) | field)
 
+GPS_DATA data;
+void CalculateDegrees(double *coordinates, char dir);   
 // need to init baudrate 9600 maybe in gps
 char NMEA_DataBuffer[BUFFER_SIZE];
-char test[10] = "123456789\n";
 
 void PrintBuffer(char* buffer) {
     int i = 0;
@@ -39,16 +41,17 @@ NMEA_DataType NMEA_GetMessage(void) {
 
         return NMEA_TYPE_RMC;    
     } else if (!strncmp(NMEA_DataBuffer, "GPGGA", 5)) {
-        PrintBuffer(NMEA_DataBuffer);
+        //PrintBuffer(NMEA_DataBuffer);
         return NMEA_TYPE_GGA;
     }
     else {
         return NMEA_TYPE_ERROR;
     }
 }
-void NMEA_ParseRMC(NMEA_DataType type, GPS_DATA *data) {
+void NMEA_ParseData(NMEA_DataType type) {
     char *endptr;
     int i = 0;
+    double fix = 0;
     uint8_t data_field = 0;
     while (NMEA_DataBuffer[i] != '*') {
         // Forward to next data field
@@ -64,45 +67,67 @@ void NMEA_ParseRMC(NMEA_DataType type, GPS_DATA *data) {
             case GPS_DATA(NMEA_TYPE_RMC, 1):
             case GPS_DATA(NMEA_TYPE_GGA, 1):
                 // Get time
-                data->time = strtod (&NMEA_DataBuffer[i], &endptr);
-                
+                fix = strtod(&NMEA_DataBuffer[i], &endptr);
+                data.time.tm_sec = (int)fmod(fix, 100);
+                fix /= 100;
+                data.time.tm_min = (int)fix % 100;
+                data.time.tm_hour = (int)fix / 100;
                 break;
             case GPS_DATA(NMEA_TYPE_RMC, 2):
                 // get status
-                data->status = NMEA_DataBuffer[i];
+                data.status = NMEA_DataBuffer[i];
                 break;
             case GPS_DATA(NMEA_TYPE_RMC, 3):
             case GPS_DATA(NMEA_TYPE_GGA, 2):
                 // Get Lat
-                data->Lat = strtod (&NMEA_DataBuffer[i], &endptr);
-
+                data.Lat = strtod(&NMEA_DataBuffer[i], &endptr);
                 while(NMEA_DataBuffer[i++] != ',');
-                if (NMEA_DataBuffer[i] == 'S' || NMEA_DataBuffer[i] == 'W') {
-                    data->Lat *= -1;
-                }
+                CalculateDegrees(&(data.Lat), NMEA_DataBuffer[i]);
                 break;
             case GPS_DATA(NMEA_TYPE_RMC, 4):
             case GPS_DATA(NMEA_TYPE_GGA, 3):
                 // Get Long
-                data->Long = strtod (&NMEA_DataBuffer[i], &endptr);
-
+                data.Long = strtod (&NMEA_DataBuffer[i], &endptr);
                 while(NMEA_DataBuffer[i++] != ',');
-                if (NMEA_DataBuffer[i] == 'S' || NMEA_DataBuffer[i] == 'W') {
-                    data->Long *= -1;
-                }
+                CalculateDegrees(&(data.Long), NMEA_DataBuffer[i]);
                 break;
             case GPS_DATA(NMEA_TYPE_RMC, 5):
                 // Get Speed
-                data->speed = strtod (&NMEA_DataBuffer[i], &endptr);
+                data.speed = strtod (&NMEA_DataBuffer[i], &endptr);
                 break;
             case GPS_DATA(NMEA_TYPE_GGA, 7):
                 // Get Altitude
-                data->altitude = strtod (&NMEA_DataBuffer[i], &endptr);
+                data.altitude = strtod (&NMEA_DataBuffer[i], &endptr);
                 break;
             default:
                 break;
         }               
                 
+    }
+}
+
+void GPS_UpdateData(void) {
+
+    
+    while (NMEA_GetMessage() != NMEA_TYPE_RMC);  
+    NMEA_ParseData(NMEA_TYPE_RMC);
+    while (NMEA_GetMessage() != NMEA_TYPE_GGA);  
+    NMEA_ParseData(NMEA_TYPE_GGA);
+
+}
+
+GPS_DATA GPS_GetData(void) {
+    return data;
+}
+void CalculateDegrees(double *coordinates, char dir) {   
+    int deg;
+    double min;
+    deg = *coordinates / 100;
+    min = fmod(*coordinates, 100);
+    *coordinates = deg + min/60;
+
+    if (dir == 'S' || dir == 'W') {
+        *coordinates *= -1;
     }
 }
 

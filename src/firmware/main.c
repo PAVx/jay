@@ -26,23 +26,17 @@ int main (void) {
     GPS_DATA data;
     while (1) {
         memset(buffer, '\0', 180);
-        
-        while (NMEA_GetMessage() != NMEA_TYPE_RMC);  
-        NMEA_ParseRMC(NMEA_TYPE_RMC, &data);
-        
-        while (NMEA_GetMessage() != NMEA_TYPE_GGA);  
-        NMEA_ParseRMC(NMEA_TYPE_GGA, &data);
-        sprintf(buffer, "time: %.0f \nstatus: %c \nlat: %.4f \nlong: %.4f \nspeed: %.2f \nAlt: %.2f \n", data.time, data.status, data.Lat, data.Long, data.speed, data.altitude);
+        GPS_UpdateData();
+        data = GPS_GetData();        
+        sprintf(buffer, "time: %02d:%02d:%02d \nstatus: %c \nlat: %.4f \nlong: %.4f \nspeed: %.2f \nAlt: %.2f \n", data.time.tm_hour, data.time.tm_min, data.time.tm_sec, data.status, data.Lat, data.Long, data.speed, data.altitude);
         
         int i = 0;
         while (buffer[i] != '\0') {
             _uart_driver_SendByte(buffer[i]);
             i++;
         }
+        _delay_ms(500);
 
-    
-         
-           
     }
     /*
 	UART_SendString("RESET\n");

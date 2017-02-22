@@ -6,7 +6,8 @@
 #include <time.h>
 
 typedef struct {
-    double time;
+    int number;
+    struct tm time;
     char status;
     double Lat;
     double Long;
@@ -24,7 +25,8 @@ typedef enum {
 } NMEA_DataType;
 
 NMEA_DataType NMEA_GetMessage(void);
-void NMEA_ParseRMC(NMEA_DataType type, GPS_DATA *data);
-
+void NMEA_ParseData(NMEA_DataType type);
+void GPS_UpdateData(void);
+GPS_DATA GPS_GetData(void);
 
 #endif
