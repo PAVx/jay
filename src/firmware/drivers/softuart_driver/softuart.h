@@ -6,8 +6,8 @@
 
 #endif
 
-#define SOFTUART_BAUD_RATE      600
-#define SOFTUART_CHANNELS       2
+#define SOFTUART_BAUD_RATE      1200
+#define SOFTUART_CHANNELS       1
 
 /****************************************************************************/
 // These are the definitions for Software UART Channel 1
