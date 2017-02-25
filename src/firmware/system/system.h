@@ -22,10 +22,10 @@
 
 // SYSTEM DEFINES
 #define COM (1)
-#define MOTORS (1)
+//#define MOTORS (1)
 #define SYSTEM_TICK (1)
-#define GYRO (1)
-#define ACCEL (1)
+//#define GYRO (1)
+//#define ACCEL (1)
 
 #ifndef F_CPU
 	#define F_CPU 16000000UL
@@ -33,7 +33,7 @@
 
 #ifndef TRUE
 	#define TRUE (1)
-#endif 
+#endif
 
 #ifndef FALSE
 	#define FALSE (0)

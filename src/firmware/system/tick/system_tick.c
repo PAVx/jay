@@ -5,6 +5,10 @@
 
 #include "protocols.h"
 #define SYSTEM_TIMEOUT (1250)
+#define SYSTEM_TICK_TIMERTOP F_CPU/64/1000/10
+#if (SOFTUART_TIMERTOP < SYSTEM_TICK_TIMERTOP)
+		#warning "Make sure OCR0B is less than OCR0A"
+#endif
 
 volatile clock_time_t clock_millis;
 
@@ -17,17 +21,18 @@ static volatile uint8_t _ticked;
 void clock_init()
 {
 	// timer mode
-	TCCR0A |= _BV(WGM01) | _BV(WGM00);
+	TCCR0A |= _BV(WGM01); // | _BV(WGM00);
 
 	// F_CPU/64/1000 = 125
-	OCR0A = F_CPU/64/1000;
+	OCR0B = SYSTEM_TICK_TIMERTOP;
+
 	// Enable timer set prescalar to 64
 	TCCR0B |= _BV(CS01) | _BV(CS00);
 
 	// Enable overflow interrupt
-	TIMSK0 = _BV(TOIE0);
+	TIMSK0 |= _BV(OCIE0B); //_BV(TOIE0);
 
-//	sei();
+	sei();
 
 	_ticked = FALSE;
 }
@@ -75,8 +80,9 @@ void system_untick(void) {
 	_ticked = FALSE;
 }
 
-ISR(TIMER0_OVF_vect)
+ISR(TIMER0_COMPB_vect)
 {
+	PORTB |= (1<<PORTB5);     //Turn 6th bit on PORTB (i.e. PB5) to 1 => on
 	static volatile uint64_t lapsed = 0;
 	// copy these to local variables so they can be stored in registers
 	// (volatile variables must be read from memory on every access)
@@ -101,11 +107,11 @@ ISR(TIMER0_OVF_vect)
 		#ifdef GYRO
     		Gyro_Update();
     	#endif
-    	
+
     	#ifdef ACCEL
     		Accel_Update();
     	#endif
-    	
+
     	#ifdef COM
 	    //	receive_packet();
     	//	packet_send();
@@ -118,7 +124,7 @@ ISR(TIMER0_OVF_vect)
 		// (???if crashing)(disable all other interrupts)
 		// update accel registers
 		// update gps registers
-		// update PID controller for stabality 
+		// update PID controller for stabality
 		// (???if crashing)(enable all other interrupts)
 
 		lapsed = 0;
