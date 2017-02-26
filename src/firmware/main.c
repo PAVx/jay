@@ -13,30 +13,62 @@ char abuffer[128];
 
 int main (void) {
 	system_initialize();
-	softuart_init();
-	DDRB |= (1<<DDB5);  //Set the 6th bit on PORTB (i.e. PB5) to 1 => output
+	#ifdef UART
+		UART_SendString("PAVx Jay UAV initialized\n\n");
+	#endif
+	#ifdef SW_UART
+		softuart_puts("PAVx Jay UAV initialized -- SWUART", 0);
+	#endif
+	//sprintf(gbuffer, "T0P = %f", (double)TIMER0_PERIOD);
+	//softuart_puts(gbuffer, 0);
 
   	while(1) {
-			//PORTB |= (1<<PORTB5);     //Turn 6th bit on PORTB (i.e. PB5) to 1 => on
 
-			// if (system_ticked()) {
-  		// 	#ifdef GYRO
-	  	// 		sprintf(gbuffer, "G_X = %f\nG_Y = %f\nG_Z = %f\n\n\r", Gyro_GetX(), Gyro_GetY(), Gyro_GetZ());
-  		// 		UART_SendString(gbuffer);
-  		// 		UART_SendString("\n");
-  		// 	#endif
-  		// 	#ifdef ACCEL
-	  	// 		sprintf(abuffer, "A_X = %f\nA_Y = %f\nA_Z = %f\n\n\r", Accel_GetX(), Accel_GetY(), Accel_GetZ());
-  		// 		UART_SendString(abuffer);
-  		// 	#endif
-			//
-  		// 	UART_SendString("\nTICKED\n\r");
-  		// 	system_untick();
-  		// }
+		if (system_ticked() == TRUE) {
 
-			softuart_puts("hey\n",0);
-			//PORTB &= ~(1<<PORTB5);    //Turn 6th bit on PORTB (i.e. PB5) to 0 => off
+			#ifdef GYRO
+    			Gyro_Update();
+    		#endif
 
+    		#ifdef ACCEL
+    			Accel_Update();
+    		#endif
+
+    		#ifdef COM
+	    	//	receive_packet();
+    		//	packet_send();
+    		#endif
+    	
+    		#ifdef LEDS
+    			toggle_led(SYSTEM_LED);
+    		#endif
+
+  		 	#ifdef GYRO
+	  	 		sprintf(gbuffer, "G_X = %f\nG_Y = %f\nG_Z = %f\n\n\r", Gyro_GetX(), Gyro_GetY(), Gyro_GetZ());
+  		 		UART_SendString(gbuffer);
+  		 		UART_SendString("\n");
+  		 	#endif
+
+  		 	#ifdef ACCEL
+	  	 		sprintf(abuffer, "A_X = %f\nA_Y = %f\nA_Z = %f\n\n\r", Accel_GetX(), Accel_GetY(), Accel_GetZ());
+  		 		UART_SendString(abuffer);
+  		 	#endif
+
+			#ifdef UART
+  		 		UART_SendString("\nHW_UART PRINT\n\r");
+  		 	#endif
+
+			#ifdef SW_UART
+  		 		softuart_puts("SW_UART PRINT\n",0);
+  		 	#endif
+
+		system_untick();
+
+  		}		
+	// todo:
+		// update accel registers
+		// update gps registers
+		// update PID controller for stabality
 
   	}
 }
