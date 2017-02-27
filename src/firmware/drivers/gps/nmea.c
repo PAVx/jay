@@ -5,11 +5,13 @@
 #include <stdio.h>
 #include <math.h>
 
+#define TIMEOUT 20
 #define BUFFER_SIZE 90
 #define GPS_DATA(type, field) ((type << 4) | field)
 
 GPS_DATA data;
-void CalculateDegrees(double *coordinates, char dir);   
+void CalculateDegrees(double *coordinates, char dir);  
+bool ValidChecksum(void);
 // need to init baudrate 9600 maybe in gps
 char NMEA_DataBuffer[BUFFER_SIZE];
 
@@ -36,17 +38,19 @@ NMEA_DataType NMEA_GetMessage(void) {
             i++;
         }
     } while ((NMEA_DataBuffer[i-1] != '\n') && (i < BUFFER_SIZE));
-    // Return data type
-    if (!strncmp(NMEA_DataBuffer, "GPRMC", 5)) {
-
-        return NMEA_TYPE_RMC;    
-    } else if (!strncmp(NMEA_DataBuffer, "GPGGA", 5)) {
-        //PrintBuffer(NMEA_DataBuffer);
-        return NMEA_TYPE_GGA;
+    // Return data type if valid
+    if (ValidChecksum()) {
+        if (!strncmp(NMEA_DataBuffer, "GPRMC", 5)) {
+            //PrintBuffer(NMEA_DataBuffer);
+            return NMEA_TYPE_RMC;    
+        } else if (!strncmp(NMEA_DataBuffer, "GPGGA", 5)) {
+            //PrintBuffer(NMEA_DataBuffer);
+            return NMEA_TYPE_GGA;
+        }
     }
-    else {
-        return NMEA_TYPE_ERROR;
-    }
+    
+    return NMEA_TYPE_ERROR;
+    
 }
 void NMEA_ParseData(NMEA_DataType type) {
     char *endptr;
@@ -107,11 +111,11 @@ void NMEA_ParseData(NMEA_DataType type) {
 }
 
 void GPS_UpdateData(void) {
-
-    
-    while (NMEA_GetMessage() != NMEA_TYPE_RMC);  
+    uint8_t counter = 0;
+    while ((NMEA_GetMessage() != NMEA_TYPE_RMC) && !(counter++ > TIMEOUT));  
     NMEA_ParseData(NMEA_TYPE_RMC);
-    while (NMEA_GetMessage() != NMEA_TYPE_GGA);  
+    counter = 0;
+    while ((NMEA_GetMessage() != NMEA_TYPE_GGA) && !(counter++ > TIMEOUT));  
     NMEA_ParseData(NMEA_TYPE_GGA);
 
 }
@@ -129,5 +133,23 @@ void CalculateDegrees(double *coordinates, char dir) {
     if (dir == 'S' || dir == 'W') {
         *coordinates *= -1;
     }
+}
+bool ValidChecksum(void) {
+    uint8_t i = 0;
+    char check_str[3];
+    uint8_t checksum = NMEA_DataBuffer[0];
+    memset(check_str, '\0', 3);
+    while (NMEA_DataBuffer[++i] != '*') {
+        checksum ^= NMEA_DataBuffer[i];
+    }
+    // check checksum
+    sprintf(check_str, "%2X", checksum);
+
+    if (!strncmp(&NMEA_DataBuffer[++i], check_str, 2)) {
+        return true;
+    } else {
+        return false;
+    }
+    
 }
 
