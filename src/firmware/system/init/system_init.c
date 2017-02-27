@@ -3,6 +3,11 @@
 
 uint8_t system_initialize(void) {
 	// initialize protcols 
+
+	#ifdef SYSTEM_TICK
+		clock_init();
+	#endif
+
 	#ifdef GYRO
 		InitializeGyro();
 	#endif
@@ -12,8 +17,13 @@ uint8_t system_initialize(void) {
 	#endif
 
 	#ifdef COM
-		#define UART (1)
-		InitializeUART(HW_UART_BAUD);
+		#ifdef SW_UART
+			softuart_init();
+		#endif
+			
+		#ifdef UART
+			InitializeUART(HW_UART_BAUD);
+		#endif 	
 	//	packet_init();
 	#endif
 
@@ -23,15 +33,7 @@ uint8_t system_initialize(void) {
 
 	// initialize system components
 	#ifdef LEDS
-		led_init();
-	#endif
-
-	#ifdef UART
-		UART_SendString("PAVx Jay UAV initialized\n\n");
-	#endif 
-
-	#ifdef SYSTEM_TICK
-		clock_init();
+		leds_init(SYSTEM_LED);
 	#endif
 
 	sei();
