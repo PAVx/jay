@@ -4,7 +4,7 @@
 // SYSTEM DEFINES
 #define COM (1)
 #define LEDS (1)
-//#define MOTORS (1)
+#define MOTORS (1)
 #define SYSTEM_TICK (1)
 //#define GYRO (1)
 //#define ACCEL (1)
@@ -14,7 +14,7 @@
 #endif
 
 #ifdef COM
-	//#define UART (1)
+	#define UART (1)
 	#define SW_UART (1)
 
 	#ifdef UART

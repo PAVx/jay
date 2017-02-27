@@ -94,7 +94,7 @@
 #endif
 
 #define SOFTUART_IN_BUF_SIZE     32
-#define SOFTUART_OUT_BUF_SIZE    8
+#define SOFTUART_OUT_BUF_SIZE    32
 
 typedef struct softuartRX_t{
 	char           inbuf[SOFTUART_IN_BUF_SIZE];
