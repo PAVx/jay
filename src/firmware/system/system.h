@@ -4,13 +4,23 @@
 // SYSTEM DEFINES
 #define COM (1)
 #define LEDS (1)
-#define MOTORS (1)
+//#define MOTORS (1)
 #define SYSTEM_TICK (1)
-#define GYRO (1)
-#define ACCEL (1)
+//#define GYRO (1)
+//#define ACCEL (1)
+
+// CLIB INCLUDES
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #ifndef F_CPU
 	#define F_CPU 16000000UL
+#endif
+
+#ifndef DEFAULT_NUM_SIBLINGS
+	#define DEFAULT_NUM_SIBLINGS (4)
 #endif
 
 #ifdef COM
@@ -53,12 +63,6 @@
 #include <inttypes.h>
 #include <avr/io.h>
 #include <util/delay.h>
-
-// CLIB INCLUDES
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
 
 // JAY INCLUDES
 #include "drivers.h"
