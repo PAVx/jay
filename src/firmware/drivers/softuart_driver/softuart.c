@@ -48,6 +48,7 @@
 #include <util/delay.h>
 
 #include "softuart.h"
+#include "system_tick.h"
 #include "Queue.h"
 
 #define SU_TRUE    1
@@ -141,6 +142,7 @@ int get_rx_pin_status(int i) {
 
 ISR(SOFTUART_T_COMP_LABEL)
 {
+	system_tick();
 	//int i = 1;
 	for(int i = 0; i < SOFTUART_CHANNELS; i++){
 		channel[i].isr.flag_rx_waiting_for_stop_bit = SU_FALSE;

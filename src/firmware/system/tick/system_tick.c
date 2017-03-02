@@ -2,8 +2,10 @@
 #include <avr/interrupt.h>
 #include "system.h"
 #include "system_tick.h"
+#include "system.h"
 
 #include "protocols.h"
+<<<<<<< HEAD
 #define SYSTEM_TIMEOUT (1250)
 #define SYSTEM_TICK_TIMERTOP F_CPU/64/1000/10
 #if (SOFTUART_TIMERTOP < SYSTEM_TICK_TIMERTOP)
@@ -11,13 +13,15 @@
 #endif
 
 volatile clock_time_t clock_millis;
+=======
+>>>>>>> 1324c4148930755d8cd1d9e08076e7146ba4f623
 
-volatile unsigned long timer0_overflow_count = 0;
-volatile unsigned long timer0_millis = 0;
-static unsigned char timer0_fract = 0;
+#define SYSTEM_TIMEOUT (20) 
 
+static volatile uint64_t _time_ms;
 static volatile uint8_t _ticked;
 
+<<<<<<< HEAD
 void clock_init()
 {
 	// timer mode
@@ -33,43 +37,36 @@ void clock_init()
 	TIMSK0 |= _BV(OCIE0B); //_BV(TOIE0);
 
 	sei();
+=======
+#ifndef SW_UART
+	#warning "software uart not defining a timer for system tick!"
+#endif
+>>>>>>> 1324c4148930755d8cd1d9e08076e7146ba4f623
 
+void clock_init(void)
+{
+	_time_ms = 0;
 	_ticked = FALSE;
 }
 
-clock_time_t clock_time()
+uint64_t clock_time(void)
 {
-	clock_time_t m;
-	uint8_t oldSREG = SREG;
-	// disable interrupts while we read timer0_millis or we might get an
-	// inconsistent value (e.g. in the middle of a write to timer0_millis)
-	cli();
-
-	m = timer0_millis;
-	SREG = oldSREG;
-
-	return m;
-
-	//return clock_millis;
+	return _time_ms;
 }
 
-clock_time_t clock_time_micros()
-{
-	clock_time_t m;
-	uint8_t oldSREG = SREG;
-	uint8_t t;
+// called in timer0, currently defined in the software uart
+void system_tick(void) {
+	static uint64_t lapsed = 0;
 
-	cli();
+	_time_ms++;
 
-	m = timer0_overflow_count;
-	t = TCNT0;
-
-	if ((TIFR0 & _BV(TOV0)) && (t < 255))
-			m++;
-
-	SREG = oldSREG;
-
-	return ((m << 8) + t) * (64 / clockCyclesPerMicrosecond());
+	if ((lapsed >= SYSTEM_TIMEOUT) && (_ticked == FALSE)) {
+		_ticked = TRUE;
+		lapsed = 0;
+	}
+	else if ((lapsed < SYSTEM_TIMEOUT) && (_ticked == FALSE)) {
+		lapsed++;
+	}
 }
 
 uint8_t system_ticked(void) {
@@ -79,6 +76,7 @@ uint8_t system_ticked(void) {
 void system_untick(void) {
 	_ticked = FALSE;
 }
+<<<<<<< HEAD
 
 ISR(TIMER0_COMPB_vect)
 {
@@ -132,3 +130,5 @@ ISR(TIMER0_COMPB_vect)
 	}
 
 }
+=======
+>>>>>>> 1324c4148930755d8cd1d9e08076e7146ba4f623
