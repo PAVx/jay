@@ -4,27 +4,61 @@
 #define _PACKET_H_
 
 #include <stdint.h>
-#include <stdbool.h>
 
 #include "system.h"
 
-struct rx_packet {
-	uint8_t device_id;
-	uint64_t longitude;
-	uint64_t latitude;
-	uint64_t time;
-	uint64_t status;
-};
-typedef struct rx_packet rx_packet_t;
-rx_packet_t rx_packets[DEFAULT_NUM_SIBLINGS + 1];
+#define MAX_PACKET_DATA_LENGTH_BYTES (256)
 
-void receive_packet(void);
-bool packet_send(void);
-void packet_init(void);
-void packet_update_device_id(uint8_t device_id);
-void packet_update_longitude(uint64_t longitude);
-void packet_update_latitude(uint64_t latitude);
-void packet_update_time(uint64_t time);
-void packet_update_status(uint64_t status);
+struct _variable_packet_descriptor {
+	uint8_t _opcode_set;
+	uint8_t constant_packet_data_length;
+
+	// malloced to a size of constant_packet_data_length
+	// this is the transmit buffer for this packet opcode
+	// the space for this buffer is only malloced if 
+	uint8_t *tx_buffer;
+	uint8_t transmit_enabled;
+
+	// the packet handler function must always 
+	// take a uint8_t* argument representing the
+	// packet accepted by the packet receiver.
+	// MUST return TRUE or FALSE representing
+	// the error state of the packet/parser
+	uint8_t (*packet_handler_ptr)(uint8_t*);
+};
+
+// type 0 - manual control packet type (control/manual_control.h)
+// type 1 - status packets from other vehicles (control/status.h)
+#define MAX_NUMBER_PACKET_TYPES (2)
+
+typedef struct _variable_packet_descriptor PacketDescriptor_t;
+PacketDescriptor_t packet_opcodes[MAX_NUMBER_PACKET_TYPES];
+
+void initialize_packet_handler(void);
+/*
+ * input_packet_type
+ * packet_opcode - the number to assign to the opcode. Every time this opcode
+ 					is detected, this corresponding packet handler function
+ 					will be called
+ * constant_packet_data_length - the const size of the data section 
+  					of the packet of this opcode
+ * packet_handler_ptr - a function pointer that will handle this packet opcode
+ * transmit_enable - TRUE or FALSE. Does this packet type (opcode) transmit packets
+ 					from this device?
+ * returns TRUE/FALSE as error state
+*/
+uint8_t input_packet_type(uint8_t packet_opcode, uint8_t constant_packet_data_length, 
+						uint8_t transmit_enable, uint8_t (*packet_handler_ptr)(uint8_t*));
+
+// autonomous function that uses UART to receive one byte at a time,
+// determines the packet type, and passes it to the correct handler
+void packet_receiver(void);
+void parse_sub_packet(uint64_t *data_out, uint8_t n, 
+	uint8_t *data_buffer, uint8_t start_byte_index);
+uint8_t packet_data_inject(uint8_t packet_opcode, uint8_t data_packet_position, uint8_t n, uint8_t* data);
+uint8_t packet_send(uint8_t packet_opcode);
+
+#define DATA_PACKET_START_POS (3)
+
 
 #endif /* _PACKET_H_ */

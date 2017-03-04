@@ -15,6 +15,11 @@
 #include <stdio.h>
 #include <string.h>
 
+////////// UNIQUE //////////
+#define DEVICE_ADDRESS (0x01)
+////////////////////////////
+#define BROADCAST_ALL_DESTINATION_ADDRESS (0xAA)
+
 #ifndef F_CPU
 	#define F_CPU 16000000UL
 #endif
@@ -70,7 +75,7 @@
 #include "system_tick.h"
 #include "system_init.h"
 #include "leds.h"
-
+#include "types.h"
 
 
 #endif

@@ -37,9 +37,10 @@ int main (void) {
 
     	#ifdef COM
     		#ifdef UART
-				receive_packet();
-			#endif
-    		// packet_send();
+				if (!UART_IsEmpty()) {
+					packet_receiver();
+				}
+			#endif	
     	#endif
 
 
@@ -69,7 +70,7 @@ int main (void) {
   		 	#endif
 
 			#ifdef UART
-  		 		//UART_SendString("\nHW_UART PRINT\n\r");
+  		 		UART_SendString("\nHW_UART PRINT\n\r");
   		 	#endif
 
 			#ifdef SW_UART
