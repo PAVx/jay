@@ -11,21 +11,9 @@
 char gbuffer[128];
 char abuffer[128];
 
-typedef enum {
-		SOP,
-		MOTOR_NUMBER,
-		DUTY_CYCLE,
-		EOP = 0x04 // ASCII EOT
-} MotorPacketFSM_t;
-MotorPacketFSM_t m_state = SOP;
-char current_mbyte = '\0';
-uint8_t manipulate_motor_number = 0;
-uint8_t manipulate_duty_cycle = 0;
-
 int main (void) {
 	system_initialize();
 	
-
 	#ifdef UART
 		UART_SendString("\nPAVx Jay UAV initialized\n\n");
 	#endif
@@ -37,9 +25,10 @@ int main (void) {
 
     	#ifdef COM
     		#ifdef UART
-				receive_packet();
-			#endif
-    		// packet_send();
+				if (!UART_IsEmpty()) {
+					packet_receiver();
+				}
+			#endif	
     	#endif
 
 
@@ -69,7 +58,7 @@ int main (void) {
   		 	#endif
 
 			#ifdef UART
-  		 		//UART_SendString("\nHW_UART PRINT\n\r");
+  		 		UART_SendString("\nHW_UART PRINT\n\r");
   		 	#endif
 
 			#ifdef SW_UART

@@ -1,3 +1,9 @@
+/* 
+	PAVx -- Pod-Based Autonomous Vehicles 
+	Library Created By: Sargis S Yonan
+	March 2017
+*/ 
+
 #include <stdint.h>
 
 #define MOTOR_ONE (1) // OCR2B -- PD3 -- ~3

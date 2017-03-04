@@ -39,7 +39,6 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adxl345_accel
 
 
 ####################
-
 # PROTOCOL HEADERS #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/
 # UART #
@@ -57,7 +56,7 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/com
 # ACCEL #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/accel
 
-
+####################
 # SYSTEM HEADERS #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I system/
 # TICK #
@@ -66,7 +65,17 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I system/tick
 SEARCHABLE_HEADER_FILE_DIRS	+= -I system/init
 # LEDS #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I system/leds
+# TYPES #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I system/types
 ####################
+
+####################
+# CONTROL HEADERS #
+SEARCHABLE_HEADER_FILE_DIRS += -I control/
+# STATUS #
+SEARCHABLE_HEADER_FILE_DIRS += -I control/status
+# MANUAL CONTROL #
+SEARCHABLE_HEADER_FILE_DIRS += -I control/manual
 
 ######################################################
 
@@ -118,7 +127,17 @@ CSOURCE						+= system/tick/system_tick.c
 CSOURCE						+= system/init/system_init.c
 # LEDS #
 CSOURCE						+= system/leds/leds.c
+# TYPES #
+CSOURCE						+= system/types/types.c
 ####################
+
+####################
+# CONTROL #
+# STATUS #
+CSOURCE						+= control/status/status.c
+# MANUAL CONTROL #
+CSOURCE						+= control/manual/manual_control.c
+
 ######################################################
 
 C_STD						= gnu99
