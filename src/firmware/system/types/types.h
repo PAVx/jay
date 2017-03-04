@@ -1,3 +1,9 @@
+/* 
+	PAVx -- Pod-Based Autonomous Vehicles 
+	Library Created By: Sargis S Yonan
+	March 2017
+*/ 
+
 #ifndef _TYPES_H_
 #define _TYPES_H_
 

@@ -1,3 +1,9 @@
+/* 
+	PAVx -- Pod-Based Autonomous Vehicles 
+	Library Created By: Sargis S Yonan
+	March 2017
+*/ 
+
 #include "types.h"
 
 uint64_t double_to_binary(double val) {

@@ -1,3 +1,9 @@
+/* 
+    PAVx -- Pod-Based Autonomous Vehicles 
+    Library Created By: Sargis S Yonan
+    March 2017
+*/ 
+
 // attitude_adjust.h
 #ifndef _ATTITUDE_ADJUST_H_
 #define _ATTITUDE_ADJUST_H_

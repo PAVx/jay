@@ -1,5 +1,8 @@
-// PAVx jay packet protocol
-// Sargis S Yonan -- jan. 26 2017
+/* 
+	PAVx -- Pod-Based Autonomous Vehicles 
+	Library Created By: Sargis S Yonan
+	March 2017
+*/ 
 
 #include <stdio.h>
 #include <stdlib.h>

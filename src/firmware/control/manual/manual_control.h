@@ -1,3 +1,9 @@
+/* 
+	PAVx -- Pod-Based Autonomous Vehicles 
+	Library Created By: Sargis S Yonan
+	March 2017
+*/ 
+
 #ifndef _MANUAL_CONTROL_H_
 #define _MANUAL_CONTROL_H_
 

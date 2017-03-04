@@ -1,3 +1,9 @@
+/* 
+    PAVx -- Pod-Based Autonomous Vehicles 
+    Library Created By: Sargis S Yonan
+    March 2017
+*/ 
+
 // waypoint.c
 
 #include "control/attitude_adjust/attitude_adjust.h"
