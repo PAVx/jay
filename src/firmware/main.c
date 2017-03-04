@@ -25,7 +25,6 @@ uint8_t manipulate_duty_cycle = 0;
 int main (void) {
 	system_initialize();
 	
-
 	#ifdef UART
 		UART_SendString("\nPAVx Jay UAV initialized\n\n");
 	#endif
