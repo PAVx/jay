@@ -5,15 +5,15 @@
 #include <stdio.h>
 #include <math.h>
 
-#define TIMEOUT 20
-#define BUFFER_SIZE 90
+#define NMEA_MAX_LEN 84
 #define GPS_DATA(type, field) ((type << 4) | field)
 
-GPS_DATA data;
+static GPS_DATA data;
 void CalculateDegrees(double *coordinates, char dir);  
 bool ValidChecksum(void);
-// need to init baudrate 9600 maybe in gps
-char NMEA_DataBuffer[BUFFER_SIZE];
+void NMEA_ParseData(NMEA_DataType type);
+//i need to init baudrate 9600 maybe in gps
+char NMEA_DataBuffer[NMEA_MAX_LEN + 1];
 
 void PrintBuffer(char* buffer) {
     int i = 0;
@@ -22,34 +22,34 @@ void PrintBuffer(char* buffer) {
         i++;
     }
 }
-NMEA_DataType NMEA_GetMessage(void) {
-    memset(NMEA_DataBuffer, '\0', BUFFER_SIZE);
-    uint8_t i = 0;
-    char start_char = '\0';
-    // Find start of message
-    do {
-        start_char = _uart_driver_GetByte();
-    } while (start_char != '$');
-    // Get message
-    do {
-        NMEA_DataBuffer[i] = _uart_driver_GetByte();
-        if (NMEA_DataBuffer[i] != -1) {
-            //_uart_driver_SendByte(NMEA_DataBuffer[i]);
-            i++;
+void NMEA_Read(char c) {
+    static uint8_t i = 0;
+    static bool recording = 0;
+    if (c == '$') {
+        i = 0;
+        memset(NMEA_DataBuffer, '\0', NMEA_MAX_LEN + 1);
+        recording = true;
+
+    } else if (recording) {
+        NMEA_DataBuffer[i++] = c;
+        if (c == '\n') {
+            // Return data type if valid
+            if (ValidChecksum()) {
+                if (!strncmp(NMEA_DataBuffer, "GPRMC", 5)) {
+                    NMEA_ParseData(NMEA_TYPE_RMC);
+                    data.new_data |= 0x1;
+                } else if (!strncmp(NMEA_DataBuffer, "GPGGA", 5)) {
+                    NMEA_ParseData(NMEA_TYPE_GGA);
+                    data.new_data |= 0x2;
+                }
+            
+            }
         }
-    } while ((NMEA_DataBuffer[i-1] != '\n') && (i < BUFFER_SIZE));
-    // Return data type if valid
-    if (ValidChecksum()) {
-        if (!strncmp(NMEA_DataBuffer, "GPRMC", 5)) {
-            //PrintBuffer(NMEA_DataBuffer);
-            return NMEA_TYPE_RMC;    
-        } else if (!strncmp(NMEA_DataBuffer, "GPGGA", 5)) {
-            //PrintBuffer(NMEA_DataBuffer);
-            return NMEA_TYPE_GGA;
+        if (i > NMEA_MAX_LEN) {
+            // error
+            recording = false;
         }
     }
-    
-    return NMEA_TYPE_ERROR;
     
 }
 void NMEA_ParseData(NMEA_DataType type) {
@@ -109,18 +109,24 @@ void NMEA_ParseData(NMEA_DataType type) {
                 
     }
 }
-
 void GPS_UpdateData(void) {
-    uint8_t counter = 0;
-    while ((NMEA_GetMessage() != NMEA_TYPE_RMC) && !(counter++ > TIMEOUT));  
-    NMEA_ParseData(NMEA_TYPE_RMC);
-    counter = 0;
-    while ((NMEA_GetMessage() != NMEA_TYPE_GGA) && !(counter++ > TIMEOUT));  
-    NMEA_ParseData(NMEA_TYPE_GGA);
+    char c;
+    c = _uart_driver_GetByte();
+    if (c != -1 ){
+       NMEA_Read(c); 
+    }    
+}
 
+bool GPS_IsDataReady(void) {
+    if(data.new_data == 0x3) {
+        return true;
+    }else {
+        return false;
+    }
 }
 
 GPS_DATA GPS_GetData(void) {
+    data.new_data = 0;
     return data;
 }
 void CalculateDegrees(double *coordinates, char dir) {   
@@ -141,6 +147,9 @@ bool ValidChecksum(void) {
     memset(check_str, '\0', 3);
     while (NMEA_DataBuffer[++i] != '*') {
         checksum ^= NMEA_DataBuffer[i];
+        if (i > NMEA_MAX_LEN) {
+            return false;
+        }
     }
     // check checksum
     sprintf(check_str, "%2X", checksum);

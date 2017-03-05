@@ -34,7 +34,7 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/hmc5883l_mag
 # ACCEL
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adxl345_accel
 # GPS
-SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/gps
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/nmea
 
 
 
@@ -71,9 +71,7 @@ CSOURCE						+= drivers/hmc5883l_mag/hmc5883l_mag.c
 # ADXL345 #
 CSOURCE						+= drivers/adxl345_accel/adxl345.c
 # NMEA #
-CSOURCE						+= drivers/gps/nmea.c
-# GPS #
-#CSOURCE                     += drivers/gps/gps_driver.c
+CSOURCE						+= drivers/nmea/nmea.c
 ####################
 
 ####################

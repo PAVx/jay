@@ -13,6 +13,7 @@ typedef struct {
     double Long;
     double speed;
     double altitude;
+    uint8_t new_data;
 } GPS_DATA;
 typedef enum {
     NMEA_TYPE_GSV,
@@ -24,9 +25,9 @@ typedef enum {
     NMEA_TYPE_ERROR
 } NMEA_DataType;
 
-NMEA_DataType NMEA_GetMessage(void);
-void NMEA_ParseData(NMEA_DataType type);
 void GPS_UpdateData(void);
 GPS_DATA GPS_GetData(void);
+bool GPS_IsDataReady(void);
+
 
 #endif

@@ -22,20 +22,21 @@ char buffer[256];
 int main (void) {
 	InitializeUART(9600);
     _delay_ms(500);
-    //char c;
     GPS_DATA data;
     while (1) {
         memset(buffer, '\0', 180);
-        GPS_UpdateData();
-        data = GPS_GetData();        
-        sprintf(buffer, "time: %02d:%02d:%02d \nstatus: %c \nlat: %.4f \nlong: %.4f \nspeed: %.2f \nAlt: %.2f \n", data.time.tm_hour, data.time.tm_min, data.time.tm_sec, data.status, data.Lat, data.Long, data.speed, data.altitude);
-        
-        int i = 0;
-        while (buffer[i] != '\0') {
-            _uart_driver_SendByte(buffer[i]);
-            i++;
-        }
-        _delay_ms(500);
+            GPS_UpdateData();
+           if(GPS_IsDataReady()) {
+                data = GPS_GetData();
+                sprintf(buffer, "time: %02d:%02d:%02d \nstatus: %c \nlat: %.4f \nlong: %.4f \nspeed: %.2f \nAlt: %.2f \n", data.time.tm_hour, data.time.tm_min, data.time.tm_sec, data.status, data.Lat, data.Long, data.speed, data.altitude);
+                int i = 0;
+                while (buffer[i] != '\0') {
+                    _uart_driver_SendByte(buffer[i]);
+                    i++;
+                }
+            }
+       
+       // check if missing many packets, data may be close in time 
 
     }
     /*
@@ -88,4 +89,5 @@ int main (void) {
         
     }*/
 }
+
 
