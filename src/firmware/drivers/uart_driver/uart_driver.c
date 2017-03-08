@@ -3,6 +3,7 @@
 
 #include "buffer.h"
 #include "uart_driver.h"
+#include "leds.h"
 
 // UART global variables
 // flag variables
@@ -48,6 +49,7 @@ void _uart_driver_Init(uint32_t baudrate)
 // create and initialize the uart transmit and receive buffers
 void _uart_driver_InitBuffers(void)
 {
+
 	#ifndef UART_BUFFERS_EXTERNAL_RAM
 		// initialize the UART receive buffer
 		bufferInit(&uartRxBuffer, uartRxData, UART_RX_BUFFER_SIZE);

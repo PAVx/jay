@@ -93,8 +93,8 @@
 	#warning "Check SOFTUART_TIMERTOP: increase prescaler, lower F_CPU or use a 16 bit timer"
 #endif
 
-#define SOFTUART_IN_BUF_SIZE     128
-#define SOFTUART_OUT_BUF_SIZE    128
+#define SOFTUART_IN_BUF_SIZE     32
+#define SOFTUART_OUT_BUF_SIZE    32
 
 typedef struct softuartRX_t{
 	char           inbuf[SOFTUART_IN_BUF_SIZE];
@@ -167,5 +167,7 @@ void softuart_puts_p( const char *prg_s, int i );
 // Helper-Macro - "automatically" inserts PSTR
 // when used: include avr/pgmspace.h before this include-file
 #define softuart_puts_P(s___) softuart_puts_p(PSTR(s___))
+
+void run_isr(void);
 
 #endif

@@ -52,13 +52,13 @@
 //! Number of bytes for uart transmit buffer.
 /// Do not change this value in uart.h, but rather override
 /// it with the desired value defined in your project's global.h
-#define UART_TX_BUFFER_SIZE		(0x0040)
+#define UART_TX_BUFFER_SIZE		(0x0020)
 #endif
 #ifndef UART_RX_BUFFER_SIZE
 //! Number of bytes for uart receive buffer.
 /// Do not change this value in uart.h, but rather override
 /// it with the desired value defined in your project's global.h
-#define UART_RX_BUFFER_SIZE		(0x0040)
+#define UART_RX_BUFFER_SIZE		(0x0020)
 #endif
 
 // define this key if you wish to use
@@ -225,5 +225,3 @@ void _uart_driver_SendTxBuffer(void);
 uint8_t _uart_driver_SendBuffer(char *buffer, uint16_t nBytes);
 
 #endif
-
-

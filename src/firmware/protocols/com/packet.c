@@ -11,8 +11,8 @@
 	#define RX_PACKET_TEST (1)
 #endif
 
-#ifdef RX_PACKET_TEST 
-	char test_out_buffer[512];
+#ifdef RX_PACKET_TEST
+	char test_out_buffer[2];
 #endif
 
 #define SOH (0x01) // start of transmission byte
@@ -36,7 +36,7 @@
 
 #ifndef TRUE
 	#define TRUE (1)
-#endif 
+#endif
 
 #ifndef FALSE
 	#define FALSE (0)
@@ -50,20 +50,20 @@ uint8_t __rx_packet[PACKET_SIZE_BYTES];
 
 void receive_packet(void) {
 	uint8_t received_byte;
-	
+
 	static uint8_t inner_state = 0;
 	static uint8_t state = 0;
 	static uint8_t this_device_id = 0;
 	uint8_t parse_count = 0;
 
-	#ifndef UART
+	#ifdef UART
 		return;
 	#endif
 
 	if (!UART_IsEmpty()) {
 
 		received_byte = (uint8_t)UART_GetByte();
-		
+
 			// waiting for SOH
 			if (state == 0) {
 				this_device_id = 0;
@@ -108,10 +108,10 @@ void receive_packet(void) {
 
 					rx_packets[this_device_id].longitude &= 0x0000000000000000;
 					for (parse_count = 0; parse_count < SUB_PACKET_SIZE_BYTES; parse_count++) {
-						rx_packets[this_device_id].longitude |= 
-						(__rx_packet[LONGITUDE_BYTE_START_POS + (8 - parse_count)]) << (parse_count * 8);	
+						rx_packets[this_device_id].longitude |=
+						(__rx_packet[LONGITUDE_BYTE_START_POS + (8 - parse_count)]) << (parse_count * 8);
 					}
-					
+
 				}
 			}
 			// receiving latitude
@@ -126,8 +126,8 @@ void receive_packet(void) {
 
 					rx_packets[this_device_id].latitude &= 0x0000000000000000;
 					for (parse_count = 0; parse_count < SUB_PACKET_SIZE_BYTES; parse_count++) {
-						rx_packets[this_device_id].latitude |= 
-						(__rx_packet[LATITUDE_BYTE_START_POS + (8 - parse_count)]) << (parse_count * 8);	
+						rx_packets[this_device_id].latitude |=
+						(__rx_packet[LATITUDE_BYTE_START_POS + (8 - parse_count)]) << (parse_count * 8);
 					}
 				}
 			}
@@ -143,8 +143,8 @@ void receive_packet(void) {
 
 					rx_packets[this_device_id].time &= 0x0000000000000000;
 					for (parse_count = 0; parse_count < SUB_PACKET_SIZE_BYTES; parse_count++) {
-						rx_packets[this_device_id].time |= 
-						(__rx_packet[TIME_BYTE_START_POS + (8 - parse_count)]) << (parse_count * 8);	
+						rx_packets[this_device_id].time |=
+						(__rx_packet[TIME_BYTE_START_POS + (8 - parse_count)]) << (parse_count * 8);
 					}
 				}
 			}
@@ -160,8 +160,8 @@ void receive_packet(void) {
 
 					rx_packets[this_device_id].status &= 0x0000000000000000;
 					for (parse_count = 0; parse_count < SUB_PACKET_SIZE_BYTES; parse_count++) {
-						rx_packets[this_device_id].status |= 
-						(__rx_packet[STATUS_BYTE_START_POS + (8 - parse_count)]) << (parse_count * 8);	
+						rx_packets[this_device_id].status |=
+						(__rx_packet[STATUS_BYTE_START_POS + (8 - parse_count)]) << (parse_count * 8);
 					}
 				}
 			}
@@ -172,22 +172,22 @@ void receive_packet(void) {
 					UART_SendByte('G');
 
 				#ifdef RX_PACKET_TEST
-					
-					sprintf(test_out_buffer, "DID:0x%X\nLONGITUDE:0x%X%X\nLATITUDE:0x%X%X\nTIME:0x%X%X\nSTATUS:0x%X%X\n", 
-						rx_packets[this_device_id].device_id, 
-						(unsigned int)(rx_packets[this_device_id].longitude >> 32), 
-						(unsigned int)(rx_packets[this_device_id].longitude & 0x0000000011111111), 
-						(unsigned int)(rx_packets[this_device_id].latitude >> 32), 
-						(unsigned int)(rx_packets[this_device_id].latitude & 0x0000000011111111), 
-						(unsigned int)(rx_packets[this_device_id].time >> 32), 
-						(unsigned int)(rx_packets[this_device_id].time & 0x0000000011111111), 
-						(unsigned int)(rx_packets[this_device_id].status >> 32), 
+
+					sprintf(test_out_buffer, "DID:0x%X\nLONGITUDE:0x%X%X\nLATITUDE:0x%X%X\nTIME:0x%X%X\nSTATUS:0x%X%X\n",
+						rx_packets[this_device_id].device_id,
+						(unsigned int)(rx_packets[this_device_id].longitude >> 32),
+						(unsigned int)(rx_packets[this_device_id].longitude & 0x0000000011111111),
+						(unsigned int)(rx_packets[this_device_id].latitude >> 32),
+						(unsigned int)(rx_packets[this_device_id].latitude & 0x0000000011111111),
+						(unsigned int)(rx_packets[this_device_id].time >> 32),
+						(unsigned int)(rx_packets[this_device_id].time & 0x0000000011111111),
+						(unsigned int)(rx_packets[this_device_id].status >> 32),
 						(unsigned int)(rx_packets[this_device_id].status & 0x0000000011111111)
 						);
 					UART_SendString(test_out_buffer);
 					state = 0;
 					inner_state = 0;
-					
+
 					memset(__rx_packet, 0, PACKET_SIZE_BYTES);
 				#endif
 
@@ -224,7 +224,7 @@ void packet_update_device_id(uint8_t device_id) {
 void packet_update_longitude(uint64_t longitude) {
 	uint8_t i = 0;
 	for (i = 0; i < 8; i++) {
-		__tx_packet[LONGITUDE_BYTE_START_POS + i] = 
+		__tx_packet[LONGITUDE_BYTE_START_POS + i] =
 		(uint8_t)((uint64_t)(longitude & 0x00000000000000FF));
 		longitude = (uint64_t)longitude >> 8;
 	}
@@ -234,7 +234,7 @@ void packet_update_longitude(uint64_t longitude) {
 void packet_update_latitude(uint64_t latitude) {
 	uint8_t i = 0;
 	for (i = 0; i < SUB_PACKET_SIZE_BYTES; i++) {
-		__tx_packet[LATITUDE_BYTE_START_POS + i] = 
+		__tx_packet[LATITUDE_BYTE_START_POS + i] =
 		(uint8_t)((uint64_t)latitude & 0x00000000000000FF);
 		latitude = (uint64_t)latitude >> 8;
 	}
@@ -244,7 +244,7 @@ void packet_update_latitude(uint64_t latitude) {
 void packet_update_time(uint64_t time) {
 	uint8_t i = 0;
 	for (i = 0; i < SUB_PACKET_SIZE_BYTES; i++) {
-		__tx_packet[TIME_BYTE_START_POS + i] = 
+		__tx_packet[TIME_BYTE_START_POS + i] =
 		(uint8_t)((uint64_t)time & 0x00000000000000FF);
 		time = (uint64_t)time >> 8;
 	}
@@ -254,7 +254,7 @@ void packet_update_time(uint64_t time) {
 void packet_update_status(uint64_t status) {
 	uint8_t i = 0;
 	for (i = 0; i < SUB_PACKET_SIZE_BYTES; i++) {
-		__tx_packet[STATUS_BYTE_START_POS + i] = 
+		__tx_packet[STATUS_BYTE_START_POS + i] =
 		(uint8_t)((uint64_t)status & 0x00000000000000FF);
 		status = (uint64_t)status >> 8;
 	}
