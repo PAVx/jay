@@ -97,9 +97,11 @@
 #define SOFTUART_OUT_BUF_SIZE    128
 
 typedef struct softuartRX_t{
+	char           inbuf[SOFTUART_IN_BUF_SIZE];
+	unsigned char  qin;
+	unsigned char  qout;
 	unsigned char  flag_rx_off;
 	unsigned char  flag_rx_ready;
-  Queue rx_buffer;
 } softuartRX;
 
 typedef struct softuartTX_t{
@@ -109,7 +111,7 @@ typedef struct softuartTX_t{
 	unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */
 
 	unsigned char flag_ok_to_pop;
-	Queue tx_buffer; // you can change the max size in Queue.h
+	Queue tx_buffer;
 } softuartTX;
 
 typedef struct softuartISR_t{

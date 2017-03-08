@@ -11,7 +11,7 @@
 #define COM (1)
 #define LEDS (1)
 //#define MOTORS (1)
-#define SYSTEM_TICK (1)
+//#define SYSTEM_TICK (1)
 //#define GYRO (1)
 //#define ACCEL (1)
 

@@ -6,10 +6,17 @@
 #ifndef _QUEUE_H_INCLUDE_
 #define _QUEUE_H_INCLUDE_
 
+#ifndef QUEUE_TXRX_MAXSIZE
+#define QUEUE_TXRX_MAXSIZE 128
+#endif
 
 // Exported type --------------------------------------------------------------
-typedef struct QueueObj* Queue;
-
+typedef struct Queue {
+   uint8_t length;
+   uint16_t buffer[QUEUE_TXRX_MAXSIZE];
+   uint8_t head;
+   uint8_t tail;
+} Queue;
 
 // Constructors-Destructors ---------------------------------------------------
 
@@ -49,12 +56,10 @@ void Enqueue(Queue Q, uint16_t data);
 // Pre: !isEmpty(Q)
 void Dequeue(Queue Q);
 
-
+// clear()
+// clears the buffer
+void clear(Queue Q);
 // Other Functions ------------------------------------------------------------
-
-// printQueue()
-// Prints data elements in Q on a single line to stdout.
-void printQueue(Queue Q);
 
 // equals()
 // returns true (1) if A is identical to B, false (0) otherwise
