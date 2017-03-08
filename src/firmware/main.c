@@ -18,7 +18,7 @@ int main (void) {
 		UART_SendString("\nPAVx Jay UAV initialized\n\n");
 	#endif
 	#ifdef SW_UART
-		//softuart_puts("\nPAVx Jay UAV initialized -- SWUART", 0);
+		softuart_puts("\nPAVx Jay UAV initialized -- SWUART", 0);
 	#endif
 
   	while(1) {
@@ -26,11 +26,11 @@ int main (void) {
     	#ifdef COM
     		#ifdef UART
 				if (!UART_IsEmpty()) {
-					packet_receiver();
+					//packet_receiver();
 				}
 			#endif	
     	#endif
-
+      softuart_puts("\nsup",0);
 
 		if (system_ticked() == TRUE) {
 
