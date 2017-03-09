@@ -131,7 +131,7 @@ float ITG3200_GetZ(void)
 
 float ITG3200_GetTemp(void)
 {
-    return _g_t;
+    return _Calculate_G_Temp(_g_t);
 }
 
 float _Calculate_G_Temp(float _t_raw)

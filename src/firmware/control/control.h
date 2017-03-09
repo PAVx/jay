@@ -4,7 +4,5 @@
 	March 2017
 */ 
 
-// mag.h
-
-void InitializeMag(void);
-float Mag_Get(void);
+#include "status.h"
+#include "manual_control.h"

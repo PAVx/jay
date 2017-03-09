@@ -1,24 +1,27 @@
+#ifndef _SOFTUART_H_
+#define _SOFTUART_H_
+
 #include "Queue.h"
+#include "system.h"
 
 #if !defined(F_CPU)
-    #warning "F_CPU not defined in makefile - now defined in softuart.h"
-    #define F_CPU 16000000UL
+	#warning "F_CPU not defined in makefile - now defined in softuart.h"
+	#define F_CPU 16000000UL
 
 #endif
 
-#define SOFTUART_BAUD_RATE      600
-#define SOFTUART_CHANNELS       2
+#define SOFTUART_CHANNELS       1
 
 /****************************************************************************/
 // These are the definitions for Software UART Channel 1
 #if SOFTUART_CHANNELS > 0
 #define SOFTUART_RXPIN_1      PIND
 #define SOFTUART_RXDDR_1      DDRD
-#define SOFTUART_RXBIT_1      PD2
+#define SOFTUART_RXBIT_1      PD4
 
 #define SOFTUART_TXPORT_1     PORTD
 #define SOFTUART_TXDDR_1      DDRD
-#define SOFTUART_TXBIT_1      PD3
+#define SOFTUART_TXBIT_1      PD5
 #endif
 
 /****************************************************************************/
@@ -74,63 +77,60 @@
 // #define SOFTUART_PRESCALE (1)
 
 #if (SOFTUART_PRESCALE == 8)
-    #define SOFTUART_PRESC_MASKA         (0)
-    #define SOFTUART_PRESC_MASKB         (1 << CS01)
+	#define SOFTUART_PRESC_MASKA         (0)
+	#define SOFTUART_PRESC_MASKB         (1 << CS01)
 #elif (SOFTUART_PRESCALE==1)
-    #define SOFTUART_PRESC_MASKA         (0)
-    #define SOFTUART_PRESC_MASKB         (1 << CS00)
+	#define SOFTUART_PRESC_MASKA         (0)
+	#define SOFTUART_PRESC_MASKB         (1 << CS00)
 #elif (SOFTUART_PRESCALE==64)
-    #define SOFTUART_PRESC_MASKA         (0)
-    #define SOFTUART_PRESC_MASKB         (1 << CS01)|(1 << CS00)
+	#define SOFTUART_PRESC_MASKA         (0)
+	#define SOFTUART_PRESC_MASKB         (1 << CS01)|(1 << CS00)
 #else
-    #error "prescale unsupported"
+	#error "prescale unsupported"
 #endif
-
-
-#define SOFTUART_TIMERTOP ( F_CPU/SOFTUART_PRESCALE/SOFTUART_BAUD_RATE/3 - 1)
 
 #if (SOFTUART_TIMERTOP > 0xff)
-    #warning "Check SOFTUART_TIMERTOP: increase prescaler, lower F_CPU or use a 16 bit timer"
+	#warning "Check SOFTUART_TIMERTOP: increase prescaler, lower F_CPU or use a 16 bit timer"
 #endif
 
-#define SOFTUART_IN_BUF_SIZE     32
-#define SOFTUART_OUT_BUF_SIZE    8
+#define SOFTUART_IN_BUF_SIZE     128
+#define SOFTUART_OUT_BUF_SIZE    128
 
 typedef struct softuartRX_t{
-  char           inbuf[SOFTUART_IN_BUF_SIZE];
-  unsigned char  qin;
-  unsigned char  qout;
-  unsigned char  flag_rx_off;
-  unsigned char  flag_rx_ready;
+	char           inbuf[SOFTUART_IN_BUF_SIZE];
+	unsigned char  qin;
+	unsigned char  qout;
+	unsigned char  flag_rx_off;
+	unsigned char  flag_rx_ready;
 } softuartRX;
 
 typedef struct softuartTX_t{
-  unsigned char  flag_tx_busy;
-  unsigned char  timer_tx_ctr;
-  unsigned char  bits_left_in_tx;
-  unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */
+	unsigned char  flag_tx_busy;
+	unsigned char  timer_tx_ctr;
+	unsigned char  bits_left_in_tx;
+	unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */
 
-  unsigned char flag_ok_to_pop;
-  Queue tx_buffer;
+	unsigned char flag_ok_to_pop;
+	Queue tx_buffer;
 } softuartTX;
 
 typedef struct softuartISR_t{
-  unsigned char flag_rx_waiting_for_stop_bit; // = SU_FALSE;
-  unsigned char rx_mask;
+	unsigned char flag_rx_waiting_for_stop_bit; // = SU_FALSE;
+	unsigned char rx_mask;
 
-  unsigned char timer_rx_ctr;
-  unsigned char bits_left_in_rx;
-  unsigned char internal_rx_buffer;
-  int tx_byte;
+	unsigned char timer_rx_ctr;
+	unsigned char bits_left_in_rx;
+	unsigned char internal_rx_buffer;
+	int tx_byte;
 } softuartISR;
 
 typedef struct softUART_t{
-  softuartRX rx;
-  softuartTX tx;
-  softuartISR isr;
-  uint32_t baud;
-  uint8_t type;
-  uint8_t id;
+	softuartRX rx;
+	softuartTX tx;
+	softuartISR isr;
+	uint32_t baud;
+	uint8_t type;
+	uint8_t id;
 } softUART;
 
 // Init the Software Uart
@@ -167,3 +167,5 @@ void softuart_puts_p( const char *prg_s, int i );
 // Helper-Macro - "automatically" inserts PSTR
 // when used: include avr/pgmspace.h before this include-file
 #define softuart_puts_P(s___) softuart_puts_p(PSTR(s___))
+
+#endif

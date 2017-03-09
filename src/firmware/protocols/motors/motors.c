@@ -1,3 +1,9 @@
+/* 
+	PAVx -- Pod-Based Autonomous Vehicles 
+	Library Created By: Sargis S Yonan
+	March 2017
+*/ 
+
 #include "motors.h"
 #include "pwm_driver.h"
 #include <util/delay.h>
@@ -34,10 +40,12 @@ void motors_initialize(void) {
 
 }
 void motor_set(uint8_t motor_id, uint8_t speed) {
+	if (motor_id > NUM_MOTORS) return;
 	_motors[motor_id - 1].current_speed = speed;
 	pwm_setval(speed, motor_id);
 }
 
 uint8_t motor_get_speed(uint8_t motor_id) {
+	if (motor_id > NUM_MOTORS) return 0;
 	return _motors[motor_id - 1].current_speed;
 }

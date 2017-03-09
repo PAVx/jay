@@ -1,21 +1,36 @@
+/* 
+	PAVx -- Pod-Based Autonomous Vehicles 
+	Library Created By: Sargis S Yonan
+	March 2017
+*/ 
+
 #include "system_init.h"
 #include "system.h"
 
-//#define GYRO (1)
-#define COM (1)
-#define MOTORS (1)
-#define SYSTEM_TICK (1)
-
 uint8_t system_initialize(void) {
 	// initialize protcols 
+
+	#ifdef SYSTEM_TICK
+		clock_init();
+	#endif
+
 	#ifdef GYRO
 		InitializeGyro();
 	#endif
 	
+	#ifdef ACCEL
+		InitializeAccel();
+	#endif
+
 	#ifdef COM
-		#define UART (1)
-		InitializeUART(HW_UART_BAUD);
-		packet_init();
+		#ifdef SW_UART
+			softuart_init();
+		#endif
+			
+		#ifdef UART
+			InitializeUART(HW_UART_BAUD);
+		#endif 	
+	//	packet_init();
 	#endif
 
 	#ifdef MOTORS
@@ -23,17 +38,11 @@ uint8_t system_initialize(void) {
 	#endif
 
 	// initialize system components
-	#ifdef SYSTEM_TICK
-		clock_init();
-	#endif
-
 	#ifdef LEDS
-		led_init();
+		leds_init(SYSTEM_LED);
 	#endif
 
-	#ifdef UART
-		UART_SendString("PAVx Jay UAV initialized\n\n");
-	#endif 
+	sei();
 
 	return TRUE;
 }

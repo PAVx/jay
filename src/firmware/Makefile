@@ -4,8 +4,8 @@ BURNER						= avrdude
 CC_AVR						= atmega328p
 F_CPU						= 16000000UL
 BURNER_AVR					= ATMEGA328P
-BURNER_PROGRAMMER			= arduino
-COMPILER_PATH				= COM3
+BURNER_PROGRAMMER			= usbasp
+COMPILER_PATH				= /dev/tty.usbmodem
 OBJECT_COPY					= avr-objcopy
 BAUDRATE					= 115200
 ###########################################
@@ -37,7 +37,6 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adxl345_accel
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/nmea
 
 
-
 ####################
 # PROTOCOL HEADERS #
 # UART #
@@ -51,8 +50,26 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/temperature
 # ACCEL #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/accel
 
+####################
+# SYSTEM HEADERS #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I system/
+# TICK #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I system/tick
+# INIT #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I system/init
+# LEDS #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I system/leds
+# TYPES #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I system/types
+####################
 
 ####################
+# CONTROL HEADERS #
+SEARCHABLE_HEADER_FILE_DIRS += -I control/
+# STATUS #
+SEARCHABLE_HEADER_FILE_DIRS += -I control/status
+# MANUAL CONTROL #
+SEARCHABLE_HEADER_FILE_DIRS += -I control/manual
 
 ######################################################
 
@@ -90,6 +107,26 @@ CSOURCE						+= protocols/temperature/temperature.c
 CSOURCE						+= protocols/accel/accel.c
 ####################
 
+####################
+# SYSTEM #
+# TICK #
+CSOURCE						+= system/tick/system_tick.c
+# INIT #
+CSOURCE						+= system/init/system_init.c
+# LEDS #
+CSOURCE						+= system/leds/leds.c
+# TYPES #
+CSOURCE						+= system/types/types.c
+####################
+
+####################
+# CONTROL #
+# STATUS #
+CSOURCE						+= control/status/status.c
+# MANUAL CONTROL #
+CSOURCE						+= control/manual/manual_control.c
+
+>>>>>>> master
 ######################################################
 
 C_STD						= gnu99
