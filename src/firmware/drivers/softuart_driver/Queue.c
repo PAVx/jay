@@ -53,13 +53,19 @@ int isEmpty(Queue Q){
    return(Q.length==0);
 }
 
+// isFull()
+// Returns true (1) if Q is full, otherwise returns false (0)
+int isFull(Queue Q) {
+  return Q.length==QUEUE_TXRX_MAXSIZE;
+}
+
 // Manipulation procedures ----------------------------------------------------
 
 // Enqueue()
 // Places new data element at the end of Q if Queue not full
 void Enqueue(Queue Q, uint16_t data)
 {
-   if (Q.length == QUEUE_TXRX_MAXSIZE) return; // it's full
+   if (isFull(Q)) return;
    Q.buffer[Q.head] = data;
    Q.head = (Q.head + 1) % QUEUE_TXRX_MAXSIZE;
    Q.length++;

@@ -44,6 +44,9 @@ int getLength(Queue Q);
 // Returns true (1) if Q is empty, otherwise returns false (0)
 int isEmpty(Queue Q);
 
+// isFull()
+// Returns true (1) if Q is full, otherwise returns false (0)
+int isFull(Queue Q);
 
 // Manipulation procedures ----------------------------------------------------
 

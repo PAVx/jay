@@ -314,7 +314,7 @@ char softuart_getchar( int i )
 
 unsigned char softuart_kbhit( int i )
 {
-	 return(!isEmpty(channel[i].rx.rx_buffer));
+	 return(!isFull(channel[i].rx.rx_buffer));
 }
 
 void softuart_flush_input_buffer( int i )
