@@ -245,7 +245,7 @@ void softuart_turn_rx_off( int i )
 char softuart_getchar( int i )
 {
 	char ch;
-
+  if (1) return '\0'; // don't use RX yet
 	while ( channel[i].rx.qout == channel[i].rx.qin ) {
 		idle();
 	}
@@ -275,15 +275,16 @@ unsigned char softuart_transmit_busy( int i )
 
 void softuart_putchar( const char ch , int i)
 {
-	while ( getLength(channel[i].tx.tx_buffer) >= SOFTUART_OUT_BUF_SIZE-1) {
+	if ( getLength(channel[i].tx.tx_buffer) >= SOFTUART_OUT_BUF_SIZE-1) {
 		//softuart_flush_input_buffer(0); // wait for transmitter ready
 		  // add watchdog-reset here if needed;
+      return; // do nothing in this case
 	}
 
 	// invoke_UART_transmit
 	channel[i].tx.timer_tx_ctr       = 3;
 	channel[i].tx.bits_left_in_tx    += TX_NUM_OF_BITS;			// V2: add number of bits to total needed to empty
-	channel[i].tx.internal_tx_buffer = ( ch << 1 ) | 0x200;
+	channel[i].tx.internal_tx_buffer = ( ch << 1 ) | 0x200; // add start/stop bits
 	channel[i].tx.flag_tx_busy       = SU_TRUE;
 
 	Enqueue(channel[i].tx.tx_buffer, (int)channel[i].tx.internal_tx_buffer);								// V2: added a queue as a buffer.
