@@ -48,9 +48,6 @@
 #include <util/delay.h>
 
 #include "softuart.h"
-#include "system_tick.h"
-#include "Queue.h"
-#include "leds.h"
 
 #define SU_TRUE    1
 #define SU_FALSE   0
@@ -147,7 +144,6 @@ ISR(SOFTUART_T_COMP_LABEL)
 	//system_tick();
 	//int i = 1;
 	_isrFlag = 1;
-	toggle_led(SYSTEM_LED);
 	run_isr();
 }
 
@@ -292,6 +288,12 @@ void softuart_putchar( const char ch , int i)
 
 void softuart_puts( const char *s , int i)
 {
+	if ( (getLength(channel[i].tx.tx_buffer) + strlen(s)) >= SOFTUART_OUT_BUF_SIZE-1) {
+		//softuart_flush_input_buffer(0); // wait for transmitter ready
+			// add watchdog-reset here if needed;
+			return; // do nothing in this case
+	}
+
 	while ( *s ) {
 		softuart_putchar( *s , i);
 		s++;

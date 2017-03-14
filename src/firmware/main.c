@@ -80,7 +80,7 @@ int main (void) {
 			system_untick();
 		}
 
-		softuart_puts("S\n",0);
+		softuart_puts("Sup\n",0);
 		// todo:
 		// update accel registers
 		// update gps registers

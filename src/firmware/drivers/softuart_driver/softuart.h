@@ -7,8 +7,8 @@
 #if !defined(F_CPU)
 	#warning "F_CPU not defined in makefile - now defined in softuart.h"
 	#define F_CPU 16000000UL
-
 #endif
+
 
 #define SOFTUART_CHANNELS       1
 
@@ -93,8 +93,8 @@
 	#warning "Check SOFTUART_TIMERTOP: increase prescaler, lower F_CPU or use a 16 bit timer"
 #endif
 
-#define SOFTUART_IN_BUF_SIZE     32
-#define SOFTUART_OUT_BUF_SIZE    32
+#define SOFTUART_IN_BUF_SIZE     128
+#define SOFTUART_OUT_BUF_SIZE    128
 
 typedef struct softuartRX_t{
 	char           inbuf[SOFTUART_IN_BUF_SIZE];
