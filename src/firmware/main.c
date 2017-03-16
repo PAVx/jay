@@ -17,25 +17,51 @@
 	#define F_CPU 16000000UL
 #endif
 
-char buffer[256];
+char buffer[80];
+void PrintBuffer(char* buff) {
+    int i = 0;
+    while (buff[i] != '\0') {
+        _uart_driver_SendByte(buff[i]);
+        i++;
+    }
+}
+void PrintNum(int num) {
+    char str[7] = "";
+    sprintf(str, "%d\n", num);
+    UART_SendString(str);
+}
 
 int main (void) {
-	InitializeUART(9600);
+    InitializeUART(9600); //TODO: softUART
+    _delay_ms(2000);
+
+    InitializeNEO6M();   
+	UART_SendString("RESET\n");
+    //int i;
     _delay_ms(500);
+    UART_SendString("$PUBX,00*33\n");
     GPS_DATA data;
     while (1) {
-        memset(buffer, '\0', 180);
-            GPS_UpdateData();
+        
+           GPS_UpdateData();
+           
            if(GPS_IsDataReady()) {
+                _delay_ms(50);
+                UART_SendString("$PUBX,00*33\n");
+
+
+                memset(buffer, '\0', 80);
                 data = GPS_GetData();
-                sprintf(buffer, "time: %02d:%02d:%02d \nstatus: %c \nlat: %.4f \nlong: %.4f \nspeed: %.2f \nAlt: %.2f \n", data.time.tm_hour, data.time.tm_min, data.time.tm_sec, data.status, data.Lat, data.Long, data.speed, data.altitude);
+                
+                sprintf(buffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", data.time.tm_hour, data.time.tm_min, data.time.tm_sec, data.Lat, data.Long, data.speed, data.altitude);
                 int i = 0;
                 while (buffer[i] != '\0') {
                     _uart_driver_SendByte(buffer[i]);
                     i++;
                 }
-            }
-       
+           }
+            
+        
        // check if missing many packets, data may be close in time 
 
     }

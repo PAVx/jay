@@ -4,8 +4,8 @@ BURNER						= avrdude
 CC_AVR						= atmega328p
 F_CPU						= 16000000UL
 BURNER_AVR					= ATMEGA328P
-BURNER_PROGRAMMER			= usbasp
-COMPILER_PATH				= /dev/tty.usbmodem
+BURNER_PROGRAMMER			= Arduino
+COMPILER_PATH				= COM3
 OBJECT_COPY					= avr-objcopy
 BAUDRATE					= 115200
 ###########################################
@@ -19,6 +19,7 @@ CSOURCE						= main.c
 
 ####################
 # DRIVER HEADERS #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/
 # UART DRIVER
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/uart_driver
 # SOFTUART DRIVER
@@ -31,6 +32,8 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/i2c_driver
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/itg3200_gyro
 # MAG
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/hmc5883l_mag
+# PWM
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/pwm
 # ACCEL
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adxl345_accel
 # GPS
@@ -39,6 +42,7 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/nmea
 
 ####################
 # PROTOCOL HEADERS #
+SEARCHABLE_HEADER_FILE_DIRS += -I protocols/
 # UART #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/uart
 # MAG #
@@ -47,6 +51,10 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/mag
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/gyro
 # TEMP #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/temperature
+# MOTORS #
+SEARCHABLE_HEADER_FILE_DIRS += -I protocols/motors
+# COMMUNICATION #
+SEARCHABLE_HEADER_FILE_DIRS += -I protocols/com
 # ACCEL #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/accel
 
@@ -77,6 +85,10 @@ SEARCHABLE_HEADER_FILE_DIRS += -I control/manual
 # DRIVER SOURCES #
 # UART #
 CSOURCE						+= drivers/uart_driver/uart_driver.c
+# SOFTUART #
+CSOURCE						+= drivers/softuart_driver/Queue.c
+# SOFTUART #
+CSOURCE						+= drivers/softuart_driver/softuart.c
 # BUFFER #
 CSOURCE						+= drivers/buffer/buffer.c
 # I2C #
@@ -85,6 +97,8 @@ CSOURCE						+= drivers/i2c_driver/i2c_driver.c
 CSOURCE						+= drivers/itg3200_gyro/itg3200.c
 # HMC5883L #
 CSOURCE						+= drivers/hmc5883l_mag/hmc5883l_mag.c
+# PWM #
+CSOURCE						+= drivers/pwm/pwm_driver.c
 # ADXL345 #
 CSOURCE						+= drivers/adxl345_accel/adxl345.c
 # NMEA #
@@ -103,6 +117,10 @@ CSOURCE						+= protocols/mag/mag.c
 CSOURCE						+= protocols/gyro/gyro.c
 # TEMP #
 CSOURCE						+= protocols/temperature/temperature.c
+# MOTORS #
+CSOURCE						+= protocols/motors/motors.c
+# COMMUNICATION #
+CSOURCE						+= protocols/com/packet.c
 # ACCEL #
 CSOURCE						+= protocols/accel/accel.c
 ####################
@@ -126,7 +144,6 @@ CSOURCE						+= control/status/status.c
 # MANUAL CONTROL #
 CSOURCE						+= control/manual/manual_control.c
 
->>>>>>> master
 ######################################################
 
 C_STD						= gnu99

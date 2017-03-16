@@ -22,9 +22,10 @@ typedef enum {
     NMEA_TYPE_GGA,
     NMEA_TYPE_GLL,
     NMEA_TYPE_VTG,
+    UBX_TYPE_00,
     NMEA_TYPE_ERROR
-} NMEA_DataType;
-
+} SentenceType;
+void InitializeNEO6M(void); 
 void GPS_UpdateData(void);
 GPS_DATA GPS_GetData(void);
 bool GPS_IsDataReady(void);
