@@ -1,3 +1,9 @@
+/* 
+    PAVx -- Pod-Based Autonomous Vehicles 
+    Library Created By: Sargis S Yonan
+    March 2017
+*/ 
+
 // pid.c
 
 // Some PID concepts borrowed the bitcraze/crazieflie-firmware repository

@@ -1,3 +1,9 @@
+/* 
+	PAVx -- Pod-Based Autonomous Vehicles 
+	Library Created By: Sargis S Yonan
+	March 2017
+*/ 
+
 #include "gyro.h"
 #include "itg3200.h"
 

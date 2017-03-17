@@ -1,3 +1,9 @@
+/* 
+	PAVx -- Pod-Based Autonomous Vehicles 
+	Library Created By: Sargis S Yonan
+	March 2017
+*/ 
+
 #ifndef _SYSTEM_H_
 #define _SYSTEM_H_
 
@@ -14,6 +20,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
+////////// UNIQUE //////////
+#define DEVICE_ADDRESS (0x01)
+////////////////////////////
+#define BROADCAST_ALL_DESTINATION_ADDRESS (0xAA)
 
 #ifndef F_CPU
 	#define F_CPU 16000000UL
@@ -70,7 +81,7 @@
 #include "system_tick.h"
 #include "system_init.h"
 #include "leds.h"
-
+#include "types.h"
 
 
 #endif

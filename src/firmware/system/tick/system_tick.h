@@ -1,3 +1,9 @@
+/* 
+	PAVx -- Pod-Based Autonomous Vehicles 
+	Library Created By: Sargis S Yonan
+	March 2017
+*/ 
+
 #ifndef _SYSTEM_TICK_H_
 #define _SYSTEM_TICK_H_
 

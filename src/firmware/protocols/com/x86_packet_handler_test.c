@@ -1,9 +1,16 @@
+/* 
+	PAVx -- Pod-Based Autonomous Vehicles 
+	Library Created By: Sargis S Yonan
+	March 2017
+*/ 
+
 // packet_handler_test.c
 #define TRUE (1)
 #define FALSE (0)
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 uint64_t double_to_binary(double val) {
 	unsigned long long *double_as_bin = (unsigned long long *)&val;
@@ -24,6 +31,12 @@ double binary_to_double(uint64_t bin) {
 struct _variable_packet_descriptor {
 	uint8_t _opcode_set;
 	uint8_t constant_packet_data_length;
+
+	// malloced to a size of constant_packet_data_length
+	// this is the transmit buffer for this packet opcode
+	// the space for this buffer is only malloced if 
+	uint8_t *tx_buffer;
+	uint8_t transmit_enabled;
 
 	// the packet handler function must always 
 	// take a uint8_t* argument representing the
@@ -47,10 +60,12 @@ void initialize_packet_handler(void);
  * constant_packet_data_length - the const size of the data section 
   					of the packet of this opcode
  * packet_handler_ptr - a function pointer that will handle this packet opcode
+ * transmit_enable - TRUE or FALSE. Does this packet type (opcode) transmit packets
+ 					from this device?
  * returns TRUE/FALSE as error state
 */
 uint8_t input_packet_type(uint8_t packet_opcode, uint8_t constant_packet_data_length, 
-						uint8_t (*packet_handler_ptr)(uint8_t*));
+						uint8_t transmit_enable, uint8_t (*packet_handler_ptr)(uint8_t*));
 
 // autonomous function that uses UART to receive one byte at a time,
 // determines the packet type, and passes it to the correct handler
@@ -80,7 +95,7 @@ void _parse_sub_packet(uint64_t *data_out, uint8_t n,
 	*data_out = 0x0000000000000000;
 
 	for (parse_count = 0; parse_count < n; parse_count++) {
-		*data_out |= (uint64_t)(data_buffer[start_byte_index + parse_count]) << (((n - 1)	- parse_count) * 8);	
+		*data_out |= (uint64_t)(data_buffer[start_byte_index + parse_count])  << (8 * parse_count);	
 
 		printf("BYTE %d: 0x%X\n0x%llX\n", parse_count, data_buffer[start_byte_index + parse_count], *data_out);
 	}
@@ -118,6 +133,7 @@ uint8_t gps_packet_parser(uint8_t *input_buffer) {
 #define STX_BYTE (0x02)
 #define EOT_BYTE (0x04)
 
+#define CONSTANT_PACKET_BYTE_LENGTH (4) // sizeof SOH_BYTE + STX_BYTE + OPCODE_BYTE + EOT_BYTE
 typedef enum {
 	SOH_STATE = 0x00,
 	STX_STATE,
@@ -144,13 +160,14 @@ void initialize_packet_handler(void) {
 		packet_opcodes[i]._opcode_set = FALSE;
 		packet_opcodes[i].constant_packet_data_length = 0;
 		packet_opcodes[i].packet_handler_ptr = NULL;	
+		packet_opcodes[i].transmit_enabled = FALSE;
 	}
 
 	_packet_handler_initialized = FALSE;
 }
 
 uint8_t input_packet_type(uint8_t packet_opcode, uint8_t constant_packet_data_length, 
-	uint8_t (*packet_handler_ptr)(uint8_t*)) {
+	uint8_t transmit_enable, uint8_t (*packet_handler_ptr)(uint8_t*)) {
 
 
 	if (!_packet_handler_initialized) {
@@ -168,7 +185,19 @@ uint8_t input_packet_type(uint8_t packet_opcode, uint8_t constant_packet_data_le
 		packet_opcodes[packet_opcode].constant_packet_data_length = constant_packet_data_length;
 		packet_opcodes[packet_opcode].packet_handler_ptr = packet_handler_ptr;
 		packet_opcodes[packet_opcode]._opcode_set = TRUE;
+		packet_opcodes[packet_opcode].transmit_enabled = transmit_enable;
 
+		if (transmit_enable) {
+			packet_opcodes[packet_opcode].tx_buffer = calloc(constant_packet_data_length + CONSTANT_PACKET_BYTE_LENGTH, sizeof(uint8_t));
+			if (!packet_opcodes[packet_opcode].tx_buffer) {
+				return FALSE;
+			} else {
+				packet_opcodes[packet_opcode].tx_buffer[0] = SOH_BYTE;
+				packet_opcodes[packet_opcode].tx_buffer[1] = STX_BYTE;
+				packet_opcodes[packet_opcode].tx_buffer[2] = packet_opcode;
+				packet_opcodes[packet_opcode].tx_buffer[3 + constant_packet_data_length] = EOT_BYTE;	
+			}
+		}
 		return TRUE;
 	}
 
@@ -249,36 +278,86 @@ void packet_receiver(void) {
 	} 
 }
 
+void double_to_byte_array(double val, uint8_t buff[8]) {
+	uint64_t bin = double_to_binary(val);
+	uint8_t i = 0;
 
+	for (i = 0; i < 8; i++) {
+		buff[i] = (bin >> 8 * (i + 1)) & 0x00000000000000FF;
+	}
 
+}
+
+uint8_t packet_data_inject(uint8_t packet_opcode, uint8_t data_packet_position, uint8_t n, uint8_t* data) {
+	uint8_t i = 0;
+
+	if (packet_opcode < MAX_NUMBER_PACKET_TYPES) {
+			for (i = 0; i < n; i++) {
+				packet_opcodes[packet_opcode].tx_buffer[3 + data_packet_position + i] = data[i];
+			}
+
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+void UART_Send(uint8_t *data, uint8_t n) {
+	while(data) {
+		if (*data == EOT_BYTE) break;
+		printf("0x%X\n", *(data++));
+	}
+}
+
+double byte_array_to_double(uint8_t *data, uint8_t pos) {
+	uint64_t bin = 0;
+	_parse_sub_packet(&bin, 8, data, pos);
+
+	return binary_to_double(bin);
+}
+
+uint8_t packet_send(uint8_t packet_opcode) {
+	if (packet_opcode < MAX_NUMBER_PACKET_TYPES) {
+		if (packet_opcodes[packet_opcode].transmit_enabled) {
+			UART_Send(packet_opcodes[packet_opcode].tx_buffer, packet_opcodes[packet_opcode].constant_packet_data_length + CONSTANT_PACKET_BYTE_LENGTH);
+		}
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
 
 int main (void) {
-	uint8_t tx_buffer[38] = {
-		0x01, 
-		0x02, 
-		0x02, 
-		0x02, // source
-		0x01, // destination
 
-		0xC0, 0x5E, 0x81, 0x47, 0xAE, 0x14, 0x7A, 0xE1, // -122.020000
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x22, // 8
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x33, // 8
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x44, // 8
-		0x04
-	};
-
+	uint8_t source = 0x02;
+	uint8_t destination = 0x01;
 	double longi = 36.9711913;
 	double lat = -122.02;
 	uint64_t time = 29238112912812;
-	uint64_t status = 0b00010101101001;
+	uint64_t status = 0xFF00FF00FF00FF00;
+	uint8_t byte_array[8];
 
-	input_packet_type(2, 34, &gps_packet_parser);
+	input_packet_type(2, 34, TRUE, &gps_packet_parser);
 
+	// send the tx_buffer pointer to test out!!!!
+	packet_data_inject(2, 0, 1, &source);
+	packet_data_inject(2, 1, 1, &destination);
 
+	double_to_byte_array(longi, byte_array);
+	packet_data_inject(2, 2, 8, byte_array);
 
-	for(int i = 0; i < 38; i++) {
-		_test_byte = tx_buffer[i];
-		packet_receiver();
-	}
+	double_to_byte_array(lat, byte_array);
+	packet_data_inject(2, 10, 8, byte_array);
+
+	double_to_byte_array(time, byte_array);
+	packet_data_inject(2, 18, 8, byte_array);
+
+	double_to_byte_array(status, byte_array);
+	packet_data_inject(2, 26, 8, byte_array);
+
+	packet_send(2);
+
+	printf("\nLONG TO DUB TEST: %lf\n", byte_array_to_double(packet_opcodes[2].tx_buffer, 4));
 
 }

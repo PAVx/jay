@@ -1,5 +1,8 @@
-// UART PROTOCOL DEFINITIONS
-// WRITTEN BY: SARGIS S YONAN
+/* 
+    PAVx -- Pod-Based Autonomous Vehicles 
+    Library Created By: Sargis S Yonan
+    March 2017
+*/ 
 
 #include "uart.h"
 
