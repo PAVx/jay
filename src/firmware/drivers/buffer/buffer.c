@@ -1,5 +1,6 @@
 #include "buffer.h"
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
 #ifndef CRITICAL_SECTION_START
 #define CRITICAL_SECTION_START	unsigned char _sreg = SREG; cli()
@@ -124,4 +125,3 @@ void bufferFlush(cBuffer* buffer)
 	// end critical section
 	CRITICAL_SECTION_END;
 }
-

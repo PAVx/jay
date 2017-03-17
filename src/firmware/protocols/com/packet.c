@@ -42,7 +42,6 @@ static uint8_t _packet_handler_initialized = FALSE;
 // accepting buffer by the packet handler
 static uint8_t rx_packet[MAX_PACKET_DATA_LENGTH_BYTES];
 
-
 void parse_sub_packet(uint64_t *data_out, uint8_t n, 
 	uint8_t *data_buffer, uint8_t start_byte_index) {
 
@@ -57,7 +56,7 @@ void parse_sub_packet(uint64_t *data_out, uint8_t n,
 
 void initialize_packet_handler(void) {
 	uint8_t i = 0;
-
+  
 	// initializes all empty opcodes
 	for(i = 0; i < MAX_NUMBER_PACKET_TYPES; i++) {
 		packet_opcodes[i]._opcode_set = FALSE;
@@ -71,7 +70,6 @@ void initialize_packet_handler(void) {
 
 uint8_t input_packet_type(uint8_t packet_opcode, uint8_t constant_packet_data_length, 
 	uint8_t transmit_enable, uint8_t (*packet_handler_ptr)(uint8_t*)) {
-
 
 	if (!_packet_handler_initialized) {
 		initialize_packet_handler();
@@ -103,7 +101,6 @@ uint8_t input_packet_type(uint8_t packet_opcode, uint8_t constant_packet_data_le
 		}
 		return TRUE;
 	}
-
 	return FALSE;
 }
 
@@ -177,7 +174,6 @@ void packet_receiver(void) {
 
 uint8_t packet_data_inject(uint8_t packet_opcode, uint8_t data_packet_position, uint8_t n, uint8_t* data) {
 	uint8_t i = 0;
-
 	if (packet_opcode < MAX_NUMBER_PACKET_TYPES) {
 			for (i = 0; i < n; i++) {
 				packet_opcodes[packet_opcode].tx_buffer[DATA_PACKET_START_POS + data_packet_position + i] = data[i];

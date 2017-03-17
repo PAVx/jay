@@ -1,14 +1,14 @@
 #ifndef _SOFTUART_H_
 #define _SOFTUART_H_
 
-#include "Queue.h"
 #include "system.h"
+#include "buffer.h"
 
 #if !defined(F_CPU)
 	#warning "F_CPU not defined in makefile - now defined in softuart.h"
 	#define F_CPU 16000000UL
-
 #endif
+
 
 #define SOFTUART_CHANNELS       1
 
@@ -93,8 +93,8 @@
 	#warning "Check SOFTUART_TIMERTOP: increase prescaler, lower F_CPU or use a 16 bit timer"
 #endif
 
-#define SOFTUART_IN_BUF_SIZE     128
-#define SOFTUART_OUT_BUF_SIZE    128
+#define SOFTUART_IN_BUF_SIZE     64
+#define SOFTUART_OUT_BUF_SIZE    64
 
 typedef struct softuartRX_t{
 	char           inbuf[SOFTUART_IN_BUF_SIZE];
@@ -111,7 +111,6 @@ typedef struct softuartTX_t{
 	unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */
 
 	unsigned char flag_ok_to_pop;
-	Queue tx_buffer;
 } softuartTX;
 
 typedef struct softuartISR_t{
@@ -121,7 +120,7 @@ typedef struct softuartISR_t{
 	unsigned char timer_rx_ctr;
 	unsigned char bits_left_in_rx;
 	unsigned char internal_rx_buffer;
-	int tx_byte;
+	uint16_t tx_byte;
 } softuartISR;
 
 typedef struct softUART_t{
@@ -167,5 +166,7 @@ void softuart_puts_p( const char *prg_s, int i );
 // Helper-Macro - "automatically" inserts PSTR
 // when used: include avr/pgmspace.h before this include-file
 #define softuart_puts_P(s___) softuart_puts_p(PSTR(s___))
+
+void run_isr(void);
 
 #endif

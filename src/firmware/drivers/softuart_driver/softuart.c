@@ -48,8 +48,6 @@
 #include <util/delay.h>
 
 #include "softuart.h"
-#include "system_tick.h"
-#include "Queue.h"
 
 #define SU_TRUE    1
 #define SU_FALSE   0
@@ -60,7 +58,12 @@
 // 1 Startbit, 8 Databits, 1 Stopbit = 10 Bits/Frame
 #define TX_NUM_OF_BITS (10)
 
+static unsigned char suartTxData[SOFTUART_OUT_BUF_SIZE];
+cBuffer suartTxBuffer;				///< uart transmit buffer
+
+
 static softUART channel[SOFTUART_CHANNELS];
+static char _isrFlag;
 
 void set_tx_pin_high(int i) {
 		#ifdef SOFTUART_TXPORT_1
@@ -142,88 +145,10 @@ int get_rx_pin_status(int i) {
 
 ISR(SOFTUART_T_COMP_LABEL)
 {
-	system_tick();
+	//system_tick();
 	//int i = 1;
-	for(int i = 0; i < SOFTUART_CHANNELS; i++){
-		channel[i].isr.flag_rx_waiting_for_stop_bit = SU_FALSE;
-
-		unsigned char start_bit = '0', flag_in = '0';
-		unsigned char tmp = '0';
-
-		// Transmitter Section
-		if ( channel[i].tx.flag_tx_busy == SU_TRUE ) {
-
-			if(channel[i].tx.flag_ok_to_pop == SU_TRUE){
-				channel[i].isr.tx_byte = getFront(channel[i].tx.tx_buffer);
-				Dequeue(channel[i].tx.tx_buffer);
-				channel[i].tx.flag_ok_to_pop = SU_FALSE;
-			}
-
-			tmp = channel[i].tx.timer_tx_ctr;
-			if ( --tmp == 0 ) { // if ( --timer_tx_ctr <= 0 )
-				if ( channel[i].isr.tx_byte & 0x01 ) {
-					set_tx_pin_high(i);
-				}
-				else {
-					set_tx_pin_low(i);
-				}
-
-				channel[i].isr.tx_byte >>= 1;
-				tmp = 3; // timer_tx_ctr = 3;
-				if ( --channel[i].tx.bits_left_in_tx == 0 ) {
-					channel[i].tx.flag_tx_busy = SU_FALSE;
-					channel[i].tx.flag_ok_to_pop = SU_TRUE;
-				} else if ( channel[i].tx.bits_left_in_tx%TX_NUM_OF_BITS == 0 ) {
-					channel[i].tx.flag_ok_to_pop = SU_TRUE;
-				}
-			}
-			channel[i].tx.timer_tx_ctr = tmp;
-		}
-
-		// Receiver Section
-		if ( channel[i].rx.flag_rx_off == SU_FALSE ) {
-			if ( channel[i].isr.flag_rx_waiting_for_stop_bit ) {
-				if ( --channel[i].isr.timer_rx_ctr == 0 ) {
-					channel[i].isr.flag_rx_waiting_for_stop_bit = SU_FALSE;
-					channel[i].rx.flag_rx_ready = SU_FALSE;
-					channel[i].rx.inbuf[channel[i].rx.qin] = channel[i].isr.internal_rx_buffer;
-					if ( ++channel[i].rx.qin >= SOFTUART_IN_BUF_SIZE ) {
-						// overflow - reset inbuf-index
-						channel[i].rx.qin = 0;
-					}
-				}
-			}
-			else {  // rx_test_busy
-				if ( channel[i].rx.flag_rx_ready == SU_FALSE ) {
-					start_bit = get_rx_pin_status(i);
-					// test for start bit
-					if ( start_bit == 0 ) {
-						channel[i].rx.flag_rx_ready      = SU_TRUE;
-						channel[i].isr.internal_rx_buffer = 0;
-						channel[i].isr.timer_rx_ctr       = 4;
-						channel[i].isr.bits_left_in_rx    = RX_NUM_OF_BITS;
-						channel[i].isr.rx_mask            = 1;
-					}
-				}
-				else {  // rx_busy
-					tmp = channel[i].isr.timer_rx_ctr;
-					if ( --tmp == 0 ) { // if ( --timer_rx_ctr == 0 ) {
-						// rcv
-						tmp = 3;
-						flag_in = get_rx_pin_status(i);
-						if ( flag_in ) {
-							channel[i].isr.internal_rx_buffer |= channel[i].isr.rx_mask;
-						}
-						channel[i].isr.rx_mask <<= 1;
-						if ( --channel[i].isr.bits_left_in_rx == 0 ) {
-							channel[i].isr.flag_rx_waiting_for_stop_bit = SU_TRUE;
-						}
-					}
-					channel[i].isr.timer_rx_ctr = tmp;
-				}
-			}
-		}
-	}
+	_isrFlag = 1;
+	run_isr();
 }
 
 static void io_init(void)
@@ -291,12 +216,15 @@ void softuart_init( void )
 		channel[i].rx.flag_rx_ready = SU_FALSE;
 		channel[i].rx.flag_rx_off   = SU_FALSE;
 		channel[i].tx.flag_ok_to_pop = SU_TRUE;
-		channel[i].tx.tx_buffer = newQueue();
+		//channel[i].tx.tx_buffer = newQueue();
 		set_tx_pin_high(i); /* mt: set to high to avoid garbage on init */
 	}
 
+	bufferInit(&suartTxBuffer, suartTxData, SOFTUART_OUT_BUF_SIZE);
+
 	io_init();
 	timer_init();
+	_isrFlag = 0;
 }
 
 static void idle(void)
@@ -319,7 +247,7 @@ void softuart_turn_rx_off( int i )
 char softuart_getchar( int i )
 {
 	char ch;
-
+  if (1) return '\0'; // don't use RX yet
 	while ( channel[i].rx.qout == channel[i].rx.qin ) {
 		idle();
 	}
@@ -349,22 +277,29 @@ unsigned char softuart_transmit_busy( int i )
 
 void softuart_putchar( const char ch , int i)
 {
-	while ( getLength(channel[i].tx.tx_buffer) >= SOFTUART_OUT_BUF_SIZE-1) {
-		; // wait for transmitter ready
+	if ( suartTxBuffer.datalength >= SOFTUART_OUT_BUF_SIZE-1) {
+		//softuart_flush_input_buffer(0); // wait for transmitter ready
 		  // add watchdog-reset here if needed;
+      return; // do nothing in this case
 	}
 
 	// invoke_UART_transmit
 	channel[i].tx.timer_tx_ctr       = 3;
 	channel[i].tx.bits_left_in_tx    += TX_NUM_OF_BITS;			// V2: add number of bits to total needed to empty
-	channel[i].tx.internal_tx_buffer = ( ch << 1 ) | 0x200;
+	channel[i].tx.internal_tx_buffer = ( ch << 1 ) | 0x200; // add start/stop bits
 	channel[i].tx.flag_tx_busy       = SU_TRUE;
 
-	Enqueue(channel[i].tx.tx_buffer, (int)channel[i].tx.internal_tx_buffer);								// V2: added a queue as a buffer.
+	bufferAddToEnd(&suartTxBuffer, ch);
 }
 
 void softuart_puts( const char *s , int i)
 {
+	if ( suartTxBuffer.datalength + strlen(s) >= SOFTUART_OUT_BUF_SIZE-1) {
+		//softuart_flush_input_buffer(0); // wait for transmitter ready
+			// add watchdog-reset here if needed;
+			return; // do nothing in this case
+	}
+
 	while ( *s ) {
 		softuart_putchar( *s , i);
 		s++;
@@ -377,5 +312,91 @@ void softuart_puts_p( const char *prg_s , int i)
 
 	while ( ( c = pgm_read_byte( prg_s++ ) ) ) {
 		softuart_putchar(c, i);
+	}
+}
+
+void run_isr()
+{
+	if(_isrFlag == 1){
+		for(int i = 0; i < SOFTUART_CHANNELS; i++){
+			channel[i].isr.flag_rx_waiting_for_stop_bit = SU_FALSE;
+
+			unsigned char start_bit = '0', flag_in = '0';
+			unsigned char tmp = '0';
+
+			// Transmitter Section
+			if ( channel[i].tx.flag_tx_busy == SU_TRUE ) {
+
+				if(channel[i].tx.flag_ok_to_pop == SU_TRUE){
+					channel[i].isr.tx_byte = ( bufferGetFromFront(&suartTxBuffer )<< 1 ) | 0x200;
+					channel[i].tx.flag_ok_to_pop = SU_FALSE;
+				}
+
+				tmp = channel[i].tx.timer_tx_ctr;
+				if ( --tmp == 0 ) { // if ( --timer_tx_ctr <= 0 )
+					if ( channel[i].isr.tx_byte & 0x01 ) {
+						set_tx_pin_high(i);
+					}
+					else {
+						set_tx_pin_low(i);
+					}
+
+					channel[i].isr.tx_byte >>= 1;
+					tmp = 3; // timer_tx_ctr = 3;
+					if ( --channel[i].tx.bits_left_in_tx == 0 ) {
+						channel[i].tx.flag_tx_busy = SU_FALSE;
+						channel[i].tx.flag_ok_to_pop = SU_TRUE;
+					} else if ( channel[i].tx.bits_left_in_tx%TX_NUM_OF_BITS == 0 ) {
+						channel[i].tx.flag_ok_to_pop = SU_TRUE;
+					}
+				}
+				channel[i].tx.timer_tx_ctr = tmp;
+			}
+
+			// Receiver Section
+			if ( channel[i].rx.flag_rx_off == SU_FALSE ) {
+				if ( channel[i].isr.flag_rx_waiting_for_stop_bit ) {
+					if ( --channel[i].isr.timer_rx_ctr == 0 ) {
+						channel[i].isr.flag_rx_waiting_for_stop_bit = SU_FALSE;
+						channel[i].rx.flag_rx_ready = SU_FALSE;
+						channel[i].rx.inbuf[channel[i].rx.qin] = channel[i].isr.internal_rx_buffer;
+						if ( ++channel[i].rx.qin >= SOFTUART_IN_BUF_SIZE ) {
+							// overflow - reset inbuf-index
+							channel[i].rx.qin = 0;
+						}
+					}
+				}
+				else {  // rx_test_busy
+					if ( channel[i].rx.flag_rx_ready == SU_FALSE ) {
+						start_bit = get_rx_pin_status(i);
+						// test for start bit
+						if ( start_bit == 0 ) {
+							channel[i].rx.flag_rx_ready      = SU_TRUE;
+							channel[i].isr.internal_rx_buffer = 0;
+							channel[i].isr.timer_rx_ctr       = 4;
+							channel[i].isr.bits_left_in_rx    = RX_NUM_OF_BITS;
+							channel[i].isr.rx_mask            = 1;
+						}
+					}
+					else {  // rx_busy
+						tmp = channel[i].isr.timer_rx_ctr;
+						if ( --tmp == 0 ) { // if ( --timer_rx_ctr == 0 ) {
+							// rcv
+							tmp = 3;
+							flag_in = get_rx_pin_status(i);
+							if ( flag_in ) {
+								channel[i].isr.internal_rx_buffer |= channel[i].isr.rx_mask;
+							}
+							channel[i].isr.rx_mask <<= 1;
+							if ( --channel[i].isr.bits_left_in_rx == 0 ) {
+								channel[i].isr.flag_rx_waiting_for_stop_bit = SU_TRUE;
+							}
+						}
+						channel[i].isr.timer_rx_ctr = tmp;
+					}
+				}
+			}
+		}
+		_isrFlag = 0;
 	}
 }
