@@ -75,8 +75,6 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I system/leds
 # UART #
 CSOURCE						+= drivers/uart_driver/uart_driver.c
 # SOFTUART #
-CSOURCE						+= drivers/softuart_driver/Queue.c
-# SOFTUART #
 CSOURCE						+= drivers/softuart_driver/softuart.c
 # BUFFER #
 CSOURCE						+= drivers/buffer/buffer.c

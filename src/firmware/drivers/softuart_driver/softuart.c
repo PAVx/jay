@@ -58,6 +58,10 @@
 // 1 Startbit, 8 Databits, 1 Stopbit = 10 Bits/Frame
 #define TX_NUM_OF_BITS (10)
 
+static unsigned char suartTxData[SOFTUART_OUT_BUF_SIZE];
+cBuffer suartTxBuffer;				///< uart transmit buffer
+
+
 static softUART channel[SOFTUART_CHANNELS];
 static char _isrFlag;
 
@@ -212,9 +216,11 @@ void softuart_init( void )
 		channel[i].rx.flag_rx_ready = SU_FALSE;
 		channel[i].rx.flag_rx_off   = SU_FALSE;
 		channel[i].tx.flag_ok_to_pop = SU_TRUE;
-		channel[i].tx.tx_buffer = newQueue();
+		//channel[i].tx.tx_buffer = newQueue();
 		set_tx_pin_high(i); /* mt: set to high to avoid garbage on init */
 	}
+
+	bufferInit(&suartTxBuffer, suartTxData, SOFTUART_OUT_BUF_SIZE);
 
 	io_init();
 	timer_init();
@@ -271,7 +277,7 @@ unsigned char softuart_transmit_busy( int i )
 
 void softuart_putchar( const char ch , int i)
 {
-	if ( getLength(channel[i].tx.tx_buffer) >= SOFTUART_OUT_BUF_SIZE-1) {
+	if ( suartTxBuffer.datalength >= SOFTUART_OUT_BUF_SIZE-1) {
 		//softuart_flush_input_buffer(0); // wait for transmitter ready
 		  // add watchdog-reset here if needed;
       return; // do nothing in this case
@@ -283,12 +289,12 @@ void softuart_putchar( const char ch , int i)
 	channel[i].tx.internal_tx_buffer = ( ch << 1 ) | 0x200; // add start/stop bits
 	channel[i].tx.flag_tx_busy       = SU_TRUE;
 
-	Enqueue(channel[i].tx.tx_buffer, (int)channel[i].tx.internal_tx_buffer);								// V2: added a queue as a buffer.
+	bufferAddToEnd(&suartTxBuffer, ch);
 }
 
 void softuart_puts( const char *s , int i)
 {
-	if ( (getLength(channel[i].tx.tx_buffer) + strlen(s)) >= SOFTUART_OUT_BUF_SIZE-1) {
+	if ( suartTxBuffer.datalength + strlen(s) >= SOFTUART_OUT_BUF_SIZE-1) {
 		//softuart_flush_input_buffer(0); // wait for transmitter ready
 			// add watchdog-reset here if needed;
 			return; // do nothing in this case
@@ -322,8 +328,7 @@ void run_isr()
 			if ( channel[i].tx.flag_tx_busy == SU_TRUE ) {
 
 				if(channel[i].tx.flag_ok_to_pop == SU_TRUE){
-					channel[i].isr.tx_byte = getFront(channel[i].tx.tx_buffer);
-					Dequeue(channel[i].tx.tx_buffer);
+					channel[i].isr.tx_byte = ( bufferGetFromFront(&suartTxBuffer )<< 1 ) | 0x200;
 					channel[i].tx.flag_ok_to_pop = SU_FALSE;
 				}
 

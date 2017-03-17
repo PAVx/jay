@@ -24,10 +24,11 @@ uint8_t manipulate_duty_cycle = 0;
 
 int main (void) {
 	system_initialize();
+	softuart_init();
 	led_off(SYSTEM_LED);
 
 	#ifdef UART
-		//UART_SendString("\nPAVx Jay UAV initialized\n\n");
+		UART_SendString("\nPAVx Jay UAV initialized\n\n");
 	#endif
 	#ifdef SW_UART
 		softuart_puts("\nPavx", 0);
@@ -80,7 +81,8 @@ int main (void) {
 			system_untick();
 		}
 
-		softuart_puts("Sup\n",0);
+		softuart_puts("sup\n",0);
+		UART_SendString("\nHW_UART PRINT\n\r");
 		// todo:
 		// update accel registers
 		// update gps registers

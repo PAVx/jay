@@ -1,8 +1,8 @@
 #ifndef _SOFTUART_H_
 #define _SOFTUART_H_
 
-#include "Queue.h"
 #include "system.h"
+#include "buffer.h"
 
 #if !defined(F_CPU)
 	#warning "F_CPU not defined in makefile - now defined in softuart.h"
@@ -93,8 +93,8 @@
 	#warning "Check SOFTUART_TIMERTOP: increase prescaler, lower F_CPU or use a 16 bit timer"
 #endif
 
-#define SOFTUART_IN_BUF_SIZE     128
-#define SOFTUART_OUT_BUF_SIZE    128
+#define SOFTUART_IN_BUF_SIZE     64
+#define SOFTUART_OUT_BUF_SIZE    64
 
 typedef struct softuartRX_t{
 	char           inbuf[SOFTUART_IN_BUF_SIZE];
@@ -111,7 +111,6 @@ typedef struct softuartTX_t{
 	unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */
 
 	unsigned char flag_ok_to_pop;
-	Queue tx_buffer;
 } softuartTX;
 
 typedef struct softuartISR_t{
@@ -121,7 +120,7 @@ typedef struct softuartISR_t{
 	unsigned char timer_rx_ctr;
 	unsigned char bits_left_in_rx;
 	unsigned char internal_rx_buffer;
-	int tx_byte;
+	uint16_t tx_byte;
 } softuartISR;
 
 typedef struct softUART_t{
