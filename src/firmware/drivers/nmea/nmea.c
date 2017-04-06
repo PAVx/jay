@@ -1,5 +1,6 @@
 #include "nmea.h"
 #include "uart.h"
+#include "softuart.h"
 #include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
@@ -50,27 +51,8 @@ void Send(char* sentence, char* out) {
 
 }
 void InitializeNEO6M(void) {
-    char out[30];
-    Send("PUBX,40,GSV,0,0,0,0,0,0", out);
-    UART_SendString(out);
-    _delay_ms(500);
-    Send("PUBX,40,RMC,0,0,0,0,0,0", out);
-    UART_SendString(out);
-    _delay_ms(500);
     
-    Send("PUBX,40,GSA,0,0,0,0,0,0", out);
-    UART_SendString(out);
-    _delay_ms(500);
-    Send("PUBX,40,GGA,0,0,0,0,0,0", out);
-    UART_SendString(out);
-    _delay_ms(500);
-    Send("PUBX,40,GLL,0,0,0,0,0,0", out);
-    UART_SendString(out);
-    _delay_ms(500);
-    Send("PUBX,40,VTG,0,0,0,0,0,0", out);
-    UART_SendString(out);
-    _delay_ms(500);
-    
+    softuart_turn_rx_on(0);
 }
 void NMEA_Read(char c) {
     static uint8_t i = 0;
@@ -191,13 +173,15 @@ void NMEA_ParseData(SentenceType type) {
 }
 void GPS_UpdateData(void) {
     char c;
-    while (!_uart_driver_ReceiveBufferIsEmpty()){
-        c = _uart_driver_GetByte();
+    //while(!_uart_driver_ReceiveBufferIsEmpty()){
+        c = softuart_getchar(0);
         if (c != -1 ){
+            softuart_turn_rx_off(0);
             _uart_driver_SendByte(c);
-            NMEA_Read(c); 
+            softuart_turn_rx_on(0);
+            //NMEA_Read(c); 
         }    
-    }
+   //}
 }
 
 bool GPS_IsDataReady(void) {

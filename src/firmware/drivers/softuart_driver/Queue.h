@@ -27,7 +27,7 @@ void freeQueue(Queue* pQ);
 // getFront()
 // Returns the value at the front of Q.
 // Pre: !isEmpty(Q)
-uint16_t getFront(Queue Q);
+unsigned short getFront(Queue Q);
 
 // getLength()
 // Returns the length of Q.
@@ -42,7 +42,7 @@ int isEmpty(Queue Q);
 
 // Enqueue()
 // Places new data element at the end of Q
-void Enqueue(Queue Q, uint16_t data);
+void Enqueue(Queue Q, unsigned short data);
 
 // Dequeue()
 // Deletes element at front of Q

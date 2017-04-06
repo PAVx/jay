@@ -12,7 +12,7 @@
 
 // private NodeObj type
 typedef struct NodeObj{
-   uint16_t data;
+   unsigned short data;
    struct NodeObj* next;
 } NodeObj;
 
@@ -32,7 +32,7 @@ typedef struct QueueObj{
 // newNode()
 // Returns reference to new Node object. Initializes next and data fields.
 // Private.
-Node newNode(uint16_t data){
+Node newNode(unsigned short data){
    Node N = malloc(sizeof(NodeObj));
    N->data = data;
    N->next = NULL;
@@ -78,7 +78,7 @@ void freeQueue(Queue* pQ){
 // getFront()
 // Returns the value at the front of Q.
 // Pre: !isEmpty(Q)
-uint16_t getFront(Queue Q){
+unsigned short getFront(Queue Q){
    if( Q==NULL ){
       printf("Queue Error: calling getFront() on NULL Queue reference\n");
       exit(1);
@@ -115,7 +115,7 @@ int isEmpty(Queue Q){
 
 // Enqueue()
 // Places new data element at the end of Q
-void Enqueue(Queue Q, uint16_t data)
+void Enqueue(Queue Q, unsigned short data)
 {
    Node N = newNode(data);
 
