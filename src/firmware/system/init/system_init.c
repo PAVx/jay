@@ -8,7 +8,7 @@
 #include "system.h"
 
 uint8_t system_initialize(void) {
-	// initialize protcols 
+	// initialize protcols
 
 	#ifdef SYSTEM_TICK
 		clock_init();
@@ -17,7 +17,7 @@ uint8_t system_initialize(void) {
 	#ifdef GYRO
 		InitializeGyro();
 	#endif
-	
+
 	#ifdef ACCEL
 		InitializeAccel();
 	#endif
@@ -26,10 +26,10 @@ uint8_t system_initialize(void) {
 		#ifdef SW_UART
 			softuart_init();
 		#endif
-			
+
 		#ifdef UART
 			InitializeUART(HW_UART_BAUD);
-		#endif 	
+		#endif
 	//	packet_init();
 	#endif
 

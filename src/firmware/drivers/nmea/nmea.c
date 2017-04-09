@@ -8,9 +8,9 @@
 #define NMEA_MAX_LEN 85
 #define GPS_DATA(type, field) ((type << 4) | field)
 typedef enum {
-    NOT_RECORDING;
-    RECORDING;
-    CHECKSUM_UPPER;
+    NOT_RECORDING,
+    RECORDING,
+    CHECKSUM_UPPER,
     CHECKSUM_LOWER 
 } SentenceState;
 
@@ -45,7 +45,7 @@ void NEO6M_GetChar(void) {
 
 static void NMEA_Read(char c) {
     static uint8_t i = 0;
-    static uint8_t sentence_state = NOT_RECORDING;
+    static SentenceState sentence_state = NOT_RECORDING;
     static uint8_t checksum = 0;
     static double curr_time;
     if (c == '$') {

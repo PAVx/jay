@@ -14,6 +14,7 @@
 #define SYSTEM_TICK (1)
 //#define GYRO (1)
 //#define ACCEL (1)
+#define GPS (1)
 
 // CLIB INCLUDES
 #include <stdlib.h>
@@ -51,7 +52,7 @@
 
 		#ifndef SOFTUART_BAUD_RATE
 			#define SOFTUART_BAUD_RATE (4800)
-			
+
 			#define SOFTUART_TIMERTOP (F_CPU/TIMER0_PRESCALE/SOFTUART_BAUD_RATE/3 - 1)
 			#define TIMER0_PERIOD (SOFTUART_TIMERTOP)
 		#endif
