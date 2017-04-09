@@ -4,31 +4,20 @@
 #define _NMEA_H_
 #include <stdbool.h>
 #include <time.h>
-
+#include <math.h>
 typedef struct {
-    int number;
-    struct tm time;
+    double time;
     char status;
     double Lat;
     double Long;
     double speed;
     double altitude;
-    uint8_t new_data;
+    bool newDataReady;
 } GPS_DATA;
-typedef enum {
-    NMEA_TYPE_GSV,
-    NMEA_TYPE_RMC,
-    NMEA_TYPE_GSA,
-    NMEA_TYPE_GGA,
-    NMEA_TYPE_GLL,
-    NMEA_TYPE_VTG,
-    UBX_TYPE_00,
-    NMEA_TYPE_ERROR
-} SentenceType;
-void InitializeNEO6M(void); 
-void GPS_UpdateData(void);
-GPS_DATA GPS_GetData(void);
-bool GPS_IsDataReady(void);
+
+void NEO6M_GetChar(void);
+GPS_DATA Get_gpsData(void);
+bool Get_newDataReady(void);
 
 
 #endif

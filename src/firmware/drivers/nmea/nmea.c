@@ -4,60 +4,50 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
-#include <stdio.h>
-#include <math.h>
-#include <util/delay.h>
 
-#define NMEA_MAX_LEN 120
+#define NMEA_MAX_LEN 85
 #define GPS_DATA(type, field) ((type << 4) | field)
-#define NOT_RECORDING 0
-#define RECORDING 1
-#define CHECKSUM_UPPER 2
-#define CHECKSUM_LOWER 3
+typedef enum {
+    NOT_RECORDING;
+    RECORDING;
+    CHECKSUM_UPPER;
+    CHECKSUM_LOWER 
+} SentenceState;
+
+typedef enum {
+    NMEA_TYPE_GSV,
+    NMEA_TYPE_RMC,
+    NMEA_TYPE_GSA,
+    NMEA_TYPE_GGA,
+    NMEA_TYPE_GLL,
+    NMEA_TYPE_VTG,
+    UBX_TYPE_00,
+    NMEA_TYPE_ERROR
+} SentenceType;
+
 static GPS_DATA data;
-void CalculateDegrees(double *coordinates, char dir);  
-bool ValidChecksum(void);
-void NMEA_ParseData(SentenceType type);
-//i need to init baudrate 9600 maybe in gps
-char NMEA_DataBuffer[NMEA_MAX_LEN + 1];
-uint8_t CharToHex(char c) {
-    if(isxdigit(c)) {
-        if(isalpha(c)) {
-            return (uint8_t) (c - 'A' + 10);
-        } else {
-            return (uint8_t) (c - '0');
-        }
+static char NMEA_DataBuffer[NMEA_MAX_LEN];
 
-    }
-    return (uint8_t) -1;
-}
-uint8_t CalculateChecksum(const char* buff) {
-    uint8_t checksum = 0;
-    int i = 0;
-    if(buff[i] == '$') {
-        i++; //skip $
-    }
-    int bytes = strlen(buff);
-    for (;i<bytes && buff[i]!='*';i++) {
-        checksum ^= buff[i];
-    }
-    return checksum;
+static void NMEA_Read(char c); 
+static void NMEA_ParseData(SentenceType type);
+static void CalculateDegrees(double *coordinates, char dir);  
+static uint8_t CharToHex(char c); 
+static uint8_t CalculateChecksum(const char* buff);
+
+void NEO6M_GetChar(void) {
+    char c;
+    c = softuart_getchar(0);
+    if (c != -1 ){
+        //_uart_driver_SendByte(c);
+        NMEA_Read(c); 
+    }    
 }
 
-//Input sentence in form of $...*
-void Send(char* sentence, char* out) {
-    uint8_t checksum = CalculateChecksum(sentence);
-    snprintf(out, 50, "$%s*%2X\n", sentence, checksum);
-
-}
-void InitializeNEO6M(void) {
-    
-    softuart_turn_rx_on(0);
-}
-void NMEA_Read(char c) {
+static void NMEA_Read(char c) {
     static uint8_t i = 0;
     static uint8_t sentence_state = NOT_RECORDING;
     static uint8_t checksum = 0;
+    static double curr_time;
     if (c == '$') {
         i = 0;
         memset(NMEA_DataBuffer, '\0', NMEA_MAX_LEN);
@@ -89,30 +79,24 @@ void NMEA_Read(char c) {
             checksum |= x;
             if (checksum == CalculateChecksum(NMEA_DataBuffer)) {
                 if (!strncmp(NMEA_DataBuffer, "GPRMC", 5)) {
-                    //NMEA_ParseData(NMEA_TYPE_RMC);
-                    data.new_data |= 0x3;
+                    data.newDataReady = false;
+                    NMEA_ParseData(NMEA_TYPE_RMC);
+                    curr_time = data.time;
                 } else if (!strncmp(NMEA_DataBuffer, "GPGGA", 5)) {
-                    //NMEA_ParseData(NMEA_TYPE_GGA);
-                    data.new_data |= 0x2;
-                } else if (!strncmp(NMEA_DataBuffer, "PUBX", 4)) {
-                    _uart_driver_SendByte('!');
-                    NMEA_ParseData(UBX_TYPE_00);
-                    data.new_data = 0x3;
-                }
- 
-
+                    NMEA_ParseData(NMEA_TYPE_GGA);
+                    if (curr_time == data.time) {
+                        data.newDataReady = true;
+                    }
+                } 
             }
         } 
         sentence_state = NOT_RECORDING;
-       
     }
-   
-    
 }
-void NMEA_ParseData(SentenceType type) {
+
+static void NMEA_ParseData(SentenceType type) {
     char *endptr;
     int i = 0;
-    double fix = 0;
     uint8_t data_field = 0;
     while (NMEA_DataBuffer[i] != '*') {
         // Forward to next data field
@@ -129,11 +113,7 @@ void NMEA_ParseData(SentenceType type) {
             case GPS_DATA(NMEA_TYPE_GGA, 1):
             case GPS_DATA(UBX_TYPE_00, 2):
                 // Get time
-                fix = strtod(&NMEA_DataBuffer[i], &endptr);
-                data.time.tm_sec = (int)fmod(fix, 100);
-                fix /= 100;
-                data.time.tm_min = (int)fix % 100;
-                data.time.tm_hour = (int)fix / 100;
+                data.time = strtod(&NMEA_DataBuffer[i], &endptr);
                 break;
             case GPS_DATA(NMEA_TYPE_RMC, 2):
                 // get status
@@ -171,32 +151,33 @@ void NMEA_ParseData(SentenceType type) {
                 
     }
 }
-void GPS_UpdateData(void) {
-    char c;
-    //while(!_uart_driver_ReceiveBufferIsEmpty()){
-        c = softuart_getchar(0);
-        if (c != -1 ){
-            softuart_turn_rx_off(0);
-            _uart_driver_SendByte(c);
-            softuart_turn_rx_on(0);
-            //NMEA_Read(c); 
-        }    
-   //}
-}
 
-bool GPS_IsDataReady(void) {
-    if(data.new_data == 0x3) {
-        return true;
-    }else {
-        return false;
+static uint8_t CharToHex(char c) {
+    if(isxdigit(c)) {
+        if(isalpha(c)) {
+            return (uint8_t) (c - 'A' + 10);
+        } else {
+            return (uint8_t) (c - '0');
+        }
+
     }
+    return (uint8_t) -1;
 }
 
-GPS_DATA GPS_GetData(void) {
-    data.new_data = 0;
-    return data;
+static uint8_t CalculateChecksum(const char* buff) {
+    uint8_t checksum = 0;
+    int i = 0;
+    if(buff[i] == '$') {
+        i++; //skip $
+    }
+    int bytes = strlen(buff);
+    for (;i<bytes && buff[i]!='*';i++) {
+        checksum ^= buff[i];
+    }
+    return checksum;
 }
-void CalculateDegrees(double *coordinates, char dir) {   
+
+static void CalculateDegrees(double *coordinates, char dir) {   
     int deg;
     double min;
     deg = *coordinates / 100;
@@ -206,5 +187,14 @@ void CalculateDegrees(double *coordinates, char dir) {
     if (dir == 'S' || dir == 'W') {
         *coordinates *= -1;
     }
+}
+
+bool Get_newDataReady(void) {
+    return data.newDataReady;    
+}
+
+GPS_DATA Get_gpsData(void) {
+    data.newDataReady = false;
+    return data;
 }
 

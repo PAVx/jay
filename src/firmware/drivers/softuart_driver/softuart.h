@@ -106,8 +106,8 @@ typedef struct softuartRX_t{
 
 typedef struct softuartTX_t{
 	unsigned char  flag_tx_busy;
-	unsigned char  timer_tx_ctr;
-	unsigned char  bits_left_in_tx;
+	uint8_t  timer_tx_ctr;
+	uint16_t  bits_left_in_tx;
 	unsigned short internal_tx_buffer; /* ! mt: was type uchar - this was wrong */
 
 	unsigned char flag_ok_to_pop;
@@ -117,8 +117,8 @@ typedef struct softuartISR_t{
 	unsigned char flag_rx_waiting_for_stop_bit; // = SU_FALSE;
 	unsigned char rx_mask;
 
-	unsigned char timer_rx_ctr;
-	unsigned char bits_left_in_rx;
+	uint8_t timer_rx_ctr;
+	uint16_t bits_left_in_rx;
 	unsigned char internal_rx_buffer;
 	uint16_t tx_byte;
 } softuartISR;

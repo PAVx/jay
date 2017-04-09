@@ -13,11 +13,12 @@
 #include "temperature.h"
 #include "accel.h"
 #include "nmea.h"
+#include "gps.h"
 #ifndef F_CPU
 	#define F_CPU 16000000UL
 #endif
 
-char buffer[1];
+char buffer[50];
 void PrintBuffer(char* buff) {
     int i = 0;
     while (buff[i] != '\0') {
@@ -33,40 +34,31 @@ void PrintNum(int num) {
 
 int main (void) {
     system_initialize();
+    _delay_ms(1000);
     _delay_ms(500);
-	UART_SendString("RESET\n");
-    _delay_ms(500);
-    softuart_turn_rx_on(0);
-    _delay_ms(500);
-    //InitializeNEO6M();   
     //int i;
     //char c;
-   
-   //GPS_DATA data;
+   UART_SendString("RESET\n");
     while (1) {
     
-           GPS_UpdateData();
-    /*       
-           if(GPS_IsDataReady()) {
-                _delay_ms(50);
+           NEO6M_GetChar();
+                      
+           if(GPS_NewDataReady()) {
 
-                while(softuart_transmit_busy(0));
-                softuart_puts(sentence, 0);
-
-                memset(buffer, '\0', 40);
-                data = GPS_GetData();
-                
-                //sprintf(buffer, "T: %02d:%02d:%02d\n"L: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", data.time.tm_hour, data.time.tm_min, data.time.tm_sec, data.Lat, data.Long, data.speed, data.altitude);
+                memset(buffer, '\0', 50);
+                GPS_UpdateData();
+                struct tm time = GPS_GetTime();
+                sprintf(buffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", time.tm_hour, time.tm_min, time.tm_sec, GPS_GetLatitude(), GPS_GetLongitude(), GPS_GetSpeed(), GPS_GetAltitude());
                 int i = 0;
                 while (buffer[i] != '\0') {
                     _uart_driver_SendByte(buffer[i]);
                     i++;
                 }
            }
-            
+         
         
        // check if missing many packets, data may be close in time 
-*/
+
     }
     /*
 	UART_SendString("RESET\n");

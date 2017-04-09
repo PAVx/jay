@@ -216,6 +216,7 @@ void softuart_init( void )
 		channel[i].rx.flag_rx_ready = SU_FALSE;
 		channel[i].rx.flag_rx_off   = SU_FALSE;
 		channel[i].tx.flag_ok_to_pop = SU_TRUE;
+        channel[i].isr.flag_rx_waiting_for_stop_bit = SU_FALSE;
 		//channel[i].tx.tx_buffer = newQueue();
 		set_tx_pin_high(i); /* mt: set to high to avoid garbage on init */
 	}
@@ -247,16 +248,17 @@ void softuart_turn_rx_off( int i )
 char softuart_getchar( int i )
 {
 	char ch;
-  if (1) return '\0'; // don't use RX yet
-	while ( channel[i].rx.qout == channel[i].rx.qin ) {
-		idle();
-	}
-	ch = channel[i].rx.inbuf[channel[i].rx.qout];
-	if ( ++channel[i].rx.qout >= SOFTUART_IN_BUF_SIZE ) {
-		channel[i].rx.qout = 0;
-	}
+  //if (1) return '\0'; // don't use RX yet
+	if ( channel[i].rx.qout != channel[i].rx.qin ) {
+	
+        idle(); //How to use idle?	
+	    ch = channel[i].rx.inbuf[channel[i].rx.qout];
+	    if ( ++channel[i].rx.qout >= SOFTUART_IN_BUF_SIZE ) {
+		    channel[i].rx.qout = 0;
+	    }
 
-	return( ch );
+	    return( ch );
+    } else return -1;
 }
 
 unsigned char softuart_kbhit( int i )
@@ -319,10 +321,9 @@ void run_isr()
 {
 	if(_isrFlag == 1){
 		for(int i = 0; i < SOFTUART_CHANNELS; i++){
-			channel[i].isr.flag_rx_waiting_for_stop_bit = SU_FALSE;
 
-			unsigned char start_bit = '0', flag_in = '0';
-			unsigned char tmp = '0';
+			uint8_t start_bit = 0, flag_in = 0;
+			uint8_t tmp = 0;
 
 			// Transmitter Section
 			if ( channel[i].tx.flag_tx_busy == SU_TRUE ) {

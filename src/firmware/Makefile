@@ -57,6 +57,8 @@ SEARCHABLE_HEADER_FILE_DIRS += -I protocols/motors
 SEARCHABLE_HEADER_FILE_DIRS += -I protocols/com
 # ACCEL #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/accel
+# GPS #
+SEARCHABLE_HEADER_FILE_DIRS += -I protocols/gps
 
 ####################
 # SYSTEM HEADERS #
@@ -123,6 +125,8 @@ CSOURCE						+= protocols/motors/motors.c
 CSOURCE						+= protocols/com/packet.c
 # ACCEL #
 CSOURCE						+= protocols/accel/accel.c
+# GPS #
+CSOURCE                     += protocols/gps/gps.c
 ####################
 
 ####################

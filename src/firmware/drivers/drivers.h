@@ -15,5 +15,5 @@
 #include "pwm_driver.h"
 #include "softuart.h"
 #include "uart_driver.h"
-
+#include "nmea.h"
 #endif
