@@ -64,6 +64,7 @@ int main (void) {
 		 	#endif
             
             #ifdef GPS
+            
                 if(GPS_NewDataReady()) {
  
                     memset(gpsbuffer, '\0', 50);
@@ -76,7 +77,7 @@ int main (void) {
                         i++;
                     }
                 }
-
+            
             #endif
 
 			#ifdef UART

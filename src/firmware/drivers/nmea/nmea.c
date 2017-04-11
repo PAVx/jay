@@ -36,11 +36,17 @@ static uint8_t CalculateChecksum(const char* buff);
 
 void NEO6M_GetChar(void) {
     char c;
-    c = softuart_getchar(0);
-    if (c != -1 ){
-        //_uart_driver_SendByte(c);
-        NMEA_Read(c); 
-    }    
+    //int i = 0;
+    while(softuart_kbhit(0)) {
+        c = softuart_getchar(0);
+        if (c != -1 ){
+            //i++;
+            //_uart_driver_SendByte(c);
+            NMEA_Read(c); 
+        } 
+    }
+    //UART_SendByte(i);
+    //UART_SendByte('\n');
 }
 
 static void NMEA_Read(char c) {
