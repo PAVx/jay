@@ -16,12 +16,17 @@ int main (void) {
 	system_initialize();
 	softuart_init();
 	led_off(SYSTEM_LED);
-
+    set_tick_timer(1000);
+    //sprintf(gpsbuffer, "%ld\n", SOFTUART_TIMERTOP);
+    //UART_SendString(gpsbuffer);
+    //memset(gpsbuffer, '\0', 50);
+    sprintf(gpsbuffer, "%ld\n", TICK_PERIOD_us);
+    UART_SendString(gpsbuffer);
 	#ifdef UART
 		UART_SendString("\nPAVx Jay UAV initialized\n\n");
 	#endif
 	#ifdef SW_UART
-		softuart_puts("\nPavx", 0);
+		//softuart_puts("\nPavx", 0);
 	#endif
 
 	while(1) {
@@ -69,6 +74,7 @@ int main (void) {
  
                     memset(gpsbuffer, '\0', 50);
                     GPS_UpdateData();
+                   /* 
                     struct tm time = GPS_GetTime();
                     sprintf(gpsbuffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", time.tm_hour, time.tm_min, time.tm_sec, GPS_GetLatitude(), GPS_GetLongitude(), GPS_GetSpeed(), GPS_GetAltitude());
                     int i = 0;
@@ -76,6 +82,17 @@ int main (void) {
                         _uart_driver_SendByte(gpsbuffer[i]);
                         i++;
                     }
+                 */   
+                }
+                
+                if(tick_timer_flag()) {
+                    
+                    clear_tick_timer_flag();
+                     char buffer[20];
+                    sprintf(buffer, "Hi:%f\n", (double)clock_time());
+                    UART_SendString(buffer);
+
+                    //UART_SendString("Testing\n");
                 }
             
             #endif

@@ -10,9 +10,13 @@
 #include <stdint.h>
 
 void clock_init(void);
-uint64_t clock_time(void);
+uint16_t clock_time(void);
 void system_tick(void);
 uint8_t system_ticked(void);
 void system_untick(void);
+
+void clear_tick_timer_flag(void);
+bool tick_timer_flag(void); 
+void set_tick_timer(uint64_t ms); 
 
 #endif /* _SYSTEM_TICK_H_ */

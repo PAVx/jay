@@ -26,7 +26,7 @@
 #define DEVICE_ADDRESS (0x01)
 ////////////////////////////
 #define BROADCAST_ALL_DESTINATION_ADDRESS (0xAA)
-
+#define u_sec 1000000
 #ifndef F_CPU
 	#define F_CPU 16000000UL
 #endif
@@ -41,7 +41,7 @@
 
 	#ifdef UART
 		#ifndef HW_UART_BAUD
-			#define HW_UART_BAUD (4800)
+			#define HW_UART_BAUD (9600)
 		#endif
 	#endif
 
@@ -58,7 +58,7 @@
 		#endif
 
 		#define TIMER_PERIOD ((TIMER0_PERIOD * 1000) / F_CPU)
-
+        #define TICK_PERIOD_us ((SOFTUART_TIMERTOP * TIMER0_PRESCALE * u_sec)/ F_CPU) 
 	#endif
 #endif
 

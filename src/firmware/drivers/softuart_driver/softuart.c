@@ -145,7 +145,7 @@ int get_rx_pin_status(int i) {
 
 ISR(SOFTUART_T_COMP_LABEL)
 {
-	//system_tick();
+	system_tick();
 	//int i = 1;
 	_isrFlag = 1;
 	run_isr();
