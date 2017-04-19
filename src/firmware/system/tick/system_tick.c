@@ -12,32 +12,34 @@
 #include "system.h"
 #include "drivers.h"
 #include "protocols.h"
-
+#define NUM_COMP 2
+#define MAX_COMPARE_VALUE 65535
 #define SYSTEM_TIMEOUT (20) 
 typedef struct {
-    uint64_t ticked;
-    uint16_t compare;
+    uint16_t value;
+    uint16_t period;
     bool flag;
+    bool overflow;
     bool enable;
-} tick_t;
-static volatile tick_t tick_timer0;
-static volatile uint64_t _tick_count;
-static volatile uint8_t _ticked;
+} tick_comp_t;
+static tick_comp_t compare[NUM_COMP];
+static volatile uint64_t _tick_count = 0;
+static volatile uint8_t _tick_enabled = false;
 
 #ifndef SW_UART
 	#warning "software uart not defining a timer for system tick!"
 #endif
 
-void clock_init(void)
+void clock_start(void)
 {
-    
 	_tick_count = 0;
-	_ticked = false;
+	_tick_enabled = true;
 }
 
 uint16_t clock_time(void)
 {
-	return tick_timer0.compare;
+	return _tick_count;
+
 }
 
 // called in timer0, currently defined in the software uart
@@ -55,29 +57,41 @@ void system_tick(void) {
 		lapsed++;
 	}
     */
-    if(tick_timer0.enable) {
-        tick_timer0.ticked++;
-        if (tick_timer0.ticked >= tick_timer0.compare) {  
-            tick_timer0.flag = true;
-            tick_timer0.ticked = 0;
+    if(_tick_enabled) {
+        _tick_count++;
+        for(uint8_t i = 0; i < NUM_COMP; i++) {
+            if (compare[i].enable) {
+                if(_tick_count >= compare[i].value && !compare[i].overflow) {  
+                
+                    compare[i].value += compare[i].period;
+                    if (compare[i].value <= _tick_count) {
+                        compare[i].overflow = true;    
+                    }
+                    compare[i].flag = true;
+                }   
+            }
+        }
+        if (_tick_count > MAX_COMPARE_VALUE) {
+            _tick_count = 0;
+            for (uint8_t i = 0; i < NUM_COMP; i++) {
+                compare[i].overflow = false;
+            }
+
         }
     }
-}
-void set_tick_timer(uint64_t ms) {
-    tick_timer0.compare = (ms * 1000) / TICK_PERIOD_us;
-    tick_timer0.enable = true;
-}
-bool tick_timer_flag(void) {
-    return tick_timer0.flag;
-}
-void clear_tick_timer_flag(void) {
-    tick_timer0.flag = false;
-}
-uint8_t system_ticked(void) {
-	return _ticked;
-}
 
-void system_untick(void) {
-	_ticked = false;
+}
+void set_tick_period(uint8_t compare_x, uint64_t ms) {
+    if (compare_x < NUM_COMP) {
+        compare[compare_x].period = (ms * 1000) / TICK_PERIOD_us;
+        compare[compare_x].value = compare[compare_x].period;
+        compare[compare_x].enable = true;
+    }
+}
+bool tick_timer_flag(uint8_t compare_x) {
+    return compare[compare_x].flag;
+}
+void clear_tick_timer_flag(uint8_t compare_x) {
+    compare[compare_x].flag = false;
 }
 

@@ -82,7 +82,6 @@ uint8_t input_packet_type(uint8_t packet_opcode, uint8_t constant_packet_data_le
 		if (packet_opcodes[packet_opcode]._opcode_set) {
 			return FALSE;
 		}
-
 		packet_opcodes[packet_opcode].constant_packet_data_length = constant_packet_data_length;
 		packet_opcodes[packet_opcode].packet_handler_ptr = packet_handler_ptr;
 		packet_opcodes[packet_opcode]._opcode_set = TRUE;
@@ -118,12 +117,12 @@ void packet_receiver(void) {
 			if (byte_in == SOH_BYTE) {
 				receiver_state = STX_STATE;
 			}
-
 			break;
 
 		case STX_STATE:
 			if (byte_in == STX_BYTE) {
 				receiver_state = OPCODE_STATE;
+
 			} else {
 				receiver_state = SOH_STATE;
 			}
@@ -133,7 +132,8 @@ void packet_receiver(void) {
 		case OPCODE_STATE:
 			if (byte_in < MAX_NUMBER_PACKET_TYPES) {
 				this_opcode = byte_in;
-				receiver_state = DATA_STATE;
+				
+                receiver_state = DATA_STATE;
 			} else {
 				receiver_state = SOH_STATE;
 			}
@@ -156,6 +156,7 @@ void packet_receiver(void) {
 
 		case EOT_STATE:
 				if (byte_in == EOT_BYTE) {
+                    
 					(*(packet_opcodes[this_opcode].packet_handler_ptr))(rx_packet);
 				}  
 				
