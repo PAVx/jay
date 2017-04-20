@@ -71,6 +71,8 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I system/init
 SEARCHABLE_HEADER_FILE_DIRS	+= -I system/leds
 # TYPES #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I system/types
+# MEMORY #
+SEARCHABLE_HEADER_FILE_DIRS += -I system/memory/nonvolatile
 ####################
 
 ####################
@@ -137,6 +139,8 @@ CSOURCE						+= system/init/system_init.c
 CSOURCE						+= system/leds/leds.c
 # TYPES #
 CSOURCE						+= system/types/types.c
+# MEMORY #
+CSOURCE						+= system/memory/nonvolatile/nvmem.c
 ####################
 
 ####################

@@ -83,6 +83,7 @@
 #include "system_init.h"
 #include "leds.h"
 #include "types.h"
+#include "nvmem.h"
 
 
 #endif
