@@ -62,11 +62,11 @@ int main (void) {
   	 		    sprintf(abuffer, "A_X = %f\nA_Y = %f\nA_Z = %f\n\n\r", Accel_GetX(), Accel_GetY(), Accel_GetZ());
 		 		UART_SendString(abuffer);
 		 	#endif
-            
+
             #ifdef GPS
-            
+
                 if(GPS_NewDataReady()) {
- 
+
                     memset(gpsbuffer, '\0', 50);
                     GPS_UpdateData();
                     struct tm time = GPS_GetTime();
@@ -77,7 +77,7 @@ int main (void) {
                         i++;
                     }
                 }
-            
+
             #endif
 
 			#ifdef UART
@@ -93,6 +93,7 @@ int main (void) {
 
 		//softuart_puts("sup\n",0);
 		//UART_SendString("\nHW_UART PRINT\n\r");
+
 		// todo:
 		// update accel registers
 		// update gps registers

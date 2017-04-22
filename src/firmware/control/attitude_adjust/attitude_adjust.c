@@ -1,8 +1,8 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 // attitude_adjust.c
 
@@ -24,6 +24,8 @@ int16_t pitchOutput;
 int16_t yawOutput;
 
 Success_t InitializeAttitudeAdjust(void) {
+	//TODO: remove these as sensor and copter aren't a protocol
+
 	if ((_sensor ) && (_copter)) {
 		return ALREADY_INITIALIZED;
 	}
@@ -56,20 +58,23 @@ Success_t InitializeAttitudeAdjust(void) {
 void AttitudeAdjustCorrectRatePID(
 	double rollRateActual, double pitchRateActual, double yawRateActual,
 	double rollRateDesired, double pitchRateDesired, double yawRateDesired) {
-  PIDSetDesired(&pidRollRate, rollRateDesired);
-  rollOutput = saturateSignedInt16(pidUpdate(&pidRollRate, rollRateActual, UPDATE_ERROR));
 
-  PIDSetDesired(&pidPitchRate, pitchRateDesired);
-  pitchOutput = saturateSignedInt16(pidUpdate(&pidPitchRate, pitchRateActual, UPDATE_ERROR));
+	PIDSetDesired(&pidRollRate, rollRateDesired);
+	rollOutput = saturateSignedInt16(pidUpdate(&pidRollRate, rollRateActual, UPDATE_ERROR));
 
-  PIDSetDesired(&pidYawRate, yawRateDesired);
-  yawOutput = saturateSignedInt16(pidUpdate(&pidYawRate, yawRateActual, UPDATE_ERROR));
+	PIDSetDesired(&pidPitchRate, pitchRateDesired);
+	pitchOutput = saturateSignedInt16(pidUpdate(&pidPitchRate, pitchRateActual, UPDATE_ERROR));
+
+	PIDSetDesired(&pidYawRate, yawRateDesired);
+	yawOutput = saturateSignedInt16(pidUpdate(&pidYawRate, yawRateActual, UPDATE_ERROR));
 }
 
+// TODO: Why are *RateDesired included
 void AttitudeAdjustRunPID(
 	double eulerRollActual, double eulerPitchActual, double eulerYawActual,
 	double eulerRollDesired, double eulerPitchDesired, double eulerYawDesired,
 	double* rollRateDesired, double* pitchRateDesired, double* yawRateDesired)	{
+
 	double yawError;
 
 	PIDSetDesired(&pidRoll, eulerRollDesired);
@@ -98,7 +103,7 @@ void AttitudeAdjustGetActuatorOutput(int16_t* roll, int16_t* pitch, int16_t* yaw
 
 
 // Manual Test Function -- AVOID USE //
-
+//TODO: no _sensor-> struct, remove or restructure
 Success_t Adjust_Yaw(double angle) {
 	if (_IsValidYawAngle(angle) == INVALID_PARAMETER) {
 		return INVALID_PARAMETER;
@@ -280,6 +285,8 @@ Success_t _IsValidRollAngle(double angle) {
 
 Success_t _Roll(AttitudeDirection_t direction) {
 	switch (direction) {
+		// need to change this so that the _copter struct is taken out.
+		// 
 		case ROLL_LEFT:
 			if ((_copter->RotorTwo->current_thrust < MAX_ROTOR_2_THRUST) &&
 				(_copter->RotorFour->current_thrust < MAX_ROTOR_4_THRUST) {
