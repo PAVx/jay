@@ -4,8 +4,8 @@ BURNER						= avrdude
 CC_AVR						= atmega328p
 F_CPU						= 16000000UL
 BURNER_AVR					= ATMEGA328P
-BURNER_PROGRAMMER			= Arduino
-COMPILER_PATH				= COM3
+BURNER_PROGRAMMER			= usbasp
+COMPILER_PATH				= tty.usbserial*
 OBJECT_COPY					= avr-objcopy
 BAUDRATE					= 115200
 ###########################################

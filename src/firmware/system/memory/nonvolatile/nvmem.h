@@ -1,5 +1,5 @@
 // eeprom.h
-// Written by Sargis Yonan
+// nvram.h by Sargis Yonan
 // April 2017
 
 #include <avr/io.h>
