@@ -6,10 +6,9 @@
 
 // attitude_adjust.c
 
-#include "control/attitude_adjust/attitude_adjust.h"
+#include "attitude_adjust.h"
 
-Sensor_t *_sensor;
-Copter_t *_copter;
+//#define USE_RATES
 
 PID_t pidRollRate;
 PID_t pidPitchRate;
@@ -19,31 +18,26 @@ PID_t pidRoll;
 PID_t pidPitch;
 PID_t pidYaw;
 
+// Yaw Pitch Roll Rate Errors
 int16_t rollOutput;
 int16_t pitchOutput;
 int16_t yawOutput;
 
+// Yaw Pitch Roll Errors
+int16_t rollError;
+int16_t pitchError;
+int16_t yawError;
+
 Success_t InitializeAttitudeAdjust(void) {
-	//TODO: remove these as sensor and copter aren't a protocol
 
-	if ((_sensor ) && (_copter)) {
-		return ALREADY_INITIALIZED;
-	}
-
-	if (SensorInitialize == ALREADY_INITIALIZED) {
-		_sensor = GetSensorProtocol();
-	}
-
-	if (CopterInitialize == ALREADY_INITIALIZED) {
-		_copter = GetCopterProtocol();
-	}
-
-	PIDCreateInstance(&pidRollRate, 0, PID_ROLL_RATE_KP, PID_ROLL_RATE_KI, PID_ROLL_RATE_KD, IMU_UPDATE_DT);
-	PIDCreateInstance(&pidPitchRate, 0, PID_PITCH_RATE_KP, PID_PITCH_RATE_KI, PID_PITCH_RATE_KD, IMU_UPDATE_DT);
-	PIDCreateInstance(&pidYawRate, 0, PID_YAW_RATE_KP, PID_YAW_RATE_KI, PID_YAW_RATE_KD, IMU_UPDATE_DT);
-	PIDSetIntegralLimit(&pidRollRate, PID_ROLL_RATE_INTEGRATION_LIMIT);
-	PIDSetIntegralLimit(&pidPitchRate, PID_PITCH_RATE_INTEGRATION_LIMIT);
-	PIDSetIntegralLimit(&pidYawRate, PID_YAW_RATE_INTEGRATION_LIMIT);
+	#ifdef USE_RATES
+		PIDCreateInstance(&pidRollRate, 0, PID_ROLL_RATE_KP, PID_ROLL_RATE_KI, PID_ROLL_RATE_KD, IMU_UPDATE_DT);
+		PIDCreateInstance(&pidPitchRate, 0, PID_PITCH_RATE_KP, PID_PITCH_RATE_KI, PID_PITCH_RATE_KD, IMU_UPDATE_DT);
+		PIDCreateInstance(&pidYawRate, 0, PID_YAW_RATE_KP, PID_YAW_RATE_KI, PID_YAW_RATE_KD, IMU_UPDATE_DT);
+		PIDSetIntegralLimit(&pidRollRate, PID_ROLL_RATE_INTEGRATION_LIMIT);
+		PIDSetIntegralLimit(&pidPitchRate, PID_PITCH_RATE_INTEGRATION_LIMIT);
+		PIDSetIntegralLimit(&pidYawRate, PID_YAW_RATE_INTEGRATION_LIMIT);
+	#endif
 
 	PIDCreateInstance(&pidRoll, 0, PID_ROLL_KP, PID_ROLL_KI, PID_ROLL_KD, IMU_UPDATE_DT);
 	PIDCreateInstance(&pidPitch, 0, PID_PITCH_KP, PID_PITCH_KI, PID_PITCH_KD, IMU_UPDATE_DT);
@@ -53,6 +47,19 @@ Success_t InitializeAttitudeAdjust(void) {
 	PIDSetIntegralLimit(&pidYaw, PID_YAW_INTEGRATION_LIMIT);
 
 	return SUCCESS;
+}
+
+void AttituteAdjustSetDesired(double rollDesired, double pitchDesired, double yawDesired){
+	PIDSetDesired(&pidYaw, YawDesired);
+	PIDSetDesired(&pidPitch, pitchDesired);
+	PIDSetDesired(&pidRoll, RollDesired);
+}
+
+
+void AttituteAdjustUpdatePID(double rollActual, double pitchActual, double yawActual){
+	yawError = saturateSignedInt16(pidUpdate(&pidYaw, pidYaw.desired, UPDATE_ERROR));
+	pitchError = saturateSignedInt16(pidUpdate(&pidPitch, pidPitch.desired, UPDATE_ERROR));
+	rollError = saturateSignedInt16(pidUpdate(&pidRoll, pidRoll.desired, UPDATE_ERROR));
 }
 
 void AttitudeAdjustCorrectRatePID(
@@ -101,6 +108,21 @@ void AttitudeAdjustGetActuatorOutput(int16_t* roll, int16_t* pitch, int16_t* yaw
 	*yaw = yawOutput;
 }
 
+// Niraj's Functions
+int16_t* getMotorVal(void){
+	/* Motor Array: [mot1, mot2, mot3, mot4]
+		mot1		mot2
+		    	  ^
+			drone
+		mot3		mot4
+	*/
+	uint16_t motor_changes[4];
+	motor_changes[0] = -yawError -pitchError -rollError;
+	motor_changes[1] =  yawError -pitchError +rollError;
+	motor_changes[2] =  yawError +pitchError -rollError;
+	motor_changes[3] = -yawError +pitchError -rollError;
+	return &motor_changes;
+}
 
 // Manual Test Function -- AVOID USE //
 //TODO: no _sensor-> struct, remove or restructure
@@ -286,7 +308,7 @@ Success_t _IsValidRollAngle(double angle) {
 Success_t _Roll(AttitudeDirection_t direction) {
 	switch (direction) {
 		// need to change this so that the _copter struct is taken out.
-		// 
+		//
 		case ROLL_LEFT:
 			if ((_copter->RotorTwo->current_thrust < MAX_ROTOR_2_THRUST) &&
 				(_copter->RotorFour->current_thrust < MAX_ROTOR_4_THRUST) {
