@@ -8,12 +8,14 @@
 #include <string.h>
 #include <util/delay.h>
 
-char gbuffer[128];
-char abuffer[128];
+char gbuffer[15];
+char abuffer[15];
 char gpsbuffer[50];
 
+float vector = 0;
+
 int main (void) {
-	#define MOTOR_TEST (1)
+	//#define MOTOR_TEST (1)
 
 	#ifdef MOTOR_TEST
 		uint8_t byte = 0;
@@ -22,8 +24,10 @@ int main (void) {
 	#endif
 
 	system_initialize();
-	//softuart_init();
+
 	led_on(SYSTEM_LED);
+	led_on(GP_LED1);
+	led_off(GP_LED2);
 
 	#ifdef UART
 		UART_SendString("\nPAVx Jay UAV initialized\n\n");
@@ -32,20 +36,6 @@ int main (void) {
 	for(;;) {
 
 		#ifdef MOTOR_TEST
-
-
-		while(1) {
-			motor_set(1, 128);
-			motor_set(2, 128);
-			motor_set(3, 128);
-			motor_set(4, 128);
-
-			led_on(SYSTEM_LED);
-			led_on(GP_LED1);
-			led_on(GP_LED2);
-		}
-
-
 		while(1) {
 			if (!UART_IsEmpty()) {
 				byte = UART_GetByte();
@@ -170,8 +160,6 @@ int main (void) {
 		}
 		#endif
 
-
-
 	  	#ifdef COM
 	  		#ifdef UART
 				// receive_packet();
@@ -180,46 +168,74 @@ int main (void) {
 	  	#endif
 
 		#ifdef GYRO
-  		//	Gyro_Update();
+  			Gyro_Update();
   		#endif
 
   		#ifdef ACCEL
-  		//	Accel_Update();
+  			Accel_Update();
   		#endif
 
         #ifdef GPS
-        //    NEO6M_GetChar();
+            NEO6M_GetChar();
         #endif
 
   		#ifdef LEDS
- // 			toggle_led(SYSTEM_LED);
+  			toggle_led(GP_LED2);
+  			toggle_led(GP_LED1);
   		#endif
 
 	 	#ifdef GYRO
-		//	sprintf(gbuffer, "G_X = %f\nG_Y = %f\nG_Z = %f\n\n\r", Gyro_GetX(), Gyro_GetY(), Gyro_GetZ());
-		//	UART_SendString(gbuffer);
-		//	UART_SendString("\n");
+  			memset(gbuffer, '\0', 15);
+			UART_SendByte('\n');
+
+			sprintf(gbuffer, "  G_X = %f\n", Gyro_GetX());
+			UART_SendString(gbuffer);
+			sprintf(gbuffer, " G_Y = %f\n", Gyro_GetY());
+			UART_SendString(gbuffer);
+			sprintf(gbuffer, " G_Z = %f\n", Gyro_GetZ());
+			UART_SendString(gbuffer);
+
+			UART_SendByte('\n');
+
 	 	#endif
 
 	 	#ifdef ACCEL
-	 	//	sprintf(abuffer, "A_X = %f\nA_Y = %f\nA_Z = %f\n\n\r", Accel_GetX(), Accel_GetY(), Accel_GetZ());
-	 	//	UART_SendString(abuffer);
+			memset(abuffer, '\0', 15);
+			UART_SendByte('\n');
+
+			sprintf(abuffer, "  A_X = %f\n", Accel_GetX());
+			UART_SendString(abuffer);
+			sprintf(abuffer, " A_Y = %f\n", Accel_GetY());
+			UART_SendString(abuffer);
+			sprintf(abuffer, " A_Z = %f\n", Accel_GetZ());
+			UART_SendString(abuffer);
+
+			UART_SendString("--------------------------");
 	 	#endif
         
         #ifdef GPS
-        //    if(GPS_NewDataReady()) {
-        //        memset(gpsbuffer, '\0', 50);
-        //        GPS_UpdateData();
-        //        struct tm time = GPS_GetTime();
-        //        sprintf(gpsbuffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", time.tm_hour, time.tm_min, time.tm_sec, GPS_GetLatitude(), GPS_GetLongitude(), GPS_GetSpeed(), GPS_GetAltitude());
-        //        int i = 0;
-        //        while (gpsbuffer[i] != '\0') {
-        //            _uart_driver_SendByte(gpsbuffer[i]);
-        //            i++;
-        //        }
-        //    }
+            if(GPS_NewDataReady()) {
+
+
+			UART_SendString("-------***********----");
+
+
+                memset(gpsbuffer, '\0', 50);
+                GPS_UpdateData();
+                struct tm time = GPS_GetTime();
+                sprintf(gpsbuffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", time.tm_hour, time.tm_min, time.tm_sec, GPS_GetLatitude(), GPS_GetLongitude(), GPS_GetSpeed(), GPS_GetAltitude());
+                int i = 0;
+                while (gpsbuffer[i] != '\0') {
+                    UART_SendByte(gpsbuffer[i]);
+                    i++;
+                }
+            }
         
         #endif
+
+
+	 	_delay_ms(500);
+
 
 		}
 	}
