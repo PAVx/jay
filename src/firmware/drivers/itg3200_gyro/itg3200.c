@@ -8,14 +8,14 @@
 
 #include "uart.h"
 
-float _g_t;
-float _g_x;
-float _g_y;
-float _g_z;
+float _g_t = 0;
+float _g_x = 0;
+float _g_y = 0;
+float _g_z = 0;
 
-float g_offx;
-float g_offy;
-float g_offz;
+float g_offx = 0;
+float g_offy = 0;
+float g_offz = 0;
 
 bool initialized = false;
 

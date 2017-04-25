@@ -9,11 +9,11 @@
 
 // SYSTEM DEFINES
 #define COM (1)
-//#define LEDS (1)
-//#define MOTORS (1)
+#define LEDS (1)
+#define MOTORS (1)
 #define SYSTEM_TICK (1)
-//#define GYRO (1)
-//#define ACCEL (1)
+#define GYRO (1)
+#define ACCEL (1)
 #define GPS (1)
 
 // CLIB INCLUDES
@@ -41,7 +41,7 @@
 
 	#ifdef UART
 		#ifndef HW_UART_BAUD
-			#define HW_UART_BAUD (4800)
+			#define HW_UART_BAUD (9600)
 		#endif
 	#endif
 
