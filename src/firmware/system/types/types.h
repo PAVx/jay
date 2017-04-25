@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+#define ASCII_NUMBER_OFFSET (0x30)
+
 uint64_t double_to_binary(double val);
 double binary_to_double(uint64_t bin);
 void double_to_byte_array(double val, uint8_t buff[8]);

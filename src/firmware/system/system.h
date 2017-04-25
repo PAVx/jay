@@ -32,7 +32,7 @@
 #endif
 
 #ifndef DEFAULT_NUM_SIBLINGS
-	#define DEFAULT_NUM_SIBLINGS (4)
+	#define DEFAULT_NUM_SIBLINGS (8) // a max value -- be conservative for packet memory reasons
 #endif
 
 #ifdef COM

@@ -4,8 +4,8 @@ BURNER						= avrdude
 CC_AVR						= atmega328p
 F_CPU						= 16000000UL
 BURNER_AVR					= ATMEGA328P
-BURNER_PROGRAMMER			= usbasp
-COMPILER_PATH				= tty.usbserial*
+BURNER_PROGRAMMER			= Arduino
+COMPILER_PATH				= tty.usbmodem14141
 OBJECT_COPY					= avr-objcopy
 BAUDRATE					= 115200
 ###########################################
@@ -190,10 +190,12 @@ CC_LN_OPTIONS				+= ${OBJECTS}
 
 
 all:
-	${CC} ${CC_COMP_OPTIONS}
+	${CC} ${CC_COMP_OPTIONS} 
 	${CC} ${CC_LN_OPTIONS}
 
 	${OBJECT_COPY} -j .text -j .data -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
 	${BURNER} -F -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 	#${BURNER} -F -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex 
 
+clean:
+	rm *.hex *.elf *.o
