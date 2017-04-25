@@ -16,6 +16,9 @@
 #define ACCEL (1)
 #define GPS (1)
 
+#define SYSTEM_INIT_DEBUG_PRINTOUTS (1)
+
+
 // CLIB INCLUDES
 #include <stdlib.h>
 #include <stdint.h>
@@ -59,6 +62,12 @@
 
 		#define TIMER_PERIOD ((TIMER0_PERIOD * 1000) / F_CPU)
 
+	#endif
+#endif
+
+#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
+	#ifndef UART
+		#define UART (1)
 	#endif
 #endif
 

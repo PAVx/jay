@@ -33,14 +33,6 @@
 int main (void) {
 	system_initialize();
 
-
-	#ifdef UART
-		UART_SendString("\n\nPAVx Jay UAV System v3.0\n\n");
-		UART_SendString("\n\n--Device Address: ");
-		UART_SendByte(DEVICE_ADDRESS + ASCII_NUMBER_OFFSET);
-		UART_SendString("is online\n\n");
-	#endif
-
 	for(;;) {
 
 		#ifdef MOTOR_TEST
