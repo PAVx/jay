@@ -48,7 +48,6 @@ int main (void) {
 		if (system_ticked() == TRUE) {
 			#ifdef CAM
 				Cam_Update();
-
 			#endif
 			Gyro_Update();
 			Accel_Update();
@@ -72,7 +71,7 @@ int main (void) {
 			AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
 
 			// Update Motors
-			int16_t* motor_delta = getMotorDeltal();
+			int16_t* motor_delta = AttitudeAdjustGetActuation();
 			motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) + motor_delta[0]);
 			motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TW0) + motor_delta[1]);
 			motor_set(MOTOR_THREE, motor_get_speed(MOTOR_ONE) + motor_delta[2]);

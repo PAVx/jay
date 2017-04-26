@@ -7,6 +7,7 @@
 // attitude_adjust.c
 
 #include "attitude_adjust.h"
+#include "motors.h"
 
 //#define USE_RATES
 
@@ -55,13 +56,13 @@ void AttituteAdjustSetDesired(double rollDesired, double pitchDesired, double ya
 	PIDSetDesired(&pidRoll, RollDesired);
 }
 
-
 void AttituteAdjustUpdatePID(double rollActual, double pitchActual, double yawActual){
 	yawError = saturateSignedInt16(pidUpdate(&pidYaw, pidYaw.desired, UPDATE_ERROR));
 	pitchError = saturateSignedInt16(pidUpdate(&pidPitch, pidPitch.desired, UPDATE_ERROR));
 	rollError = saturateSignedInt16(pidUpdate(&pidRoll, pidRoll.desired, UPDATE_ERROR));
 }
 
+/*
 void AttitudeAdjustCorrectRatePID(
 	double rollRateActual, double pitchRateActual, double yawRateActual,
 	double rollRateDesired, double pitchRateDesired, double yawRateDesired) {
@@ -76,7 +77,6 @@ void AttitudeAdjustCorrectRatePID(
 	yawOutput = saturateSignedInt16(pidUpdate(&pidYawRate, yawRateActual, UPDATE_ERROR));
 }
 
-// TODO: Why are *RateDesired included
 void AttitudeAdjustRunPID(
 	double eulerRollActual, double eulerPitchActual, double eulerYawActual,
 	double eulerRollDesired, double eulerPitchDesired, double eulerYawDesired,
@@ -102,19 +102,21 @@ void AttitudeAdjustRunPID(
 	*yawRateDesired = PIDUpdate(&pidYaw, eulerYawActual, NO_UPDATE);
 }
 
-void AttitudeAdjustGetActuatorOutput(int16_t* roll, int16_t* pitch, int16_t* yaw)	{
+void AttitudeAdjustGetActuatorOutput(int16_t* roll, int16_t* pitch, int16_t* yaw) {
 	*roll = rollOutput;
 	*pitch = pitchOutput;
 	*yaw = yawOutput;
 }
+*/
 
-// Niraj's Functions
-int16_t* getMotorVal(void){
+int16_t* AttitudeAdjustGetActuation(void){
 	/* Motor Array: [mot1, mot2, mot3, mot4]
-		mot1		mot2
-		    	  ^
-			drone
-		mot3		mot4
+		mot1				mot2
+		cw				ccw
+		    	  	^
+			      drone
+		mot3				mot4
+		ccw				cw
 	*/
 	uint16_t motor_changes[4];
 	motor_changes[0] = -yawError -pitchError -rollError;
@@ -125,7 +127,6 @@ int16_t* getMotorVal(void){
 }
 
 // Manual Test Function -- AVOID USE //
-//TODO: no _sensor-> struct, remove or restructure
 Success_t Adjust_Yaw(double angle) {
 	if (_IsValidYawAngle(angle) == INVALID_PARAMETER) {
 		return INVALID_PARAMETER;
@@ -159,28 +160,34 @@ Success_t _IsValidYawAngle(double angle) {
 Success_t _Yaw(AttitudeDirection_t direction) {
 	switch (direction) {
 		case YAW_CW:
-			if ((_copter->RotorOne->current_thrust < MAX_ROTOR_1_THRUST) &&
-				(_copter->RotorThree->current_thrust < MAX_ROTOR_3_THRUST)) {
+			if ((motor_get_speed(MOTOR_ONE) < MAX_ROTOR_1_THRUST) &&
+				(motor_get_speed(MOTOR_FOUR) < MAX_ROTOR_4_THRUST) &&
+				(motor_get_speed(MOTOR_TWO) > MIN_ROTOR_2_THRUST) &&
+				(motor_get_speed(MOTOR_THREE) > MIN_ROTOR_3_THRUST) {
 
-				_copter->RotorOne->Control((_copter->RotorOne->gpio),
-					_copter->RotorOne->current_thrust + YAW_CW_MARGIN);
+				motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) + YAW_CW_MARGIN);
+				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_FOUR) + YAW_CW_MARGIN);
 
-				_copter->RotorThree->Control((_copter->RotorThree->gpio),
-					_copter->RotorThree->current_thrust + YAW_CW_MARGIN);
+				motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TWO) - YAW_CW_MARGIN);
+				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_THREE) - YAW_CW_MARGIN);
+
 			} else {
 				return MAX_MOTOR_THRUST_ACHIEVED;
 			}
 			break;
 
 		case YAW_CCW:
-			if ((_copter->RotorTwo->current_thrust < MAX_ROTOR_2_THRUST) &&
-				(_copter->RotorFour->current_thrust < MAX_ROTOR_4_THRUST)) {
+			if ((motor_get_speed(MOTOR_TWO) < MAX_ROTOR_2_THRUST) &&
+				(motor_get_speed(MOTOR_THREE) < MAX_ROTOR_3_THRUST) &&
+				(motor_get_speed(MOTOR_ONE) > MIN_ROTOR_1_THRUST) &&
+				(motor_get_speed(MOTOR_FOUR) > MIN_ROTOR_4_THRUST) {
 
-				_copter->RotorTwo->Control((_copter->RotorTwo->gpio),
-					_copter->RotorTwo->current_thrust + YAW_CCW_MARGIN);
+				motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TWO) + YAW_CCW_MARGIN);
+				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_THREE) + YAW_CCW_MARGIN);
 
-				_copter->RotorFour->Control((_copter->RotorFour->gpio),
-					_copter->RotorFour->current_thrust + YAW_CCW_MARGIN);
+				motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) - YAW_CCW_MARGIN);
+				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_FOUR) - YAW_CCW_MARGIN);
+
 			} else {
 				return MAX_MOTOR_THRUST_ACHIEVED;
 			}
@@ -222,8 +229,7 @@ Success_t Adjust_Pitch(double angle) {
 
 Success_t _IsValidPitchAngle(double angle) {
 	if (((angle > MINIMUM_ALLOWABLE_PITCH_ANGLE) &&
-		(angle < MAXIMUM_ALLOWABLE_PITCH_ANGLE))
-		||
+		(angle < MAXIMUM_ALLOWABLE_PITCH_ANGLE)) ||
 		((angle < MINIMUM_ALLOWABLE_PITCH_ANGLE) &&
 		(angle > -1 * MAXIMUM_ALLOWABLE_PITCH_ANGLE))) {
 		return VALID_PARAMETER;
@@ -234,28 +240,34 @@ Success_t _IsValidPitchAngle(double angle) {
 Success_t _Pitch(AttitudeDirection_t direction) {
 	switch (direction) {
 		case PITCH_FORWARD:
-			if ((_copter->RotorOne->current_thrust < MAX_ROTOR_1_THRUST) &&
-				(_copter->RotorTwo->current_thrust < MAX_ROTOR_2_THRUST) {
+			if ((motor_get_speed(MOTOR_THREE) < MAX_ROTOR_3_THRUST) &&
+				(motor_get_speed(MOTOR_FOUR) < MAX_ROTOR_4_THRUST) &&
+				(motor_get_speed(MOTOR_ONE) > MIN_ROTOR_1_THRUST) &&
+				(motor_get_speed(MOTOR_TWO) > MIN_ROTOR_2_THRUST) {
 
-				_copter->RotorOne->Control((_copter->RotorOne->gpio),
-					_copter->RotorOne->current_thrust + PITCH_POSITIVE_MARGIN);
+				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_THREE) + PITCH_POSITIVE_MARGIN);
+				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_FOUR) + PITCH_POSITIVE_MARGIN);
 
-				_copter->RotorTwo->Control((_copter->RotorTwo->gpio),
-					_copter->RotorTwo->current_thrust + PITCH_POSITIVE_MARGIN);
+				motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) - PITCH_POSITIVE_MARGIN);
+				motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TWO) - PITCH_POSITIVE_MARGIN);
+
 			} else {
 				return MAX_MOTOR_THRUST_ACHIEVED;
 			}
 			break;
 
 		case PITCH_BACKWARD:
-			if ((RotorThree->current_thrust < MAX_ROTOR_3_THRUST) &&
-				(RotorFour->current_thrust < MAX_ROTOR_4_THRUST)) {
+			if ((motor_get_speed(MOTOR_ONE) < MAX_ROTOR_1_THRUST) &&
+				(motor_get_speed(MOTOR_TWO) < MAX_ROTOR_2_THRUST) &&
+				(motor_get_speed(MOTOR_THREE) > MIN_ROTOR_3_THRUST) &&
+				(motor_get_speed(MOTOR_FOUR) > MIN_ROTOR_4_THRUST) {
 
-				_copter->RotorThree->Control((_copter->RotorThree->gpio),
-					_copter->RotorThree->current_thrust + PITCH_POSITIVE_MARGIN);
+				motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) + PITCH_POSITIVE_MARGIN);
+				motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TWO) + PITCH_POSITIVE_MARGIN);
 
-				_copter->RotorFour->Control((_copter->RotorFour->gpio),
-					_copter->RotorFour->current_thrust + PITCH_POSITIVE_MARGIN);
+				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_THREE) - PITCH_POSITIVE_MARGIN);
+				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_FOUR) - PITCH_POSITIVE_MARGIN);
+
 			} else {
 				return MAX_MOTOR_THRUST_ACHIEVED;
 			}
@@ -307,31 +319,35 @@ Success_t _IsValidRollAngle(double angle) {
 
 Success_t _Roll(AttitudeDirection_t direction) {
 	switch (direction) {
-		// need to change this so that the _copter struct is taken out.
-		//
 		case ROLL_LEFT:
-			if ((_copter->RotorTwo->current_thrust < MAX_ROTOR_2_THRUST) &&
-				(_copter->RotorFour->current_thrust < MAX_ROTOR_4_THRUST) {
+			if ((motor_get_speed(MOTOR_TWO) < MAX_ROTOR_2_THRUST) &&
+				(motor_get_speed(MOTOR_FOUR) < MAX_ROTOR_4_THRUST) &&
+				(motor_get_speed(MOTOR_ONE) > MIN_ROTOR_1_THRUST) &&
+				(motor_get_speed(MOTOR_THREE) > MIN_ROTOR_3_THRUST) {
 
-				_copter->RotorTwo->Control((_copter->RotorTwo->gpio),
-					_copter->RotorTwo->current_thrust + ROLL_POSITIVE_MARGIN);
+				motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TWO) + ROLL_POSITIVE_MARGIN);
+				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_FOUR) + ROLL_POSITIVE_MARGIN);
 
-				_copter->RotorFour->Control((_copter->RotorFour->gpio),
-					_copter->RotorFour->current_thrust + ROLL_POSITIVE_MARGIN);
+				motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) - ROLL_POSITIVE_MARGIN);
+				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_THREE) - ROLL_POSITIVE_MARGIN);
+
 			} else {
 				return MAX_MOTOR_THRUST_ACHIEVED;
 			}
 			break;
 
 		case ROLL_RIGHT:
-			if ((RotorOne->current_thrust < MAX_ROTOR_1_THRUST) &&
-				(RotorThree->current_thrust < MAX_ROTOR_3_THRUST)) {
+			if ((motor_get_speed(MOTOR_ONE) < MAX_ROTOR_1_THRUST) &&
+				(motor_get_speed(MOTOR_THREE) < MAX_ROTOR_3_THRUST) &&
+				(motor_get_speed(MOTOR_TWO) > MIN_ROTOR_2_THRUST) &&
+				(motor_get_speed(MOTOR_FOUR) > MIN_ROTOR_4_THRUST) {
 
-				_copter->RotorOne->Control((_copter->RotorOne->gpio),
-					_copter->RotorOne->current_thrust + ROLL_POSITIVE_MARGIN);
+				motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) + ROLL_POSITIVE_MARGIN);
+				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_THREE) + ROLL_POSITIVE_MARGIN);
 
-				_copter->RotorThree->Control((_copter->RotorThree->gpio),
-					_copter->RotorThree->current_thrust + ROLL_POSITIVE_MARGIN);
+				motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TWO) - ROLL_POSITIVE_MARGIN);
+				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_FOUR) - ROLL_POSITIVE_MARGIN);
+
 			} else {
 				return MAX_MOTOR_THRUST_ACHIEVED;
 			}
@@ -378,47 +394,35 @@ Success_t _Altitude(AttitudeDirection_t altitude_parameter) {
 	Success_t ret;
 	switch (altitude_parameter) {
 		case LOWER_ALTITUDE:
-			if ((_copter->RotorOne->current_thrust > MINIMUM_ROTOR_1_THRUST) &&
-				(_copter->RotorTwo->current_thrust > MINIMUM_ROTOR_2_THRUST) &&
-				(_copter->RotorThree->current_thrust > MINIMUM_ROTOR_3_THRUST) &&
-				(_copter->RotorFour->current_thrust > MINIMUM_ROTOR_4_THRUST)) {
+			if ((motor_get_speed(MOTOR_ONE) > MIN_ROTOR_1_THRUST) &&
+				(motor_get_speed(MOTOR_TWO) > MIN_ROTOR_2_THRUST) &&
+				(motor_get_speed(MOTOR_THREE) > MIN_ROTOR_3_THRUST) &&
+				(motor_get_speed(MOTOR_FOUR) > MIN_ROTOR_4_THRUST) {
 
-				_copter->RotorOne->Control((_copter->RotorOne->gpio),
-					_copter->RotorOne->current_thrust - ALTITUDE_LOWER_MARGIN);
+				motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) - ALTITUDE_LOWER_MARGIN);
+				motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TWO) - ALTITUDE_LOWER_MARGIN);
+				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_THREE) - ALTITUDE_LOWER_MARGIN);
+				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_FOUR) - ALTITUDE_LOWER_MARGIN);
 
-				_copter->RotorTwo->Control((_copter->RotorTwo->gpio),
-					_copter->RotorTwo->current_thrust - ALTITUDE_LOWER_MARGIN);
-
-				_copter->RotorThree->Control((_copter->RotorThree->gpio),
-					_copter->RotorThree->current_thrust - ALTITUDE_LOWER_MARGIN);
-
-				_copter->RotorFour->Control((_copter->RotorFour->gpio),
-					_copter->RotorFour->current_thrust - ALTITUDE_LOWER_MARGIN);
 			} else {
-				return MINIMUM_MOTOR_THRUST_ACHIEVED;
+				return MIN_MOTOR_THRUST_ACHIEVED;
 			}
 			break;
 
 		case RISE_ALTITUDE:
-			if ((_copter->RotorOne->current_thrust < MAXIMUM_ROTOR_1_THRUST) &&
-				(_copter->RotorTwo->current_thrust < MAXIMUM_ROTOR_2_THRUST) &&
-				(_copter->RotorThree->current_thrust < MAXIMUM_ROTOR_3_THRUST) &&
-				(_copter->RotorFour->current_thrust < MAXIMUM_ROTOR_4_THRUST)) {
+			if ((motor_get_speed(MOTOR_ONE) < MAX_ROTOR_1_THRUST) &&
+				(motor_get_speed(MOTOR_TWO) < MAX_ROTOR_2_THRUST) &&
+				(motor_get_speed(MOTOR_THREE) < MAX_ROTOR_3_THRUST) &&
+				(motor_get_speed(MOTOR_FOUR) < MAX_ROTOR_4_THRUST) {
 
-				_copter->RotorOne->Control((_copter->RotorOne->gpio),
-					_copter->RotorOne->current_thrust + ALTITUDE_RISE_MARGIN);
+				motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) + ALTITUDE_RISE_MARGIN);
+				motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TWO) + ALTITUDE_RISE_MARGIN);
+				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_THREE) + ALTITUDE_RISE_MARGIN);
+				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_FOUR) + ALTITUDE_RISE_MARGIN);
 
-				_copter->RotorTwo->Control((_copter->RotorTwo->gpio),
-					_copter->RotorTwo->current_thrust + ALTITUDE_RISE_MARGIN);
-
-				_copter->RotorThree->Control((_copter->RotorThree->gpio),
-					_copter->RotorThree->current_thrust + ALTITUDE_RISE_MARGIN);
-
-				_copter->RotorFour->Control((_copter->RotorFour->gpio),
-					_copter->RotorFour->current_thrust + ALTITUDE_RISE_MARGIN);
-				} else {
-					return MAX_MOTOR_THRUST_ACHIEVED;
-				}
+			} else {
+				return MAX_MOTOR_THRUST_ACHIEVED;
+			}
 			break;
 	}
 

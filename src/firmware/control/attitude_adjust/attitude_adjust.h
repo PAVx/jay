@@ -1,8 +1,8 @@
-/* 
-    PAVx -- Pod-Based Autonomous Vehicles 
+/*
+    PAVx -- Pod-Based Autonomous Vehicles
     Library Created By: Sargis S Yonan
     March 2017
-*/ 
+*/
 
 // attitude_adjust.h
 #ifndef _ATTITUDE_ADJUST_H_
@@ -38,6 +38,10 @@ typedef enum AttitudeDirection AttitudeDirection_t;
 #define MIN_ROTOR_2_THRUST (0)
 #define MIN_ROTOR_3_THRUST (0)
 #define MIN_ROTOR_4_THRUST (0)
+
+// Can be used to adjust the sensitivity of the manual controller. 
+#define MOTOR_THRUST_INCREASE_MARGIN (1)
+#define MOTOR_THRUST_DECREASE_MARGIN (1)
 
 #define YAW_NEGATIVE_DEADBAND_OFFSET (2)
 #define YAW_POSITIVE_DEADBAND_OFFSET (2)
