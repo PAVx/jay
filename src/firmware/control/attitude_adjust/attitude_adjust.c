@@ -127,6 +127,9 @@ int16_t* AttitudeAdjustGetActuation(void){
 }
 
 // Manual Test Function -- AVOID USE //
+
+// These adjust functions are not necessary, they can be done by setting the
+// appropriate euler angles needed. 
 Success_t Adjust_Yaw(double angle) {
 	if (_IsValidYawAngle(angle) == INVALID_PARAMETER) {
 		return INVALID_PARAMETER;

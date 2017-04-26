@@ -21,9 +21,6 @@ int main (void) {
 	#ifdef UART
 		UART_SendString("\nPAVx Jay UAV initialized\n\n");
 	#endif
-	#ifdef SW_UART
-		softuart_puts("\nPavx", 0);
-	#endif
 
 	while(1) {
 
@@ -60,6 +57,7 @@ int main (void) {
 			}
 
 			/*
+			// Not too sure how packets will be parsed
 			if (xbee ready) {
 				getPacketXbee();
 				processPacket();
@@ -67,7 +65,7 @@ int main (void) {
 			*/
 
 			// Update PID
-			double* ypr = imu2euler(Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_Get());
+			double* ypr = imu2euler(Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
 			AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
 
 			// Update Motors
