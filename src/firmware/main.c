@@ -9,10 +9,12 @@
 #include <util/delay.h>
 
 //#define MOTOR_TEST
-#define IMU_DEBUG
-#define GPS_DEBUG
-#define LED_DEBUG
+#define IMU_DEBUG (1)
+#define GPS_DEBUG (1)
+#define LED_DEBUG (1)
 //#define PACKET_DEBUG
+
+char sys_print[32];
 
 #ifdef IMU_DEBUG
 	char gbuffer[15];
@@ -32,6 +34,12 @@
 
 int main (void) {
 	system_initialize();
+
+	#ifdef UART
+		UART_SendString("\n\nPAVx Jay UAV System v3.0\n");
+		sprintf(sys_print, " device address: 0x%X is online\n", DEVICE_ADDRESS);
+		UART_SendString(sys_print);
+	#endif
 
 	for(;;) {
 

@@ -24,9 +24,8 @@ uint8_t system_initialize(void) {
 	//	packet_init();
 	
 		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-				UART_SendString("system clock initialized...\n");
-				UART_SendString("HW UART communication substrate initialized...\n");
-				UART_SendString("SW UART communication substrate initialized...\n");
+			_uart_driver_FlushTransmitBuffer();
+			UART_SendString(" communication substrate initialized...\n");
 		#endif
 
 	#endif
@@ -35,8 +34,11 @@ uint8_t system_initialize(void) {
 	#ifdef GYRO
 		InitializeGyro();
 		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-			UART_SendString("i2c initialized...\n");
-			UART_SendString("gyroscope initialized...\n");
+			_uart_driver_FlushTransmitBuffer();		
+			UART_SendString(" i2c initialized...\n");
+			_uart_driver_FlushTransmitBuffer();
+			UART_SendString(" gyroscope initialized...\n");
+			_uart_driver_FlushTransmitBuffer();
 		#endif
 	#endif
 
@@ -44,8 +46,10 @@ uint8_t system_initialize(void) {
 		InitializeAccel();
 		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
 			#ifndef GYRO
-				UART_SendString("i2c initialized...\n");
+				_uart_driver_FlushTransmitBuffer();
+				UART_SendString(" i2c initialized...\n");
 			#endif
+			_uart_driver_FlushTransmitBuffer();
 			UART_SendString("accel initialized...\n");
 		#endif
 	#endif
@@ -54,6 +58,7 @@ uint8_t system_initialize(void) {
 	#ifdef MOTORS
 		motors_initialize();
 		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
+			_uart_driver_FlushTransmitBuffer();
 			UART_SendString("motor drivers initialized...\n");
 		#endif
 	#endif
@@ -69,27 +74,12 @@ uint8_t system_initialize(void) {
 		led_off(GP_LED2);
 		
 		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
+			_uart_driver_FlushTransmitBuffer();
 			UART_SendString("system leds initialized...\n");
 		#endif
 	#endif
 
 	sei();
 
-	#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-		UART_SendString("system interrupts initialized...\n");
-	#endif
-
-	#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-		UART_SendString("system bootloader initialized...\n");
-		UART_SendString("system starting up...\n");
-	#endif
-
-	#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-		UART_SendString("\n\nPAVx Jay UAV System v3.0\n\n");
-		UART_SendString("\n\n--Device Address: ");
-		UART_SendByte(DEVICE_ADDRESS + ASCII_NUMBER_OFFSET);
-		UART_SendString("is online\n\n");
-	#endif
-		
 	return TRUE;
 }

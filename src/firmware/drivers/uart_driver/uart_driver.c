@@ -157,6 +157,12 @@ void _uart_driver_FlushReceiveBuffer(void)
 	uartRxBuffer.datalength = 0;
 }
 
+// flush all data out of the receive buffer
+void _uart_driver_FlushTransmitBuffer(void)
+{
+	uartTxBuffer.datalength = 0;
+}
+
 // return true if uart receive buffer is empty
 uint8_t _uart_driver_ReceiveBufferIsEmpty(void)
 {
