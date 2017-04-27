@@ -8,22 +8,17 @@
 #include <string.h>
 #include <util/delay.h>
 
-<<<<<<< HEAD
-char gbuffer[128];
-char abuffer[128];
-char gpsbuffer[50];
-char testing[20];
-=======
 //#define MOTOR_TEST
-#define IMU_DEBUG
-#define GPS_DEBUG
-#define LED_DEBUG
+//#define IMU_DEBUG
+//#define GPS_DEBUG
+//#define LED_DEBUG
 //#define PACKET_DEBUG
+#define NIRAJ_TESTING
 
 #ifdef IMU_DEBUG
 	char gbuffer[15];
 	char abuffer[15];
-#endif 
+#endif
 
 #ifdef GPS_DEBUG
 	char gpsbuffer[50];
@@ -35,18 +30,10 @@ char testing[20];
 	uint16_t motor_vals[4] = {0};
 	uint8_t motor = 0;
 #endif
->>>>>>> 4459fa76c38af9eaeecbf77296a1912fcce0b400
 
 int main (void) {
 
 	system_initialize();
-<<<<<<< HEAD
-	led_off(SYSTEM_LED);
-
-	#ifdef UART
-		UART_SendString("\nPAVx Jay UAV initialized\n\n");
-	#endif
-=======
 
 	for(;;) {
 
@@ -80,19 +67,19 @@ int main (void) {
 							motor_vals[0] += 10;
 							if (motor_vals[0] > 255) {
 								motor_vals[0] = 255;
-							} 
+							}
 							motor_vals[1] += 10;
 							if (motor_vals[1] > 255) {
 								motor_vals[1] = 255;
-							} 
+							}
 							motor_vals[2] += 10;
 							if (motor_vals[2] > 255) {
 								motor_vals[2] = 255;
-							} 
+							}
 							motor_vals[3] += 10;
 							if (motor_vals[3] > 255) {
 								motor_vals[3] = 255;
-							} 
+							}
 
 							motor_set(1, motor_vals[0]);
 							motor_set(2, motor_vals[1]);
@@ -104,10 +91,10 @@ int main (void) {
 							motor_vals[motor - 1] += 10;
 							if (motor_vals[motor - 1] > 255) {
 								motor_vals[motor - 1] = 255;
-							} 
+							}
 							motor_set(motor, (uint8_t)motor_vals[motor - 1]);
 						}
-						
+
 						break;
 					case 's':
 						if (motor == 5) {
@@ -179,7 +166,6 @@ int main (void) {
 	  			toggle_led(GP_LED1);
 		  	#endif
   		#endif
->>>>>>> 4459fa76c38af9eaeecbf77296a1912fcce0b400
 
 		#ifdef PACKET_DEBUG
 		  	#ifdef COM
@@ -189,79 +175,12 @@ int main (void) {
 		  		packet_send();
 		  	#endif
 		#endif // PACKET_DEBUG
-		
+
 		#ifdef IMU_DEBUG
 			#ifdef GYRO
 	  			Gyro_Update();
 	  		#endif
 
-<<<<<<< HEAD
-		/*
-		switch(command):
-		case MANUAL {
-			AttituteAdjustSetDesired(yawDesired, pitchDesired, rollDesires);
-			break;
-		}
-		case GO_TO_LOCATION {
-			calculatePath();
-			// might want to stabalize before changing
-			AttituteAdjustSetDesired(yawDesired, pitchDesired, rollDesires);
-			break;
-		}
-		case GO_HOME {
-			break;
-		}
-		default {
-			break;
-		}
-		*/
-
-		if (system_ticked() == TRUE) {
-			#ifdef CAM
-				Cam_Update();
-			#endif
-			Gyro_Update();
-			Accel_Update();
-
-			/*
-			if (GPS_NewDataReady()) {
-				memset(gpsbuffer, '\0', 50);
-				GPS_UpdateData();
-				struct tm time = GPS_GetTime();
-				sprintf(gpsbuffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", time.tm_hour, time.tm_min, time.tm_sec, GPS_GetLatitude(), GPS_GetLongitude(), GPS_GetSpeed(), GPS_GetAltitude());
-			}
-			*/
-
-			/*
-			// Not too sure how packets will be parsed
-			if (xbee ready) {
-				getPacketXbee();
-				processPacket();
-			}
-			*/
-
-
-			// Update PID
-			//double ypr[3];
-			//imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
-			//sprintf(testing, "Y: %f, P:%f, R:%f\n", ypr[0], ypr[1], ypr[2]);
-			UART_SendString("hello\n");
-			//AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
-
-			/*
-			// Update Motors
-			int16_t* motor_delta = AttitudeAdjustGetActuation();
-			motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) + motor_delta[0]);
-			motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TW0) + motor_delta[1]);
-			motor_set(MOTOR_THREE, motor_get_speed(MOTOR_ONE) + motor_delta[2]);
-			motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_ONE) + motor_delta[3]);
-
-			sendPacket();
-			*/
-
-  			toggle_led(SYSTEM_LED);
-			system_untick();
-=======
 	  		#ifdef ACCEL
 	  			Accel_Update();
 	  		#endif
@@ -295,33 +214,101 @@ int main (void) {
 				UART_SendString("--------------------------");
 		 	#endif // ACCEL
 
-        #endif // IMU_DEBUG
+        	#endif // IMU_DEBUG
 
 		#ifdef GPS_DEBUG
-	        #ifdef GPS
-	            NEO6M_GetChar();
+		        #ifdef GPS
+		            NEO6M_GetChar();
 
-	            if(GPS_NewDataReady()) {
+		            if(GPS_NewDataReady()) {
 
+					UART_SendString("-------***********-------");
 
-				UART_SendString("-------***********-------");
+		                memset(gpsbuffer, '\0', 50);
+		                GPS_UpdateData();
+		                struct tm time = GPS_GetTime();
+		                sprintf(gpsbuffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", time.tm_hour, time.tm_min, time.tm_sec, GPS_GetLatitude(), GPS_GetLongitude(), GPS_GetSpeed(), GPS_GetAltitude());
 
-	                memset(gpsbuffer, '\0', 50);
-	                GPS_UpdateData();
-	                struct tm time = GPS_GetTime();
-	                sprintf(gpsbuffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", time.tm_hour, time.tm_min, time.tm_sec, GPS_GetLatitude(), GPS_GetLongitude(), GPS_GetSpeed(), GPS_GetAltitude());
+		                while (gpsbuffer[i] != '\0') {
+		                    UART_SendByte(gpsbuffer[i]);
+		                    i++;
+		                }
+		            }
 
-	                while (gpsbuffer[i] != '\0') {
-	                    UART_SendByte(gpsbuffer[i]);
-	                    i++;
-	                }
-	            }
-	        
-	        #endif
-	    #endif
+		        #endif
+	    	#endif
 
 	 	_delay_ms(500);
 
->>>>>>> 4459fa76c38af9eaeecbf77296a1912fcce0b400
+		#ifdef NIRAJ_TESTING
+			/*
+			switch(command):
+			case MANUAL {
+				AttituteAdjustSetDesired(yawDesired, pitchDesired, rollDesires);
+				break;
+			}
+			case GO_TO_LOCATION {
+				calculatePath();
+				// might want to stabalize before changing
+				AttituteAdjustSetDesired(yawDesired, pitchDesired, rollDesires);
+				break;
+			}
+			case GO_HOME {
+				break;
+			}
+			default {
+				break;
+			}
+			*/
+
+			if (system_ticked() == TRUE) {
+				#ifdef CAM
+					Cam_Update();
+				#endif
+				Gyro_Update();
+				Accel_Update();
+
+				/*
+				if (GPS_NewDataReady()) {
+					memset(gpsbuffer, '\0', 50);
+					GPS_UpdateData();
+					struct tm time = GPS_GetTime();
+					sprintf(gpsbuffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", time.tm_hour, time.tm_min, time.tm_sec, GPS_GetLatitude(), GPS_GetLongitude(), GPS_GetSpeed(), GPS_GetAltitude());
+				}
+				*/
+
+				/*
+				// Not too sure how packets will be parsed
+				if (xbee ready) {
+					getPacketXbee();
+					processPacket();
+				}
+				*/
+
+
+				// Update PID
+				//double ypr[3];
+				//imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
+				//sprintf(testing, "Y: %f, P:%f, R:%f\n", ypr[0], ypr[1], ypr[2]);
+				UART_SendString("hello\n");
+				//AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
+
+				/*
+				// Update Motors
+				int16_t* motor_delta = AttitudeAdjustGetActuation();
+				motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) + motor_delta[0]);
+				motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TW0) + motor_delta[1]);
+				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_ONE) + motor_delta[2]);
+				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_ONE) + motor_delta[3]);
+
+				sendPacket();
+				*/
+
+	  			toggle_led(SYSTEM_LED);
+				system_untick();
+			}
+			#endif		// NIRAJ STUFF
+
 		}
+
 	}
