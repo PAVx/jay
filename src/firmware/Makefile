@@ -200,11 +200,5 @@ all:
 	${OBJECT_COPY} -j .text -j .data -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
 	${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 
-<<<<<<< HEAD
-
 clean:
 	rm *.elf *.hex *.o
-=======
-clean:
-	rm *.hex *.elf *.o
->>>>>>> 4459fa76c38af9eaeecbf77296a1912fcce0b400
