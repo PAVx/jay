@@ -1,13 +1,12 @@
 // hmc5883l_mag.c
 
+#include <math.h>
 #include "i2c_driver.h"
 #include "hmc5883l_mag.h"
 
-#include <math.h>
-
-float _m_x;
-float _m_y;
-float _m_z;
+int16_t _m_x;
+int16_t _m_y;
+int16_t _m_z;
 
 void HMC5883L_init(void){
 	i2c_init();
@@ -51,13 +50,13 @@ void HMC5883L_Update(void) {
 	i2c_stop();
 }
 
-float HMC5883L_GetX(void){
+int16_t HMC5883L_GetX(void){
 	return _m_x;
 }
 
-float HMC5883L_GetY(void){
+int16_t HMC5883L_GetY(void){
 	return _m_y;
 }
-float HMC5883L_GetZ(void){
+int16_t HMC5883L_GetZ(void){
 	return _m_z;
 }

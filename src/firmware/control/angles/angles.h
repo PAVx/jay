@@ -15,8 +15,8 @@
 #define PITCH_ANGLE (1)
 #define ROLL_ANGLE (2)
 
-double* imu2euler(double accX, double accY, double accZ, double magX, double magY){
-double* euler2quat(double yaw, double pitch, double roll);
-double* quat2euler(double* q);
+void imu2euler(double* ypr, double accX, double accY, double accZ, double magX, double magY);
+void euler2quat(double* q, double yaw, double pitch, double roll);
+void quat2euler(double* ypr, double* q);
 
 #endif	// _ANGLES_H_

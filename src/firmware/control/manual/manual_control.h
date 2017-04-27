@@ -1,8 +1,8 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 #ifndef _MANUAL_CONTROL_H_
 #define _MANUAL_CONTROL_H_
@@ -25,8 +25,6 @@ struct _manual_control_packet {
 	uint8_t throttle;
 };
 typedef struct _manual_control_packet ManualControlPacket_t;
-
-uint8_t reference_given = FALSE;
 
 // define packet and pos
 #define MANUAL_CONTROL_PACKET_TYPE (0)

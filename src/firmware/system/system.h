@@ -1,19 +1,19 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 #ifndef _SYSTEM_H_
 #define _SYSTEM_H_
 
 // SYSTEM DEFINES
 #define COM (1)
-//#define LEDS (1)
+#define LEDS (1)
 //#define MOTORS (1)
 #define SYSTEM_TICK (1)
-//#define GYRO (1)
-//#define ACCEL (1)
+#define GYRO (1)
+#define ACCEL (1)
 #define GPS (1)
 
 // CLIB INCLUDES
@@ -41,7 +41,7 @@
 
 	#ifdef UART
 		#ifndef HW_UART_BAUD
-			#define HW_UART_BAUD (4800)
+			#define HW_UART_BAUD (9600)
 		#endif
 	#endif
 
@@ -79,6 +79,7 @@
 // JAY INCLUDES
 #include "drivers.h"
 #include "protocols.h"
+#include "control.h"
 #include "system_tick.h"
 #include "system_init.h"
 #include "leds.h"

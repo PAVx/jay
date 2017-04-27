@@ -82,6 +82,8 @@ SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/
 SEARCHABLE_HEADER_FILE_DIRS	+= -I control/status
 # MANUAL CONTROL #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/manual
+# ANGLES #
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/angles
 
 ######################################################
 
@@ -149,6 +151,8 @@ CSOURCE						+= system/memory/nonvolatile/nvmem.c
 CSOURCE						+= control/status/status.c
 # MANUAL CONTROL #
 CSOURCE						+= control/manual/manual_control.c
+# ANGLES #
+CSOURCE						+= control/angles/angles.c
 
 ######################################################
 

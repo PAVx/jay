@@ -11,11 +11,11 @@
 char gbuffer[128];
 char abuffer[128];
 char gpsbuffer[50];
+char testing[20];
 
 int main (void) {
 
 	system_initialize();
-	softuart_init();
 	led_off(SYSTEM_LED);
 
 	#ifdef UART
@@ -24,6 +24,7 @@ int main (void) {
 
 	while(1) {
 
+		/*
 		switch(command):
 		case MANUAL {
 			AttituteAdjustSetDesired(yawDesired, pitchDesired, rollDesires);
@@ -41,6 +42,7 @@ int main (void) {
 		default {
 			break;
 		}
+		*/
 
 		if (system_ticked() == TRUE) {
 			#ifdef CAM
@@ -49,12 +51,14 @@ int main (void) {
 			Gyro_Update();
 			Accel_Update();
 
+			/*
 			if (GPS_NewDataReady()) {
 				memset(gpsbuffer, '\0', 50);
 				GPS_UpdateData();
 				struct tm time = GPS_GetTime();
 				sprintf(gpsbuffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", time.tm_hour, time.tm_min, time.tm_sec, GPS_GetLatitude(), GPS_GetLongitude(), GPS_GetSpeed(), GPS_GetAltitude());
 			}
+			*/
 
 			/*
 			// Not too sure how packets will be parsed
@@ -64,10 +68,15 @@ int main (void) {
 			}
 			*/
 
-			// Update PID
-			double* ypr = imu2euler(Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
-			AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
 
+			// Update PID
+			//double ypr[3];
+			//imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
+			//sprintf(testing, "Y: %f, P:%f, R:%f\n", ypr[0], ypr[1], ypr[2]);
+			UART_SendString("hello\n");
+			//AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
+
+			/*
 			// Update Motors
 			int16_t* motor_delta = AttitudeAdjustGetActuation();
 			motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) + motor_delta[0]);
@@ -76,6 +85,7 @@ int main (void) {
 			motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_ONE) + motor_delta[3]);
 
 			sendPacket();
+			*/
 
   			toggle_led(SYSTEM_LED);
 			system_untick();
