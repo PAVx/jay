@@ -16,7 +16,7 @@
 #define ACCEL (1)
 #define GPS (1)
 
-#define SYSTEM_INIT_DEBUG_PRINTOUTS (1)
+//#define SYSTEM_INIT_DEBUG_PRINTOUTS (1)
 
 
 // CLIB INCLUDES

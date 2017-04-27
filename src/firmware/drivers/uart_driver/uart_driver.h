@@ -58,13 +58,13 @@
 //! Number of bytes for uart transmit buffer.
 /// Do not change this value in uart.h, but rather override
 /// it with the desired value defined in your project's global.h
-#define UART_TX_BUFFER_SIZE		(0x0020)
+#define UART_TX_BUFFER_SIZE		(0x0090)
 #endif
 #ifndef UART_RX_BUFFER_SIZE
 //! Number of bytes for uart receive buffer.
 /// Do not change this value in uart.h, but rather override
 /// it with the desired value defined in your project's global.h
-#define UART_RX_BUFFER_SIZE		(0x0020)
+#define UART_RX_BUFFER_SIZE		(0x0080)
 #endif
 
 // define this key if you wish to use
@@ -216,6 +216,7 @@ uint8_t _uart_driver_ReceiveBufferIsEmpty(void);
 //! Flushes (deletes) all data from receive buffer.
 ///
 void _uart_driver_FlushReceiveBuffer(void);
+void _uart_driver_FlushTransmitBuffer(void);
 
 //! Add byte to end of uart Tx buffer.
 ///	Returns TRUE if successful, FALSE if failed (no room left in buffer).
