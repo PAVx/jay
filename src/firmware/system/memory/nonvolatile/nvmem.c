@@ -1,4 +1,4 @@
-// eeprom.c
+// nvram.c
 // Sargis S Yonan
 // April 2017
 
