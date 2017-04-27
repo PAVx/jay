@@ -197,5 +197,9 @@ all:
 	${BURNER} -F -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 	#${BURNER} -F -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex 
 
+fusebits328p:
+	# sets fuse bits to use the external 16MHz XTAL on the Atmega 328P
+	avrdude -p m328p -c usbasp -U lfuse:w:0xce:m
+
 clean:
 	rm *.hex *.elf *.o
