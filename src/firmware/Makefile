@@ -38,6 +38,8 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/pwm
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adxl345_accel
 # GPS
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/nmea
+# IR SENSOR
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/d6t8l_ir
 
 
 ####################
@@ -105,6 +107,8 @@ CSOURCE						+= drivers/pwm/pwm_driver.c
 CSOURCE						+= drivers/adxl345_accel/adxl345.c
 # NMEA #
 CSOURCE						+= drivers/nmea/nmea.c
+# IR #
+CSOURCE						+= drivers/d6t8l_ir/d6t8l_ir.c
 ####################
 
 ####################
