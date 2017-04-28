@@ -1,17 +1,17 @@
-/* 
-    PAVx -- Pod-Based Autonomous Vehicles 
+/*
+    PAVx -- Pod-Based Autonomous Vehicles
     Library Created By: Sargis S Yonan
     March 2017
-*/ 
+*/
 
 // pid.c
 
 // Some PID concepts borrowed the bitcraze/crazieflie-firmware repository
 // https://www.bitcraze.io
 
-#include "control/pid/pid.h"
-
 #include "pid.h"
+
+static uint8_t _pidFlag = 0;
 
 void PIDInit(PID_t* pid, const double desired, const double kp,
              const double ki, const double kd, const double dt) {
@@ -31,7 +31,7 @@ void PIDInit(PID_t* pid, const double desired, const double kp,
 double PIDUpdate(PID_t* pid, const double measured, const UpdateFlag_t updateError) {
     double output;
 
-    if (updateError = UPDATE_ERROR) {
+    if (updateError == UPDATE_ERROR) {
         pid->error = pid->desired - measured;
     }
 
@@ -107,4 +107,16 @@ void PIDSetKd(PID_t* pid, const double kd) {
 }
 void PIDSetDt(PID_t* pid, const double dt) {
     pid->dt = dt;
+}
+
+void PIDSetFlag(){
+        _pidFlag = 1;
+}
+
+void PIDResetFlag(){
+        _pidFlag = 0;
+}
+
+uint8_t PIDGetFlag(){
+        return _pidFlag;
 }

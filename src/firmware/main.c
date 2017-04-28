@@ -11,9 +11,12 @@
 //#define MOTOR_TEST
 //#define IMU_DEBUG
 //#define GPS_DEBUG
-//#define LED_DEBUG
+#define LED_DEBUG
 //#define PACKET_DEBUG
-#define NIRAJ_TESTING
+//#define YPR_DEBUG
+//#define PID_DEBUG
+
+char testing[10];
 
 #ifdef IMU_DEBUG
 	char gbuffer[15];
@@ -31,10 +34,28 @@
 	uint8_t motor = 0;
 #endif
 
+#ifdef PID_DEBUG
+	double ypr[3];
+	int16_t motor_delta[4];
+#endif
+
 int main (void) {
 
 	system_initialize();
+	//AttituteAdjustSetDesired(0,0,0);
 
+	// calibrate ESCs by varying the duty cycle of each pin from max to low
+	uint8_t speed = 0;
+	for (speed = 0; speed < 220; speed++) {
+		pwm_setval(speed, MOTOR_ONE);
+		pwm_setval(speed, MOTOR_TWO);
+		pwm_setval(speed, MOTOR_THREE);
+		pwm_setval(speed, MOTOR_FOUR);
+
+		_delay_ms(3);
+	}
+
+	while(1){}
 	for(;;) {
 
 		#ifdef MOTOR_TEST
@@ -213,7 +234,6 @@ int main (void) {
 
 				UART_SendString("--------------------------");
 		 	#endif // ACCEL
-
         	#endif // IMU_DEBUG
 
 		#ifdef GPS_DEBUG
@@ -238,76 +258,34 @@ int main (void) {
 		        #endif
 	    	#endif
 
-	 	_delay_ms(500);
+		#ifdef YPR_DEBUG
+			Gyro_Update();
+			Accel_Update();
+			imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
+			sprintf(testing, " \nY: %f ", ypr[0]);
+			UART_SendString(testing);
+			sprintf(testing, " P: %f ", ypr[1]);
+			UART_SendString(testing);
+			sprintf(testing, " R: %f\n", ypr[2]);
+			UART_SendString(testing);
+		#endif		// YPR_DEBUG
 
-		#ifdef NIRAJ_TESTING
-			/*
-			switch(command):
-			case MANUAL {
-				AttituteAdjustSetDesired(yawDesired, pitchDesired, rollDesires);
-				break;
-			}
-			case GO_TO_LOCATION {
-				calculatePath();
-				// might want to stabalize before changing
-				AttituteAdjustSetDesired(yawDesired, pitchDesired, rollDesires);
-				break;
-			}
-			case GO_HOME {
-				break;
-			}
-			default {
-				break;
-			}
-			*/
-
-			if (system_ticked() == TRUE) {
-				#ifdef CAM
-					Cam_Update();
-				#endif
+		#ifdef PID_DEBUG
+			if(PIDGetFlag() == 1){
 				Gyro_Update();
 				Accel_Update();
+				imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
+				AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
 
-				/*
-				if (GPS_NewDataReady()) {
-					memset(gpsbuffer, '\0', 50);
-					GPS_UpdateData();
-					struct tm time = GPS_GetTime();
-					sprintf(gpsbuffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", time.tm_hour, time.tm_min, time.tm_sec, GPS_GetLatitude(), GPS_GetLongitude(), GPS_GetSpeed(), GPS_GetAltitude());
-				}
-				*/
-
-				/*
-				// Not too sure how packets will be parsed
-				if (xbee ready) {
-					getPacketXbee();
-					processPacket();
-				}
-				*/
-
-
-				// Update PID
-				//double ypr[3];
-				//imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
-				//sprintf(testing, "Y: %f, P:%f, R:%f\n", ypr[0], ypr[1], ypr[2]);
-				UART_SendString("hello\n");
-				//AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
-
-				/*
 				// Update Motors
-				int16_t* motor_delta = AttitudeAdjustGetActuation();
+				AttitudeAdjustGetActuation(motor_delta);
 				motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) + motor_delta[0]);
-				motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TW0) + motor_delta[1]);
-				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_ONE) + motor_delta[2]);
-				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_ONE) + motor_delta[3]);
-
-				sendPacket();
-				*/
-
-	  			toggle_led(SYSTEM_LED);
-				system_untick();
+				motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TWO) + motor_delta[1]);
+				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_THREE) + motor_delta[2]);
+				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_FOUR) + motor_delta[3]);
+				PIDResetFlag();
 			}
-			#endif		// NIRAJ STUFF
+		#endif // PID_DEBUG
 
 		}
 

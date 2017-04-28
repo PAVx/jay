@@ -12,9 +12,11 @@
 #define LEDS (1)
 #define MOTORS (1)
 #define SYSTEM_TICK (1)
-#define GYRO (1)
-#define ACCEL (1)
-#define GPS (1)
+//#define GYRO (1)
+//#define ACCEL (1)
+//#define MAG (1)
+//#define GPS (1)
+#define PID_CONTROLLER (1)
 
 #define SYSTEM_INIT_DEBUG_PRINTOUTS (1)
 
@@ -59,6 +61,9 @@
 			#define SOFTUART_TIMERTOP (F_CPU/TIMER0_PRESCALE/SOFTUART_BAUD_RATE/3 - 1)
 			#define TIMER0_PERIOD (SOFTUART_TIMERTOP)
 		#endif
+
+		#define PID_RATE (5)	// Hz
+		#define PID_PERIOD (TIMER0_PERIOD/PID_RATE)
 
 		#define TIMER_PERIOD ((TIMER0_PERIOD * 1000) / F_CPU)
 

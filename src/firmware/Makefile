@@ -4,8 +4,8 @@ BURNER						= avrdude
 CC_AVR						= atmega328p
 F_CPU						= 16000000UL
 BURNER_AVR					= ATMEGA328P
-BURNER_PROGRAMMER				= usbasp
-COMPILER_PATH					= tty.usbserial*
+BURNER_PROGRAMMER				= usbasp # Arduino
+COMPILER_PATH					= /dev/tty.usb*
 OBJECT_COPY					= avr-objcopy
 BAUDRATE					= 115200
 ###########################################
@@ -84,6 +84,10 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I control/status
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/manual
 # ANGLES #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/angles
+# ATTITUDE ADJUST #
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/attitude_adjust
+# PID #
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/pid
 
 ######################################################
 
@@ -153,6 +157,10 @@ CSOURCE						+= control/status/status.c
 CSOURCE						+= control/manual/manual_control.c
 # ANGLES #
 CSOURCE						+= control/angles/angles.c
+# ATTITUDE ADJUST #
+CSOURCE						+= control/attitude_adjust/attitude_adjust.c
+# PID #
+CSOURCE						+= control/pid/pid.c
 
 ######################################################
 
@@ -199,6 +207,7 @@ all:
 
 	${OBJECT_COPY} -j .text -j .data -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
 	${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
+	#${BURNER} -F -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 
 clean:
 	rm *.elf *.hex *.o

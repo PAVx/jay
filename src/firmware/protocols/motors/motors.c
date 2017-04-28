@@ -1,8 +1,8 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 #include "motors.h"
 #include "pwm_driver.h"
@@ -19,7 +19,7 @@ typedef struct motor Motor_t;
 static volatile Motor_t _motors[NUM_MOTORS];
 
 void motors_initialize(void) {
-	uint8_t speed = 0;
+	//uint8_t speed = 0;
 
 	_motors[MOTOR_ONE - 1].current_speed = 0;
 	_motors[MOTOR_TWO - 1].current_speed = 0;
@@ -29,15 +29,20 @@ void motors_initialize(void) {
 	pwm_init();
 
 	// calibrate ESCs by varying the duty cycle of each pin from max to low
-	for (speed = MAX_MOTOR_SPEED; speed > MIN_MOTOR_SPEED; speed--) {
-		pwm_setval(speed, MOTOR_ONE);
-		pwm_setval(speed, MOTOR_TWO);
-		pwm_setval(speed, MOTOR_THREE);
-		pwm_setval(speed, MOTOR_FOUR);
+	// for (speed = MAX_MOTOR_SPEED; speed > MIN_MOTOR_SPEED; speed--) {
+	// 	pwm_setval(speed, MOTOR_ONE);
+	// 	pwm_setval(speed, MOTOR_TWO);
+	// 	pwm_setval(speed, MOTOR_THREE);
+	// 	pwm_setval(speed, MOTOR_FOUR);
+	//
+	// 	_delay_us(3000);
+	// }
+	pwm_setval(10, MOTOR_ONE);
+	pwm_setval(10, MOTOR_TWO);
+	pwm_setval(10, MOTOR_THREE);
+	pwm_setval(10, MOTOR_FOUR);
 
-		_delay_ms(3);
-	}
-
+	_delay_ms(3000);
 }
 void motor_set(uint8_t motor_id, uint8_t speed) {
 	if (motor_id > NUM_MOTORS) return;

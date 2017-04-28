@@ -8,22 +8,22 @@
 
 #include "uart.h"
 
-float _g_t = 0;
-float _g_x = 0;
-float _g_y = 0;
-float _g_z = 0;
+double _g_t = 0;
+double _g_x = 0;
+double _g_y = 0;
+double _g_z = 0;
 
-float g_offx = 0;
-float g_offy = 0;
-float g_offz = 0;
+double g_offx = 0;
+double g_offy = 0;
+double g_offz = 0;
 
 bool initialized = false;
 
 void ITG3200_Calibrate(void);
 
-float _Calculate_G_Temp(float _t_raw);
+double _Calculate_G_Temp(double _t_raw);
 
-void ITG3200_ReadGyro(float *temp, float *g_x, float *g_y, float *g_z);
+void ITG3200_ReadGyro(double *temp, double *g_x, double *g_y, double *g_z);
 
 void InitializeITG3200(void)
 {
@@ -61,9 +61,9 @@ void InitializeITG3200(void)
 
 void ITG3200_Calibrate(void)
 {
-    float tmpx = 0;
-    float tmpy = 0;
-    float tmpz = 0;
+    double tmpx = 0;
+    double tmpy = 0;
+    double tmpz = 0;
 
     g_offx = 0;
     g_offy = 0;
@@ -87,7 +87,7 @@ void ITG3200_Calibrate(void)
 
 
 
-void ITG3200_ReadGyro(float *temp, float *g_x, float *g_y, float *g_z)
+void ITG3200_ReadGyro(double *temp, double *g_x, double *g_y, double *g_z)
 {
     uint8_t buff[8];
 
@@ -96,7 +96,7 @@ void ITG3200_ReadGyro(float *temp, float *g_x, float *g_y, float *g_z)
     i2c_stop();
 
     i2c_receive(ITG3200_ADDR, buff, 8);
-    
+
     *g_x = ((buff[2] << 8) | buff[3]) - g_offx;
     *g_y = ((buff[4] << 8) | buff[5]) - g_offy;
     *g_z = ((buff[6] << 8) | buff[7]) - g_offz;
@@ -105,7 +105,7 @@ void ITG3200_ReadGyro(float *temp, float *g_x, float *g_y, float *g_z)
 
 void ITG3200_UpdateData(void)
 {
-    float t, x, y, z;
+    double t, x, y, z;
     ITG3200_ReadGyro(&t, &x, &y, &z);
 
     _g_t = _Calculate_G_Temp(t);
@@ -114,27 +114,27 @@ void ITG3200_UpdateData(void)
     _g_z = z;
 }
 
-float ITG3200_GetX(void)
+double ITG3200_GetX(void)
 {
     return _g_x / 14.375;
 }
 
-float ITG3200_GetY(void)
+double ITG3200_GetY(void)
 {
     return _g_y / 14.375;
 }
 
-float ITG3200_GetZ(void)
+double ITG3200_GetZ(void)
 {
     return _g_z / 14.375;
 }
 
-float ITG3200_GetTemp(void)
+double ITG3200_GetTemp(void)
 {
     return _Calculate_G_Temp(_g_t);
 }
 
-float _Calculate_G_Temp(float _t_raw)
+double _Calculate_G_Temp(double _t_raw)
 {
-    return (35 + (((float)_t_raw + 13200) / 280));;
+    return (35 + (((double)_t_raw + 13200) / 280));;
 }

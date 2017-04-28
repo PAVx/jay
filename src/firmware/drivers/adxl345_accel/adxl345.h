@@ -9,10 +9,10 @@ void InitializeADXL345(void);
 void ADXL345_UpdateData(void);
 
 // Returns in unit g
-float ADXL345_GetX(void);
+double ADXL345_GetX(void);
 
-float ADXL345_GetY(void);
+double ADXL345_GetY(void);
 
-float ADXL345_GetZ(void);
+double ADXL345_GetZ(void);
 
 #endif

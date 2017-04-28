@@ -48,6 +48,7 @@
 #include <util/delay.h>
 
 #include "softuart.h"
+#include "pid.h"
 
 #define SU_TRUE    1
 #define SU_FALSE   0
@@ -61,9 +62,9 @@
 static unsigned char suartTxData[SOFTUART_OUT_BUF_SIZE];
 cBuffer suartTxBuffer;				///< uart transmit buffer
 
-
 static softUART channel[SOFTUART_CHANNELS];
-static char _isrFlag;
+static uint8_t _isrFlag = 0;
+static uint16_t isr_period_counter = 0;
 
 void set_tx_pin_high(int i) {
 		#ifdef SOFTUART_TXPORT_1
@@ -146,8 +147,17 @@ int get_rx_pin_status(int i) {
 ISR(SOFTUART_T_COMP_LABEL)
 {
 	//system_tick();
-	//int i = 1;
 	_isrFlag = 1;
+
+	if(PIDGetFlag() == 0){
+		isr_period_counter++;
+
+		if(isr_period_counter >= PID_PERIOD){
+			PIDSetFlag();
+			isr_period_counter = 0;
+		}
+	}
+
 	run_isr();
 }
 
@@ -250,8 +260,8 @@ char softuart_getchar( int i )
 	char ch;
   //if (1) return '\0'; // don't use RX yet
 	if ( channel[i].rx.qout != channel[i].rx.qin ) {
-	
-        idle(); //How to use idle?	
+
+        idle(); //How to use idle?
 	    ch = channel[i].rx.inbuf[channel[i].rx.qout];
 	    if ( ++channel[i].rx.qout >= SOFTUART_IN_BUF_SIZE ) {
 		    channel[i].rx.qout = 0;

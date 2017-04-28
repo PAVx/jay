@@ -1,8 +1,8 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 // pid.h
 
@@ -11,6 +11,8 @@
 
 #ifndef _PID_H_
 #define _PID_H_
+
+#include <stdint.h>
 
 #define PID_ROLL_RATE_KP  70.0
 #define PID_ROLL_RATE_KI  0.0
@@ -45,6 +47,11 @@
 #define PID_INACTIVE_LOWER_THRESHOLD (0.0001)
 #define DEFAULT_PID_INTEGRATION_LIMIT  5000.0
 
+typedef enum Success_t{
+	NO_BUENO = 0,
+	SUCCESS = 1
+}Success_t;
+
 enum Active {
 	PID_ACTIVE,
 	PID_INACTIVE
@@ -75,7 +82,7 @@ struct PID {
 };
 typedef struct PID PID_t;
 
-PID_t *PIDCreateInstance(const double desired, const double kp,
+void PIDInit(PID_t* pid, const double desired, const double kp,
              const double ki, const double kd, const double dt);
 
 void PIDSetIntegralLimit(PID_t* pid, const double limit);
@@ -107,8 +114,13 @@ void PIDSetKi(PID_t* pid, const double ki);
 // Set a new derivative gain for the PID.
 void PIDSetKd(PID_t* pid, const double kd);
 
-
 // Set a new dt gain for the PID. Defaults to IMU_UPDATE_DT upon construction
 void PIDSetDt(PID_t* pid, const double dt);
+
+void PIDSetFlag();
+
+void PIDResetFlag();
+
+uint8_t PIDGetFlag();
 
 #endif
