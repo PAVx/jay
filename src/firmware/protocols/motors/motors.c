@@ -7,6 +7,7 @@
 #include "motors.h"
 #include "pwm_driver.h"
 #include <util/delay.h>
+#include <avr/io.h>
 
 #define NUM_MOTORS (4)
 
@@ -19,7 +20,7 @@ typedef struct motor Motor_t;
 static volatile Motor_t _motors[NUM_MOTORS];
 
 void motors_initialize(void) {
-	//uint8_t speed = 0;
+	uint8_t speed = 0;
 
 	_motors[MOTOR_ONE - 1].current_speed = 0;
 	_motors[MOTOR_TWO - 1].current_speed = 0;
@@ -27,22 +28,79 @@ void motors_initialize(void) {
 	_motors[MOTOR_FOUR - 1].current_speed = 0;
 
 	pwm_init();
+	_delay_ms(3000);
+
+	DDRD |= (1<<DDD3);
+	DDRB |= (1<<DDB1);
+	DDRB |= (1<<DDB2);
+	DDRB |= (1<<DDB3);
 
 	// calibrate ESCs by varying the duty cycle of each pin from max to low
-	// for (speed = MAX_MOTOR_SPEED; speed > MIN_MOTOR_SPEED; speed--) {
-	// 	pwm_setval(speed, MOTOR_ONE);
-	// 	pwm_setval(speed, MOTOR_TWO);
-	// 	pwm_setval(speed, MOTOR_THREE);
-	// 	pwm_setval(speed, MOTOR_FOUR);
-	//
-	// 	_delay_us(3000);
-	// }
-	pwm_setval(10, MOTOR_ONE);
-	pwm_setval(10, MOTOR_TWO);
-	pwm_setval(10, MOTOR_THREE);
-	pwm_setval(10, MOTOR_FOUR);
+	for (speed = 0; speed < MAX_MOTOR_SPEED; speed++) {
+		pwm_setval(speed, MOTOR_ONE);
+		pwm_setval(speed, MOTOR_TWO);
+		pwm_setval(speed, MOTOR_THREE);
+		pwm_setval(speed, MOTOR_FOUR);
 
-	_delay_ms(3000);
+		_delay_ms(1);
+	}
+	for (speed = MAX_MOTOR_SPEED; speed > MIN_MOTOR_SPEED; speed--) {
+		pwm_setval(speed, MOTOR_ONE);
+		pwm_setval(speed, MOTOR_TWO);
+		pwm_setval(speed, MOTOR_THREE);
+		pwm_setval(speed, MOTOR_FOUR);
+
+		_delay_ms(1);
+	}
+	for (speed = 0; speed < MAX_MOTOR_SPEED; speed++) {
+		pwm_setval(speed, MOTOR_ONE);
+		pwm_setval(speed, MOTOR_TWO);
+		pwm_setval(speed, MOTOR_THREE);
+		pwm_setval(speed, MOTOR_FOUR);
+
+		_delay_ms(1);
+	}
+	for (speed = MAX_MOTOR_SPEED; speed > MIN_MOTOR_SPEED; speed--) {
+		pwm_setval(speed, MOTOR_ONE);
+		pwm_setval(speed, MOTOR_TWO);
+		pwm_setval(speed, MOTOR_THREE);
+		pwm_setval(speed, MOTOR_FOUR);
+
+		_delay_ms(1);
+	}
+	for (speed = 0; speed < MAX_MOTOR_SPEED; speed++) {
+		pwm_setval(speed, MOTOR_ONE);
+		pwm_setval(speed, MOTOR_TWO);
+		pwm_setval(speed, MOTOR_THREE);
+		pwm_setval(speed, MOTOR_FOUR);
+
+		_delay_ms(1);
+	}
+	for (speed = MAX_MOTOR_SPEED; speed > MIN_MOTOR_SPEED; speed--) {
+		pwm_setval(speed, MOTOR_ONE);
+		pwm_setval(speed, MOTOR_TWO);
+		pwm_setval(speed, MOTOR_THREE);
+		pwm_setval(speed, MOTOR_FOUR);
+
+		_delay_ms(1);
+	}
+	for (speed = 0; speed < MAX_MOTOR_SPEED; speed++) {
+		pwm_setval(speed, MOTOR_ONE);
+		pwm_setval(speed, MOTOR_TWO);
+		pwm_setval(speed, MOTOR_THREE);
+		pwm_setval(speed, MOTOR_FOUR);
+
+		_delay_ms(1);
+	}
+	for (speed = MAX_MOTOR_SPEED; speed > MIN_MOTOR_SPEED; speed--) {
+		pwm_setval(speed, MOTOR_ONE);
+		pwm_setval(speed, MOTOR_TWO);
+		pwm_setval(speed, MOTOR_THREE);
+		pwm_setval(speed, MOTOR_FOUR);
+
+		_delay_ms(1);
+	}
+
 }
 void motor_set(uint8_t motor_id, uint8_t speed) {
 	if (motor_id > NUM_MOTORS) return;

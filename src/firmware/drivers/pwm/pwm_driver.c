@@ -22,10 +22,10 @@ static volatile uint8_t duty_cycle_channel4 = PWM_DEFAULT;
 
 void pwm_init()
 {
-    DDRD |= (1<<DDD3);
-    DDRB |= (1<<DDB1);
-    DDRB |= (1<<DDB2);
-    DDRB |= (1<<DDB3);
+    DDRD &= ~(1<<DDD3);
+    DDRB &= ~(1<<DDB1);
+    DDRB &= ~(1<<DDB2);
+    DDRB &= ~(1<<DDB3);
 
 
     TCCR1A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM10);
@@ -40,6 +40,7 @@ void pwm_init()
     OCR1B = duty_cycle_channel3;
     OCR2A = duty_cycle_channel2;
     OCR2B = duty_cycle_channel1;
+   
 }
 
 void pwm_setval(uint8_t val, uint8_t channel)
