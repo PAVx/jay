@@ -40,7 +40,12 @@ void pwm_init()
     OCR1B = duty_cycle_channel3;
     OCR2A = duty_cycle_channel2;
     OCR2B = duty_cycle_channel1;
-   
+
+    DDRD |= (1<<DDD3);
+    DDRB |= (1<<DDB1);
+    DDRB |= (1<<DDB2);
+    DDRB |= (1<<DDB3);
+
 }
 
 void pwm_setval(uint8_t val, uint8_t channel)

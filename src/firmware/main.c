@@ -45,16 +45,23 @@ int main (void) {
 	//AttituteAdjustSetDesired(0,0,0);
 
 	// calibrate ESCs by varying the duty cycle of each pin from max to low
-	uint8_t speed;
+	uint8_t speed = 0;
+	uint8_t goUp = 1;
+
 	_delay_ms(3000);
-	for (speed = 0; speed < 20; speed++) {
+
+	while(1){
 		pwm_setval(speed, MOTOR_ONE);
 		pwm_setval(speed, MOTOR_TWO);
 		pwm_setval(speed, MOTOR_THREE);
 		pwm_setval(speed, MOTOR_FOUR);
 
-	 	_delay_ms(3);
-	 }
+		if (speed == 150) goUp = 0;
+		else if (speed == 20) goUp = 1;
+		if (goUp) speed++;
+		else speed--;
+		_delay_ms(50);
+	}
 
 	while(1){}
 	for(;;) {
