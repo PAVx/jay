@@ -1,13 +1,15 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 #include "manual_control.h"
 #include "packet.h"
 
 static ManualControlPacket_t _references;
+static uint8_t reference_given = FALSE;
+
 
 #define SOURCE_ADDRESS_DATA_POS (0)
 #define DESTINATION_ADDRESS_DATA_POS (1)
@@ -33,7 +35,7 @@ uint8_t manual_control_packet_handler(uint8_t *input_buffer) {
 
 	if ((input_buffer[DESTINATION_ADDRESS_DATA_POS] == BROADCAST_ALL_DESTINATION_ADDRESS) ||
 		(input_buffer[DESTINATION_ADDRESS_DATA_POS] == DEVICE_ADDRESS)) {
-	
+
 		_source_address = input_buffer[SOURCE_ADDRESS_DATA_POS];
 		if (_source_address != VALID_SOURCE_ADDRESS) {
 			return TRUE; // packet received successfully, but its irrelevent to this device

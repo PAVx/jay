@@ -1,8 +1,8 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 #include "accel.h"
 #include "adxl345.h"
@@ -18,17 +18,17 @@ void Accel_Update(void)
     ADXL345_UpdateData();
 }
 
-float Accel_GetX(void)
+double Accel_GetX(void)
 {
     return ADXL345_GetX();
 }
 
-float Accel_GetY(void)
+double Accel_GetY(void)
 {
     return ADXL345_GetY();
 }
 
-float Accel_GetZ(void)
+double Accel_GetZ(void)
 {
     return ADXL345_GetZ();
 }

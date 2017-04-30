@@ -1,12 +1,13 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 #include "motors.h"
 #include "pwm_driver.h"
 #include <util/delay.h>
+#include <avr/io.h>
 
 #define NUM_MOTORS (4)
 
@@ -27,8 +28,17 @@ void motors_initialize(void) {
 	_motors[MOTOR_FOUR - 1].current_speed = 0;
 
 	pwm_init();
+	_delay_ms(1000);
 
 	// calibrate ESCs by varying the duty cycle of each pin from max to low
+	for (speed = 0; speed < MAX_MOTOR_SPEED; speed++) {
+		pwm_setval(speed, MOTOR_ONE);
+		pwm_setval(speed, MOTOR_TWO);
+		pwm_setval(speed, MOTOR_THREE);
+		pwm_setval(speed, MOTOR_FOUR);
+
+		_delay_ms(3);
+	}
 	for (speed = MAX_MOTOR_SPEED; speed > MIN_MOTOR_SPEED; speed--) {
 		pwm_setval(speed, MOTOR_ONE);
 		pwm_setval(speed, MOTOR_TWO);

@@ -29,12 +29,12 @@ void InitializeITG3200(void);
 
 void ITG3200_UpdateData(void);
 
-float ITG3200_GetX(void);
+double ITG3200_GetX(void);
 
-float ITG3200_GetY(void);
+double ITG3200_GetY(void);
 
-float ITG3200_GetZ(void);
+double ITG3200_GetZ(void);
 
-float ITG3200_GetTemp(void);
+double ITG3200_GetTemp(void);
 
 #endif

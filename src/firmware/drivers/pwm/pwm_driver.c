@@ -1,8 +1,8 @@
-/* 
-    PAVx -- Pod-Based Autonomous Vehicles 
+/*
+    PAVx -- Pod-Based Autonomous Vehicles
     Library Created By: Sargis S Yonan
     March 2017
-*/ 
+*/
 
 #include <avr/pgmspace.h>
 #include <stdbool.h>
@@ -22,17 +22,16 @@ static volatile uint8_t duty_cycle_channel4 = PWM_DEFAULT;
 
 void pwm_init()
 {
-    DDRD |= (1<<DDD3);
-    DDRB |= (1<<DDB1);
-    DDRB |= (1<<DDB2);
-    DDRB |= (1<<DDB3);
+    DDRD &= ~(1<<DDD3);
+    DDRB &= ~(1<<DDB1);
+    DDRB &= ~(1<<DDB2);
+    DDRB &= ~(1<<DDB3);
 
-    // prescalers
-    TCCR1A = _BV(COM1A1) | _BV(COM1B1) | _BV(WGM10);
-    TCCR1B = _BV(CS11);// | _BV(CS10);
-    TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM20);
-    TCCR2B = _BV(CS21);// | _BV(CS20);;
 
+    TCCR1A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM10);
+    TCCR1B = _BV(WGM12) | _BV(CS11);
+    TCCR2A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM21)| _BV(WGM20);
+    TCCR2B = _BV(CS21);
     // Set interrupt enable
     sei();
 
@@ -41,6 +40,12 @@ void pwm_init()
     OCR1B = duty_cycle_channel3;
     OCR2A = duty_cycle_channel2;
     OCR2B = duty_cycle_channel1;
+
+    DDRD |= (1<<DDD3);
+    DDRB |= (1<<DDB1);
+    DDRB |= (1<<DDB2);
+    DDRB |= (1<<DDB3);
+
 }
 
 void pwm_setval(uint8_t val, uint8_t channel)

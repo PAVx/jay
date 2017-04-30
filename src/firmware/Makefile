@@ -4,14 +4,14 @@ BURNER						= avrdude
 CC_AVR						= atmega328p
 F_CPU						= 16000000UL
 BURNER_AVR					= ATMEGA328P
-BURNER_PROGRAMMER			= usbasp
-COMPILER_PATH				= tty.usbmodem14141
+BURNER_PROGRAMMER				= usbasp # Arduino
+COMPILER_PATH					= /dev/tty.usb*
 OBJECT_COPY					= avr-objcopy
 BAUDRATE					= 115200
 ###########################################
 
 # CC GLOBAL DEFINES
-CC_GLOBAL_DEFINES = -D F_CPU=${F_CPU}
+CC_GLOBAL_DEFINES 				= -D F_CPU=${F_CPU}
 
 ###########################################
 # MAIN SOURCE
@@ -25,7 +25,7 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/uart_driver
 # SOFTUART DRIVER
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/softuart_driver
 # BUFFER
-SEARCHABLE_HEADER_FILE_DIRS += -I drivers/buffer
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I drivers/buffer
 # I2C DRIVER
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/i2c_driver
 # ITG3200
@@ -44,7 +44,7 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/d6t8l_ir
 
 ####################
 # PROTOCOL HEADERS #
-SEARCHABLE_HEADER_FILE_DIRS += -I protocols/
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/
 # UART #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/uart
 # MAG #
@@ -54,13 +54,13 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/gyro
 # TEMP #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/temperature
 # MOTORS #
-SEARCHABLE_HEADER_FILE_DIRS += -I protocols/motors
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/motors
 # COMMUNICATION #
-SEARCHABLE_HEADER_FILE_DIRS += -I protocols/com
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/com
 # ACCEL #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/accel
 # GPS #
-SEARCHABLE_HEADER_FILE_DIRS += -I protocols/gps
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/gps
 
 ####################
 # SYSTEM HEADERS #
@@ -74,16 +74,22 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I system/leds
 # TYPES #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I system/types
 # MEMORY #
-SEARCHABLE_HEADER_FILE_DIRS += -I system/memory/nonvolatile
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I system/memory/nonvolatile
 ####################
 
 ####################
 # CONTROL HEADERS #
-SEARCHABLE_HEADER_FILE_DIRS += -I control/
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/
 # STATUS #
-SEARCHABLE_HEADER_FILE_DIRS += -I control/status
+SEARCHABLE_HEADER_FILE_DIRS	+= -I control/status
 # MANUAL CONTROL #
-SEARCHABLE_HEADER_FILE_DIRS += -I control/manual
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/manual
+# ANGLES #
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/angles
+# ATTITUDE ADJUST #
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/attitude_adjust
+# PID #
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/pid
 
 ######################################################
 
@@ -130,7 +136,7 @@ CSOURCE						+= protocols/com/packet.c
 # ACCEL #
 CSOURCE						+= protocols/accel/accel.c
 # GPS #
-CSOURCE                     += protocols/gps/gps.c
+CSOURCE                     			+= protocols/gps/gps.c
 ####################
 
 ####################
@@ -153,6 +159,12 @@ CSOURCE						+= system/memory/nonvolatile/nvmem.c
 CSOURCE						+= control/status/status.c
 # MANUAL CONTROL #
 CSOURCE						+= control/manual/manual_control.c
+# ANGLES #
+CSOURCE						+= control/angles/angles.c
+# ATTITUDE ADJUST #
+CSOURCE						+= control/attitude_adjust/attitude_adjust.c
+# PID #
+CSOURCE						+= control/pid/pid.c
 
 ######################################################
 
@@ -194,16 +206,16 @@ CC_LN_OPTIONS				+= ${OBJECTS}
 
 
 all:
-	${CC} ${CC_COMP_OPTIONS} 
+	${CC} ${CC_COMP_OPTIONS}
 	${CC} ${CC_LN_OPTIONS}
 
 	${OBJECT_COPY} -j .text -j .data -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
-	${BURNER} -F -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
-	#${BURNER} -F -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex 
+	${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
+	#${BURNER} -F -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 
 fusebits328p:
 	# sets fuse bits to use the external 16MHz XTAL on the Atmega 328P
 	avrdude -p m328p -c usbasp -U lfuse:w:0xce:m
 
 clean:
-	rm *.hex *.elf *.o
+	rm *.elf *.hex *.o

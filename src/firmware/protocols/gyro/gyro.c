@@ -1,8 +1,8 @@
 /* 
-	PAVx -- Pod-Based Autonomous Vehicles 
+	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 #include "gyro.h"
 #include "itg3200.h"
@@ -18,17 +18,17 @@ void Gyro_Update(void)
     ITG3200_UpdateData();
 }
 
-float Gyro_GetX(void)
+double Gyro_GetX(void)
 {
     return ITG3200_GetX();
 }
 
-float Gyro_GetY(void)
+double Gyro_GetY(void)
 {
     return ITG3200_GetY();
 }
 
-float Gyro_GetZ(void)
+double Gyro_GetZ(void)
 {
     return ITG3200_GetZ();
 }

@@ -1,13 +1,16 @@
 // hmc5883l_mag.c
 
+#include <math.h>
 #include "i2c_driver.h"
 #include "hmc5883l_mag.h"
 
-#include <math.h>
+int16_t _m_x;
+int16_t _m_y;
+int16_t _m_z;
 
 void HMC5883L_init(void){
 	i2c_init();
-	
+
 	i2c_start(HMC5883L_WRITE);
 	i2c_write(0x00); // set pointer to CRA
 	i2c_write(0x70); // write 0x70 to CRA
@@ -24,10 +27,10 @@ void HMC5883L_init(void){
 	i2c_stop();
 }
 
-float HMC5883L_get(void) {
-	int16_t raw_x = 0;
-	int16_t raw_y = 0;
-	int16_t raw_z = 0;
+void HMC5883L_Update(void) {
+	_m_x = 0;
+	_m_y = 0;
+	_m_z = 0;
 
 	i2c_start(HMC5883L_WRITE);
 	i2c_write(0x03); // set pointer to X axis MSB
@@ -35,16 +38,25 @@ float HMC5883L_get(void) {
 
 	i2c_start(HMC5883L_READ);
 
-	raw_x = ((uint8_t)i2c_read_ack())<<8;
-	raw_x |= i2c_read_ack();
+	_m_x = ((uint8_t)i2c_read_ack())<<8;
+	_m_x |= i2c_read_ack();
 
-	raw_z = ((uint8_t)i2c_read_ack())<<8;
-	raw_z |= i2c_read_ack();
+	_m_z = ((uint8_t)i2c_read_ack())<<8;
+	_m_z |= i2c_read_ack();
 
-	raw_y = ((uint8_t)i2c_read_ack())<<8;
-	raw_y |= i2c_read_nack();
+	_m_y = ((uint8_t)i2c_read_ack())<<8;
+	_m_y |= i2c_read_nack();
 
 	i2c_stop();
+}
 
-	return atan2((double)raw_y,(double)raw_x) * 180 / 3.141592654 + 180;
+int16_t HMC5883L_GetX(void){
+	return _m_x;
+}
+
+int16_t HMC5883L_GetY(void){
+	return _m_y;
+}
+int16_t HMC5883L_GetZ(void){
+	return _m_z;
 }
