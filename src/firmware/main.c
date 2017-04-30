@@ -232,7 +232,7 @@ int main (void) {
 
 				UART_SendString("--------------------------");
 		 	#endif // ACCEL
-        	#endif // IMU_DEBUG
+        #endif // IMU_DEBUG
 
 		#ifdef GPS_DEBUG
 		        #ifdef GPS
@@ -269,6 +269,7 @@ int main (void) {
 		#endif		// YPR_DEBUG
 
 		#ifdef PID_DEBUG
+
 			if(!UART_IsEmpty()){
 				if(UART_GetByte() == 'k'){
 					motor_set(MOTOR_ONE, 0);
@@ -277,8 +278,8 @@ int main (void) {
 					motor_set(MOTOR_FOUR, 0);
 					while(1);
 				}
-
 			}
+
 			if(PIDGetFlag() == 1){
 				toggle_led(GP_LED2);
 				Gyro_Update();
@@ -293,12 +294,8 @@ int main (void) {
 				UART_SendString(testing);
 
 				// Update Motors
-				AttitudeAdjustGetActuation(motor_delta);
-				motor_set(MOTOR_ONE, motor_get_speed(MOTOR_ONE) + motor_delta[0]);
-				motor_set(MOTOR_TWO, motor_get_speed(MOTOR_TWO) + motor_delta[1]);
-				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_THREE) + motor_delta[2]);
-				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_FOUR) + motor_delta[3]);
-				PIDResetFlag();
+				AttitudeAdjustGetError(motor_delta);
+				AttitudeAdjustSetActuation(motor_delta);
 
 				// Debugging
 				sprintf(testing, " \nM1: %d | ", motor_get_speed(MOTOR_ONE));
@@ -309,6 +306,8 @@ int main (void) {
 				UART_SendString(testing);
 				sprintf(testing, " M4: %d ", motor_get_speed(MOTOR_FOUR));
 				UART_SendString(testing);
+
+				PIDResetFlag();
 			}
 		#endif // PID_DEBUG
 

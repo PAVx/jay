@@ -92,7 +92,7 @@ void AttitudeAdjustGetActuatorOutput(int16_t* roll, int16_t* pitch, int16_t* yaw
 }
 */
 
-void AttitudeAdjustGetActuation(int16_t* motor_changes){
+void AttitudeAdjustGetError(int16_t motor_changes[NUM_MOTORS]){
 	/* Motor Array: [mot1, mot2, mot3, mot4]
 		mot1				mot2
 		cw				ccw
@@ -105,8 +105,48 @@ void AttitudeAdjustGetActuation(int16_t* motor_changes){
 	// pitch forward = positive, pitch backwards = negative
 	// roll left = positive, roll right = negative
 
-	motor_changes[0] = -yawError -pitchError -rollError;
-	motor_changes[1] =  yawError -pitchError +rollError;
-	motor_changes[2] =  yawError +pitchError -rollError;
-	motor_changes[3] = -yawError +pitchError +rollError;
+	motor_changes[0] = (-1 * ((int)yawError)) - ((int)pitchError) - ((int)rollError);
+	motor_changes[1] =  ((int)yawError) - ((int)pitchError) + ((int)rollError);
+	motor_changes[2] =  ((int)yawError) + ((int)pitchError) - ((int)rollError);
+	motor_changes[3] = -1 * ((int)yawError) + ((int)pitchError) + ((int)rollError);
+}
+
+void AttitudeAdjustSetActuation(int16_t motor_changes[NUM_MOTORS]) {
+	int16_t motor_val = 0;
+
+	motor_val = motor_get_speed(MOTOR_ONE);
+	if (motor_val + motor_changes[MOTOR_ONE - 1] > MAX_DUTY_CYCLE) {
+		motor_val = MAX_DUTY_CYCLE;
+	}
+	else if (motor_val + motor_changes[MOTOR_ONE - 1] < MIN_DUTY_CYCLE) {
+		motor_val = motor_get_speed(MOTOR_ONE);
+	}
+	motor_set(MOTOR_ONE, motor_val);
+
+	motor_val = motor_get_speed(MOTOR_TWO);
+	if (motor_val + motor_changes[MOTOR_TWO - 1] > MAX_DUTY_CYCLE) {
+		motor_val = MAX_DUTY_CYCLE;
+	}
+	else if (motor_val + motor_changes[MOTOR_TWO - 1] < MIN_DUTY_CYCLE) {
+		motor_val = motor_get_speed(MOTOR_TWO);
+	}
+	motor_set(MOTOR_TWO, motor_val);
+
+	motor_val = motor_get_speed(MOTOR_THREE);
+	if (motor_val + motor_changes[MOTOR_THREE - 1] > MAX_DUTY_CYCLE) {
+		motor_val = MAX_DUTY_CYCLE;
+	}
+	else if (motor_val + motor_changes[MOTOR_THREE - 1] < MIN_DUTY_CYCLE) {
+		motor_val = motor_get_speed(MOTOR_THREE);
+	}
+	motor_set(MOTOR_THREE, motor_val);
+
+	motor_val = motor_get_speed(MOTOR_FOUR);
+	if (motor_val + motor_changes[MOTOR_FOUR - 1] > MAX_DUTY_CYCLE) {
+		motor_val = MAX_DUTY_CYCLE;
+	}
+	else if (motor_val + motor_changes[MOTOR_FOUR - 1] < MIN_DUTY_CYCLE) {
+		motor_val = motor_get_speed(MOTOR_FOUR);
+	}
+	motor_set(MOTOR_FOUR, motor_val);
 }
