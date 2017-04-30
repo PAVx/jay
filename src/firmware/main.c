@@ -45,7 +45,6 @@ int main (void) {
 
 	system_initialize();
 
-<<<<<<< HEAD
 	_delay_ms(3000);
 
 	motor_set(MOTOR_ONE, 50);
