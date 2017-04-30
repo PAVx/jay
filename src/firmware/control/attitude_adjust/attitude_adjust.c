@@ -21,7 +21,7 @@ int16_t rollError;
 int16_t pitchError;
 int16_t yawError;
 
-Success_t InitializeAttitudeAdjust(void) {
+uint8_t InitializeAttitudeAdjust(void) {
 
 	PIDInit(&pidRoll, 0, PID_ROLL_KP, PID_ROLL_KI, PID_ROLL_KD, IMU_UPDATE_DT);
 	PIDInit(&pidPitch, 0, PID_PITCH_KP, PID_PITCH_KI, PID_PITCH_KD, IMU_UPDATE_DT);
@@ -29,8 +29,8 @@ Success_t InitializeAttitudeAdjust(void) {
 	PIDSetIntegralLimit(&pidRoll, PID_ROLL_INTEGRATION_LIMIT);
 	PIDSetIntegralLimit(&pidPitch, PID_PITCH_INTEGRATION_LIMIT);
 	PIDSetIntegralLimit(&pidYaw, PID_YAW_INTEGRATION_LIMIT);
-
-	return SUCCESS;
+	
+	return 1;
 }
 
 void AttituteAdjustSetDesired(double yawDesired, double pitchDesired, double rollDesired){

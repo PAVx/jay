@@ -48,7 +48,12 @@
 #include <util/delay.h>
 
 #include "softuart.h"
-#include "pid.h"
+#include "gyro.h"
+#include "accel.h"
+
+char testing[10];
+double ypr[3];
+int16_t motor_delta[4];
 
 #define SU_TRUE    1
 #define SU_FALSE   0
@@ -153,11 +158,12 @@ ISR(SOFTUART_T_COMP_LABEL)
 		isr_period_counter++;
 
 		if(isr_period_counter >= PID_PERIOD){
+			// Gyro_Update();
+			// Accel_Update();
 			PIDSetFlag();
 			isr_period_counter = 0;
 		}
 	}
-
 	run_isr();
 }
 

@@ -14,7 +14,7 @@
 #define LED_DEBUG
 //#define PACKET_DEBUG
 //#define YPR_DEBUG
-//#define PID_DEBUG
+#define PID_DEBUG
 
 char testing[10];
 
@@ -42,28 +42,34 @@ char testing[10];
 int main (void) {
 
 	system_initialize();
-	//AttituteAdjustSetDesired(0,0,0);
-
-	// calibrate ESCs by varying the duty cycle of each pin from max to low
-	uint8_t speed = 0;
-	uint8_t goUp = 1;
 
 	_delay_ms(3000);
 
-	while(1){
-		pwm_setval(speed, MOTOR_ONE);
-		pwm_setval(speed, MOTOR_TWO);
-		pwm_setval(speed, MOTOR_THREE);
-		pwm_setval(speed, MOTOR_FOUR);
+	motor_set(MOTOR_ONE, 50);
+	motor_set(MOTOR_TWO, 50);
+	motor_set(MOTOR_THREE, 50);
+	motor_set(MOTOR_FOUR, 50);
 
-		if (speed == 150) goUp = 0;
-		else if (speed == 20) goUp = 1;
-		if (goUp) speed++;
-		else speed--;
-		_delay_ms(50);
-	}
+	sprintf(testing, " \nAttitude Initialized: %d\n", InitializeAttitudeAdjust());
+	UART_SendString(testing);
 
-	while(1){}
+	AttituteAdjustSetDesired(0,0,0);
+
+	// uint8_t speed = 0;
+	// uint8_t goUp = 1;
+	// while(1){
+	// 	pwm_setval(speed, MOTOR_ONE);
+	// 	pwm_setval(speed, MOTOR_TWO);
+	// 	pwm_setval(speed, MOTOR_THREE);
+	// 	pwm_setval(speed, MOTOR_FOUR);
+	//
+	// 	if (speed == 150) goUp = 0;
+	// 	else if (speed == 20) goUp = 1;
+	// 	if (goUp) speed++;
+	// 	else speed--;
+	// 	_delay_ms(50);
+	// }
+
 	for(;;) {
 
 		#ifdef MOTOR_TEST
@@ -191,8 +197,8 @@ int main (void) {
 
 		#ifdef LED_DEBUG
 			#ifdef LEDS
-	  			toggle_led(GP_LED2);
-	  			toggle_led(GP_LED1);
+	  			//toggle_led(GP_LED2);
+	  			//toggle_led(GP_LED1);
 		  	#endif
   		#endif
 
@@ -279,11 +285,28 @@ int main (void) {
 		#endif		// YPR_DEBUG
 
 		#ifdef PID_DEBUG
+			if(!UART_IsEmpty()){
+				if(UART_GetByte() == 'k'){
+					motor_set(MOTOR_ONE, 0);
+					motor_set(MOTOR_TWO, 0);
+					motor_set(MOTOR_THREE, 0);
+					motor_set(MOTOR_FOUR, 0);
+					while(1);
+				}
+
+			}
 			if(PIDGetFlag() == 1){
+				toggle_led(GP_LED2);
 				Gyro_Update();
 				Accel_Update();
 				imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
 				AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
+				sprintf(testing, " \n\nY: %f ", ypr[0]);
+				UART_SendString(testing);
+				sprintf(testing, " P: %f ", ypr[1]);
+				UART_SendString(testing);
+				sprintf(testing, " R: %f", ypr[2]);
+				UART_SendString(testing);
 
 				// Update Motors
 				AttitudeAdjustGetActuation(motor_delta);
@@ -292,6 +315,16 @@ int main (void) {
 				motor_set(MOTOR_THREE, motor_get_speed(MOTOR_THREE) + motor_delta[2]);
 				motor_set(MOTOR_FOUR, motor_get_speed(MOTOR_FOUR) + motor_delta[3]);
 				PIDResetFlag();
+
+				// Debugging
+				sprintf(testing, " \nM1: %d | ", motor_get_speed(MOTOR_ONE));
+				UART_SendString(testing);
+				sprintf(testing, " M2: %d | ", motor_get_speed(MOTOR_TWO));
+				UART_SendString(testing);
+				sprintf(testing, " M3: %d | ", motor_get_speed(MOTOR_THREE));
+				UART_SendString(testing);
+				sprintf(testing, " M4: %d ", motor_get_speed(MOTOR_FOUR));
+				UART_SendString(testing);
 			}
 		#endif // PID_DEBUG
 

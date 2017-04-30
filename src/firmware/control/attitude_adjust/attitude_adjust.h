@@ -8,8 +8,7 @@
 #ifndef _ATTITUDE_ADJUST_H_
 #define _ATTITUDE_ADJUST_H_
 
-#include "pid.h"
-#include "motors.h"
+#include <stdint.h>
 
 #define MAX_ROTOR_1_THRUST (255)
 #define MAX_ROTOR_2_THRUST (255)
@@ -23,7 +22,7 @@
 
 // Feedback Controlled Functions
 
-Success_t InitializeAttitudeAdjust(void);
+uint8_t InitializeAttitudeAdjust(void);
 void AttituteAdjustSetDesired(double yawDesired, double pitchDesired, double rollDesired);
 void AttituteAdjustUpdatePID(double yawActual, double pitchActual, double rollActual);
 void AttitudeAdjustGetActuation(int16_t* motor_changes);
