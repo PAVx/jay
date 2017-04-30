@@ -52,9 +52,6 @@ int main (void) {
 	motor_set(MOTOR_THREE, 50);
 	motor_set(MOTOR_FOUR, 50);
 
-	sprintf(testing, " \nAttitude Initialized: %d\n", InitializeAttitudeAdjust());
-	UART_SendString(testing);
-
 	AttituteAdjustSetDesired(0,0,0);
 
 	for(;;) {
