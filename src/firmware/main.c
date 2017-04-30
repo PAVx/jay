@@ -18,6 +18,8 @@
 
 char testing[10];
 
+char sys_print[32];
+
 #ifdef IMU_DEBUG
 	char gbuffer[15];
 	char abuffer[15];
@@ -43,6 +45,7 @@ int main (void) {
 
 	system_initialize();
 
+<<<<<<< HEAD
 	_delay_ms(3000);
 
 	motor_set(MOTOR_ONE, 50);
@@ -54,21 +57,6 @@ int main (void) {
 	UART_SendString(testing);
 
 	AttituteAdjustSetDesired(0,0,0);
-
-	// uint8_t speed = 0;
-	// uint8_t goUp = 1;
-	// while(1){
-	// 	pwm_setval(speed, MOTOR_ONE);
-	// 	pwm_setval(speed, MOTOR_TWO);
-	// 	pwm_setval(speed, MOTOR_THREE);
-	// 	pwm_setval(speed, MOTOR_FOUR);
-	//
-	// 	if (speed == 150) goUp = 0;
-	// 	else if (speed == 20) goUp = 1;
-	// 	if (goUp) speed++;
-	// 	else speed--;
-	// 	_delay_ms(50);
-	// }
 
 	for(;;) {
 

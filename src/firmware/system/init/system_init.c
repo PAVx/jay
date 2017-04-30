@@ -24,9 +24,8 @@ uint8_t system_initialize(void) {
 	//	packet_init();
 
 		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-				UART_SendString("system clock initialized...\n");
-				UART_SendString("HW UART communication substrate initialized...\n");
-				UART_SendString("SW UART communication substrate initialized...\n");
+			_uart_driver_FlushTransmitBuffer();
+			UART_SendString(" communication substrate initialized...\n");
 		#endif
 
 	#endif
@@ -35,8 +34,11 @@ uint8_t system_initialize(void) {
 	#ifdef GYRO
 		InitializeGyro();
 		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-			UART_SendString("i2c initialized...\n");
-			UART_SendString("gyroscope initialized...\n");
+			_uart_driver_FlushTransmitBuffer();
+			UART_SendString(" i2c initialized...\n");
+			_uart_driver_FlushTransmitBuffer();
+			UART_SendString(" gyroscope initialized...\n");
+			_uart_driver_FlushTransmitBuffer();
 		#endif
 	#endif
 
@@ -44,9 +46,10 @@ uint8_t system_initialize(void) {
 		InitializeAccel();
 		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
 			#ifndef GYRO
-				UART_SendString("i2c initialized...\n");
+				_uart_driver_FlushTransmitBuffer();
+				UART_SendString(" i2c initialized...\n");
 			#endif
-			//UART_SendString("accel initialized...\n");
+			UART_SendString("accel initialized...\n");
 		#endif
 	#endif
 
@@ -54,6 +57,7 @@ uint8_t system_initialize(void) {
 		InitializeMag();
 		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
 			#ifndef GYRO
+				_uart_driver_FlushTransmitBuffer();
 				UART_SendString("i2c initialized...\n");
 			#endif
 			UART_SendString("magnometer initialized...\n");
@@ -64,6 +68,7 @@ uint8_t system_initialize(void) {
 	#ifdef MOTORS
 		motors_initialize();
 		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
+			_uart_driver_FlushTransmitBuffer();
 			UART_SendString("motor drivers initialized...\n");
 		#endif
 	#endif
@@ -79,6 +84,7 @@ uint8_t system_initialize(void) {
 		led_off(GP_LED2);
 
 		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
+			_uart_driver_FlushTransmitBuffer();
 			UART_SendString("system leds initialized...\n");
 		#endif
 	#endif
@@ -90,6 +96,7 @@ uint8_t system_initialize(void) {
 
 	sei();
 
+<<<<<<< HEAD
 	#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
 		UART_SendString("system interrupts initialized...\n");
 	#endif
@@ -106,5 +113,7 @@ uint8_t system_initialize(void) {
 		UART_SendString("is online\n\n");
 	#endif
 
+=======
+>>>>>>> 482d4efe059c295676e7235a367847d8f8b4e3c1
 	return TRUE;
 }

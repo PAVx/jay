@@ -38,6 +38,8 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/pwm
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adxl345_accel
 # GPS
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/nmea
+# IR SENSOR
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/d6t8l_ir
 
 
 ####################
@@ -111,6 +113,8 @@ CSOURCE						+= drivers/pwm/pwm_driver.c
 CSOURCE						+= drivers/adxl345_accel/adxl345.c
 # NMEA #
 CSOURCE						+= drivers/nmea/nmea.c
+# IR #
+CSOURCE						+= drivers/d6t8l_ir/d6t8l_ir.c
 ####################
 
 ####################
@@ -208,6 +212,10 @@ all:
 	${OBJECT_COPY} -j .text -j .data -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
 	${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 	#${BURNER} -F -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
+
+fusebits328p:
+	# sets fuse bits to use the external 16MHz XTAL on the Atmega 328P
+	avrdude -p m328p -c usbasp -U lfuse:w:0xce:m
 
 clean:
 	rm *.elf *.hex *.o
