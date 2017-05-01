@@ -20,6 +20,9 @@ void PIDInit(PID_t* pid, const double desired, const double kp,
     pid->integral = 0;
     pid->derivative = 0;
     pid->desired = desired;
+    pid->pOutput = 0.0;
+    pid->iOutput = 0.0;
+    pid->dOutput = 0.0;
     pid->kp = kp;
     pid->ki = ki;
     pid->kd = kd;

@@ -64,10 +64,14 @@
 
 		#define PID_RATE (5)	// Hz
 		#define PID_PERIOD (TIMER0_PERIOD/PID_RATE)
-
+		#define PID_UPDATE_PERIOD_SECONDS (0.2)
 		#define TIMER_PERIOD ((TIMER0_PERIOD * 1000) / F_CPU)
 
 	#endif
+#endif
+
+#ifdef MOTORS
+	#define MOTORS_SPIN
 #endif
 
 #ifdef SYSTEM_INIT_DEBUG_PRINTOUTS

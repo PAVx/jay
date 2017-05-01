@@ -13,7 +13,7 @@
 //#define GPS_DEBUG
 #define LED_DEBUG
 //#define PACKET_DEBUG
-//#define YPR_DEBUG
+#define YPR_DEBUG
 #define PID_DEBUG
 
 char testing[10];
@@ -38,7 +38,7 @@ char sys_print[32];
 
 #ifdef PID_DEBUG
 	double ypr[3];
-	int16_t motor_delta[4];
+	int motor_delta[4];
 #endif
 
 int main (void) {
@@ -47,10 +47,10 @@ int main (void) {
 
 	_delay_ms(3000);
 
-	motor_set(MOTOR_ONE, 50);
-	motor_set(MOTOR_TWO, 50);
-	motor_set(MOTOR_THREE, 50);
-	motor_set(MOTOR_FOUR, 50);
+	motor_set(MOTOR_ONE, 20);
+	motor_set(MOTOR_TWO, 20);
+	motor_set(MOTOR_THREE, 20);
+	motor_set(MOTOR_FOUR, 20);
 
 	AttituteAdjustSetDesired(0,0,0);
 
@@ -181,8 +181,8 @@ int main (void) {
 
 		#ifdef LED_DEBUG
 			#ifdef LEDS
-	  			//toggle_led(GP_LED2);
-	  			//toggle_led(GP_LED1);
+	  			toggle_led(GP_LED2);
+	  			toggle_led(GP_LED1);
 		  	#endif
   		#endif
 
@@ -281,17 +281,8 @@ int main (void) {
 			}
 
 			if(PIDGetFlag() == 1){
-				toggle_led(GP_LED2);
-				Gyro_Update();
-				Accel_Update();
 				imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
 				AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
-				sprintf(testing, " \n\nY: %f ", ypr[0]);
-				UART_SendString(testing);
-				sprintf(testing, " P: %f ", ypr[1]);
-				UART_SendString(testing);
-				sprintf(testing, " R: %f", ypr[2]);
-				UART_SendString(testing);
 
 				// Update Motors
 				AttitudeAdjustGetError(motor_delta);
@@ -306,6 +297,8 @@ int main (void) {
 				UART_SendString(testing);
 				sprintf(testing, " M4: %d ", motor_get_speed(MOTOR_FOUR));
 				UART_SendString(testing);
+
+
 
 				PIDResetFlag();
 			}
