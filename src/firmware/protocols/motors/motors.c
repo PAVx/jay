@@ -12,7 +12,7 @@
 #define NUM_MOTORS (4)
 
 struct motor {
-	// duty cycle (<= 255)
+	// duty cycle (<= 100)
 	uint8_t current_speed;
 };
 typedef struct motor Motor_t;
@@ -49,10 +49,26 @@ void motors_initialize(void) {
 	}
 
 }
-void motor_set(uint8_t motor_id, uint8_t speed) {
-	if (motor_id > NUM_MOTORS) return;
-	_motors[motor_id - 1].current_speed = speed;
-	pwm_setval(speed, motor_id);
+void motor_set(uint8_t motor_id, int8_t speed) {
+	uint16_t motor_val = 0; // we need a big enough container for the multiplication
+
+	if (motor_id > NUM_MOTORS) {
+		return;
+	}
+
+	if (speed < 0) {
+		return; // this means that there was a sign error
+		// we'll return to avoid actuating the motors based on an error
+	}
+
+	if (speed > MAX_DUTY_CYCLE) {
+		return; // this would be an error
+	}
+
+	motor_val = (speed * MAX_MOTOR_SPEED) / MAX_DUTY_CYCLE;
+
+	_motors[motor_id - 1].current_speed = (uint8_t)speed; // speed is 0-100
+	pwm_setval((uint8_t)motor_val, motor_id); // motor_val is 0-255 -- PWM needs this
 }
 
 uint8_t motor_get_speed(uint8_t motor_id) {

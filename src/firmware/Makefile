@@ -114,7 +114,7 @@ CSOURCE						+= drivers/adxl345_accel/adxl345.c
 # NMEA #
 CSOURCE						+= drivers/nmea/nmea.c
 # IR #
-CSOURCE						+= drivers/d6t8l_ir/d6t8l_ir.c
+#CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
 ####################
 
 ####################

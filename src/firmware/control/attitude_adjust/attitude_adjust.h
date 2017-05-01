@@ -9,22 +9,13 @@
 #define _ATTITUDE_ADJUST_H_
 
 #include <stdint.h>
+#include "motors.h"
 
-#define MAX_ROTOR_1_THRUST (255)
-#define MAX_ROTOR_2_THRUST (255)
-#define MAX_ROTOR_3_THRUST (255)
-#define MAX_ROTOR_4_THRUST (255)
-
-#define MIN_ROTOR_1_THRUST (100)
-#define MIN_ROTOR_2_THRUST (100)
-#define MIN_ROTOR_3_THRUST (100)
-#define MIN_ROTOR_4_THRUST (100)
-
-// Feedback Controlled Functions
+// Feedback Control Functions
 
 uint8_t InitializeAttitudeAdjust(void);
 void AttituteAdjustSetDesired(double yawDesired, double pitchDesired, double rollDesired);
 void AttituteAdjustUpdatePID(double yawActual, double pitchActual, double rollActual);
-void AttitudeAdjustGetActuation(int16_t* motor_changes);
-
+void AttitudeAdjustGetError(int16_t motor_changes[NUM_MOTORS]);
+void AttitudeAdjustSetActuation(int16_t motor_changes[NUM_MOTORS]);
 #endif

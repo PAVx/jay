@@ -96,24 +96,12 @@ uint8_t system_initialize(void) {
 
 	sei();
 
-<<<<<<< HEAD
-	#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-		UART_SendString("system interrupts initialized...\n");
-	#endif
-
-	#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-		UART_SendString("system bootloader initialized...\n");
-		UART_SendString("system starting up...\n");
-	#endif
-
-	#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
+	#ifdef UART
 		UART_SendString("\n\nPAVx Jay UAV System v3.0\n\n");
 		UART_SendString("\n\n--Device Address: ");
 		UART_SendByte(DEVICE_ADDRESS + ASCII_NUMBER_OFFSET);
 		UART_SendString("is online\n\n");
 	#endif
 
-=======
->>>>>>> 482d4efe059c295676e7235a367847d8f8b4e3c1
 	return TRUE;
 }
