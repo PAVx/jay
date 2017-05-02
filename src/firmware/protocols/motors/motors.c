@@ -5,6 +5,7 @@
 */
 
 #include "motors.h"
+#include "system.h"
 #include "pwm_driver.h"
 #include <util/delay.h>
 #include <avr/io.h>
