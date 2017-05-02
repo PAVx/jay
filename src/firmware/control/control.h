@@ -9,3 +9,4 @@
 #include "angles.h"
 #include "attitude_adjust.h"
 #include "pid.h"
+#include "comp_filter.h"

@@ -19,32 +19,32 @@ typedef struct
     //
     // The time delta between updates. deltaT = 1/(sampling frequency)
     //
-    float deltaT;
+    double deltaT;
 
     //
     // Weighting factor
     //
-    float alpha;
+    double alpha;
 
     //
     // The most recent accelerometer readings.
     //
-    float Ax, Ay, Az;
+    double Ax, Ay, Az;
 
     //
     // The most recent gyroscope readings.
     //
-    float Gx, Gy, Gz;
+    double Gx, Gy, Gz;
 
     //
     // Accelerometer angles in relation to the X and Y axes.
     //
-    float rawAngleX, rawAngleY;
+    double rawAngleX, rawAngleY;
 
     //
     // Comp. filter angle output in relation to the X and Y axes.
     //
-    float compAngleX, compAngleY;
+    double compAngleX, compAngleY;
 }
 ImuData;
 
@@ -74,7 +74,7 @@ ImuData;
 // Returns:
 //      Nothing.
 //
-void CompInit(ImuData *filter, float deltaT, float tau);
+void CompInit(double deltaT, double tau);
 
 //
 // Complementary Filter Start
@@ -88,7 +88,7 @@ void CompInit(ImuData *filter, float deltaT, float tau);
 // Returns:
 //      Nothing.
 //
-void CompStart(ImuData *filter);
+void CompStart(void);
 
 //
 // Complementary Filter Update
@@ -99,7 +99,7 @@ void CompStart(ImuData *filter);
 // Returns:
 //      Nothing.
 //
-void CompUpdate(ImuData *filter);
+void CompUpdate(void);
 
 //
 // Complementary Filter Angles Get
@@ -108,16 +108,16 @@ void CompUpdate(ImuData *filter);
 //      X and Y axes.
 // Parameters:
 //      filter - A SixAxis instantiation.
-//      XAngle - Address of a float to store the angle relative to the X axis into.
+//      XAngle - Address of a double to store the angle relative to the X axis into.
 //          The number 0 can be passed as a parameter if this angle is not
 //          needed.
-//      YAngle - Address of a float to store the angle relative to the Y axis into.
+//      YAngle - Address of a double to store the angle relative to the Y axis into.
 //          The number 0 can be passed as a parameter if this angle is not
 //          needed.
 // Returns:
 //      Nothing.
 //
-void CompAnglesGet(ImuData *filter, float *XAngle, float *YAngle);
+void CompAnglesGet(double *XAngle, double *YAngle);
 
 //
 // Complementary Filter Accelerometer Update
@@ -131,8 +131,7 @@ void CompAnglesGet(ImuData *filter, float *XAngle, float *YAngle);
 // Returns:
 //      Nothing.
 //
-void CompAccelUpdate(ImuData *filter, float accelX, float accelY,
-                            float accelZ);
+void CompAccelUpdate(double accelX, double accelY, double accelZ);
 
 //
 // Complementary Filter Gyroscope Update
@@ -146,7 +145,7 @@ void CompAccelUpdate(ImuData *filter, float accelX, float accelY,
 // Returns:
 //      Nothing.
 //
-void CompGyroUpdate(ImuData *filter, float gyroX, float gyroY, float gyroZ);
+void CompGyroUpdate(double gyroX, double gyroY, double gyroZ);
 
 //
 // Complementary Filter Degrees to Radians
@@ -157,7 +156,7 @@ void CompGyroUpdate(ImuData *filter, float gyroX, float gyroY, float gyroZ);
 // Returns:
 //      A value in radians.
 //
-inline float CompDegreesToRadians(float degrees){ return degrees*DEG_TO_RAD_RATIO; }
+inline double CompDegreesToRadians(double degrees){ return degrees*DEG_TO_RAD_RATIO; }
 
 //
 // Complementary Filter Radians to Degrees
@@ -168,6 +167,6 @@ inline float CompDegreesToRadians(float degrees){ return degrees*DEG_TO_RAD_RATI
 // Returns:
 //      A value in degrees.
 //
-inline float CompRadiansToDegrees(float radians){ return radians*RAD_TO_DEG_RATIO; }
+inline double CompRadiansToDegrees(double radians){ return radians*RAD_TO_DEG_RATIO; }
 
 #endif  // _COMP_FILTER_H

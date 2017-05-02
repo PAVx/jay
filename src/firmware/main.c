@@ -13,10 +13,13 @@
 //#define GPS_DEBUG
 #define LED_DEBUG
 //#define PACKET_DEBUG
-#define PID_DEBUG
+//#define PID_DEBUG
+//#define FILTER_DEBUG
+#define YPR
+double ypr[3];
 
 char testing[10];
-
+static uint8_t o = 0;
 char sys_print[32];
 
 #ifdef IMU_DEBUG
@@ -42,10 +45,18 @@ char sys_print[32];
 	static uint8_t o = 0;
 #endif
 
+#ifdef FILTER_DEBUG
+	double compPitch, compRoll;
+#endif
+
 int main (void) {
 	system_initialize();
 
 	AttituteAdjustSetDesired(0, 0, 0);
+
+	CompInit(PID_UPDATE_PERIOD_SECONDS, 2);
+	CompStart();
+
 
 	for(;;) {
 
@@ -56,7 +67,7 @@ int main (void) {
 					motor_set(MOTOR_TWO, 8);
 					motor_set(MOTOR_THREE, 8);
 					motor_set(MOTOR_FOUR, 8);
-          
+
 					o = 1;
 				}
 			}
@@ -66,7 +77,7 @@ int main (void) {
 					motor_set(MOTOR_TWO, 0);
 					motor_set(MOTOR_THREE, 0);
 					motor_set(MOTOR_FOUR, 0);
-					
+
 					o = 0;
 				}
 			}
@@ -270,10 +281,10 @@ int main (void) {
 	            }
 
 	        #endif
-    	#endif
+	    	#endif
 
-	
-		
+
+
 		#ifdef PID_DEBUG
 			if(PIDGetFlag() == 1) {
 
@@ -314,6 +325,40 @@ int main (void) {
 				PIDResetFlag();
 			}
 		#endif // PID_DEBUG
+
+		#ifdef FILTER_DEBUG
+			if(PIDGetFlag() == 1) {
+				Gyro_Update();
+				Accel_Update();
+
+				CompAccelUpdate(Accel_GetX(), Accel_GetY(), Accel_GetZ());
+				CompGyroUpdate(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ());
+				CompUpdate();
+				CompAnglesGet(&compPitch, &compRoll);
+
+				sprintf(testing, " \nP: %f ", compPitch);
+				UART_SendString(testing);
+				sprintf(testing, " R: %f", compRoll);
+				UART_SendString(testing);
+				PIDResetFlag();
+			}
+		#endif
+
+		#ifdef YPR
+			Gyro_Update();
+			Accel_Update();
+
+			cli();
+			imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
+			sei();
+
+			sprintf(testing, " \nY: %f ", ypr[0]);
+			UART_SendString(testing);
+			sprintf(testing, " P: %f ", ypr[1]);
+			UART_SendString(testing);
+			sprintf(testing, " R: %f\n", ypr[2]);
+			UART_SendString(testing);
+		#endif
 
 	}
 

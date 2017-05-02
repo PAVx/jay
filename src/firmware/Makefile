@@ -90,6 +90,8 @@ SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/angles
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/attitude_adjust
 # PID #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/pid
+# COMPLIMENTARY FILTER #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I control/complimentary
 
 ######################################################
 
@@ -165,6 +167,8 @@ CSOURCE						+= control/angles/angles.c
 CSOURCE						+= control/attitude_adjust/attitude_adjust.c
 # PID #
 CSOURCE						+= control/pid/pid.c
+# COMPLIMENTARY FILTER #
+CSOURCE						+= control/complimentary/comp_filter.c
 
 ######################################################
 

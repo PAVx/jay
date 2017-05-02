@@ -4,7 +4,7 @@
 // Revision: 1.5
 //
 // Description: Takes gyroscope and accelerometer readings and produces a "fused"
-// reading that is more accurate. Relies heavily on floating point arithmetic
+// reading that is more accurate. Relies heavily on doubleing point arithmetic
 // and trigonometry.
 //
 // This library has been tested to work with the MPU-6050 6 DOF IMU Sensor
@@ -29,6 +29,8 @@
 #define TWO_PI			6.2831853f
 #define SQ(x)			((x)*(x))
 
+ImuData filter;
+
 //*********************************************************************************
 // Internal Function Prototypes
 //*********************************************************************************
@@ -36,140 +38,140 @@
 //
 // Extrapolates angles according to accelerometer readings
 //
-void CompAccelCalculate(ImuData *filter);
+void CompAccelCalculate(void);
 
 //
 // Check to see which quadrant of the unit circle the angle lies in
 // and format the angle to lie in the range of 0 to 2*pi
 //
-float FormatAccelRange(float accelAngle, float accelZ);
+double FormatAccelRange(double accelAngle, double accelZ);
 
 //
 // Formats the Comp. Angle for faster filter convergence
 //
-float FormatFastConverge(float compAngle, float accAngle);
+double FormatFastConverge(double compAngle, double accAngle);
 
 //
 // Formats the complementary filter angle to always lie within the range of
 // 0 to 2*pi
 //
-float FormatRange0to2PI(float compAngle);
+double FormatRange0to2PI(double compAngle);
 
 //
 // Complementary Filter - This is where the magic happens.
 //
-float CompFilterProcess(float compAngle, float accelAngle, float omega,
-                        float deltaT, float alpha);
+double CompFilterProcess(double compAngle, double accelAngle, double omega,
+                        double deltaT, double alpha);
 
 //*********************************************************************************
 // External Functions
 //*********************************************************************************
 
-void CompInit(ImuData *filter, float deltaT, float tau)
+void CompInit(double deltaT, double tau)
 {
     // Save value to structure
-    filter->deltaT = deltaT;
+    filter.deltaT = deltaT;
 
     // Calculate weighting factor
-    filter->alpha = tau/(tau + deltaT);
+    filter.alpha = tau/(tau + deltaT);
 
     // Initialize other structure variables
-    filter->compAngleX = 0;
-    filter->compAngleY = 0;
-    filter->rawAngleX = 0;
-    filter->rawAngleY = 0;
-    filter->Ax = 0;
-    filter->Ay = 0;
-    filter->Az = 0;
-    filter->Gx = 0;
-    filter->Gy = 0;
-    filter->Gz = 0;
+    filter.compAngleX = 0;
+    filter.compAngleY = 0;
+    filter.rawAngleX = 0;
+    filter.rawAngleY = 0;
+    filter.Ax = 0;
+    filter.Ay = 0;
+    filter.Az = 0;
+    filter.Gx = 0;
+    filter.Gy = 0;
+    filter.Gz = 0;
 }
 
 
-void CompStart(ImuData *filter)
+void CompStart(void)
 {
     // Calculate accelerometer angles
-    CompAccelCalculate(filter);
+    CompAccelCalculate();
 
     // Initialize filter to accel angles
-    filter->compAngleX = filter->rawAngleX;
-    filter->compAngleY = filter->rawAngleY;
+    filter.compAngleX = filter.rawAngleX;
+    filter.compAngleY = filter.rawAngleY;
 }
 
 
-void CompUpdate(ImuData *filter)
+void CompUpdate(void)
 {
     // Calculate the accelerometer angles
-    CompAccelCalculate(filter);
+    CompAccelCalculate();
 
     // Omega is the rotational velocity reported by the gyroscope. Though it seems
     // strange, the rotational velocity about the Y axis must be projected back
     // onto the X axis and then its sense of direction must be inverted in order to
     // acquire positive angles about the X axis. This is shown below with -Gy being
     // passed as a parameter.
-    filter->compAngleX = CompFilterProcess(filter->compAngleX, filter->rawAngleX,
-                                           -(filter->Gy), filter->deltaT,
-                                           filter->alpha);
+    filter.compAngleX = CompFilterProcess(filter.compAngleX, filter.rawAngleX,
+                                           -(filter.Gy), filter.deltaT,
+                                           filter.alpha);
 
     // In this case, the rotational velocity about the X axis (Gx) is projected back
     // onto the Y axis and its sense of direction is already correct.
-    filter->compAngleY = CompFilterProcess(filter->compAngleY, filter->rawAngleY,
-                                           filter->Gx, filter->deltaT,
-                                           filter->alpha);
+    filter.compAngleY = CompFilterProcess(filter.compAngleY, filter.rawAngleY,
+                                           filter.Gx, filter.deltaT,
+                                           filter.alpha);
 }
 
 
-void CompAnglesGet(ImuData *filter, float *XAngle, float *YAngle)
+void CompAnglesGet(double *XAngle, double *YAngle)
 {
     // Transfer structure's updated comp. filter's angles
     // Check if valid addresses were passed as well.
     if(XAngle)
     {
-        *XAngle = filter->compAngleX;
+        *XAngle = filter.compAngleX;
     }
     if(YAngle)
     {
-        *YAngle = filter->compAngleY;
+        *YAngle = filter.compAngleY;
     }
 }
 
 
-void CompAccelUpdate(ImuData *filter, float accelX, float accelY, float accelZ)
+void CompAccelUpdate(double accelX, double accelY, double accelZ)
 {
     // Save values to structure
-    filter->Ax = accelX;
-    filter->Ay = accelY;
-    filter->Az = accelZ;
+    filter.Ax = accelX;
+    filter.Ay = accelY;
+    filter.Az = accelZ;
 }
 
 
-void CompGyroUpdate(ImuData *filter, float gyroX, float gyroY, float gyroZ)
+void CompGyroUpdate(double gyroX, double gyroY, double gyroZ)
 {
     // Save values to structure
-    filter->Gx = gyroX;
-    filter->Gy = gyroY;
-    filter->Gz = gyroZ;
+    filter.Gx = gyroX;
+    filter.Gy = gyroY;
+    filter.Gz = gyroZ;
 }
 
 //*********************************************************************************
 // Internal Functions
 //*********************************************************************************
 
-void CompAccelCalculate(ImuData *filter)
+void CompAccelCalculate(void)
 {
     // Angle made by X axis acceleration vector relative to ground
-    filter->rawAngleX = atan2f(filter->Ax, sqrtf(SQ(filter->Ay) + SQ(filter->Az)));
+    filter.rawAngleX = atan2f(filter.Ax, sqrtf(SQ(filter.Ay) + SQ(filter.Az)));
 
     // Angle made by Y axis acceleration vector relative to ground
-    filter->rawAngleY = atan2f(filter->Ay, sqrtf(SQ(filter->Ax) + SQ(filter->Az)));
+    filter.rawAngleY = atan2f(filter.Ay, sqrtf(SQ(filter.Ax) + SQ(filter.Az)));
 
     // Format the accel. angles to lie in the range of 0 to 2*pi
-    filter->rawAngleX = FormatAccelRange(filter->rawAngleX, filter->Az);
-    filter->rawAngleY = FormatAccelRange(filter->rawAngleY, filter->Az);
+    filter.rawAngleX = FormatAccelRange(filter.rawAngleX, filter.Az);
+    filter.rawAngleY = FormatAccelRange(filter.rawAngleY, filter.Az);
 }
 
-float FormatAccelRange(float accelAngle, float accelZ)
+double FormatAccelRange(double accelAngle, double accelZ)
 {
     if(accelZ < 0.0f)
     {
@@ -190,7 +192,7 @@ float FormatAccelRange(float accelAngle, float accelZ)
     return accelAngle;
 }
 
-float FormatFastConverge(float compAngle, float accAngle)
+double FormatFastConverge(double compAngle, double accAngle)
 {
     // Work with comp. angles that are closest in distance to the accelerometer angle
     // on the unit circle. This allows for significantly faster filter convergence.
@@ -206,7 +208,7 @@ float FormatFastConverge(float compAngle, float accAngle)
     return compAngle;
 }
 
-float FormatRange0to2PI(float compAngle)
+double FormatRange0to2PI(double compAngle)
 {
     while(compAngle >= TWO_PI)
     {
@@ -221,10 +223,10 @@ float FormatRange0to2PI(float compAngle)
     return compAngle;
 }
 
-float CompFilterProcess(float compAngle, float accelAngle, float omega, float deltaT,
-                  float alpha)
+double CompFilterProcess(double compAngle, double accelAngle, double omega, double deltaT,
+                  double alpha)
 {
-    float gyroAngle;
+    double gyroAngle;
 
     // Speed up filter convergence
     compAngle = FormatFastConverge(compAngle, accelAngle);

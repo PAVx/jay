@@ -9,7 +9,12 @@ double _a_x;
 double _a_y;
 double _a_z;
 
+double _lowpass_x;
+double _lowpass_y;
+double _lowpass_z;
+
 void ADXL345_ReadAccel(double *a_x, double *a_y, double *a_z);
+void ADXL345_LowPass_Filter(double x, double y, double z);
 void ADXL345_Calibrate(void);
 
 void InitializeADXL345(void)
@@ -43,8 +48,12 @@ void InitializeADXL345(void)
     _a_y = 0;
     _a_z = 0;
 
+    _lowpass_x = 0;
+    _lowpass_x = 0;
+    _lowpass_x = 0;
+
     _delay_ms(2); // Arbitrary delay amount
-    ADXL345_Calibrate();
+    // ADXL345_Calibrate();
 }
 
 void ADXL345_Calibrate(void)
@@ -90,7 +99,6 @@ void ADXL345_ReadAccel(double *a_x, double *a_y, double *a_z)
     i2c_write(0x32);
     i2c_stop();
 
-
     i2c_receive(ADXL345_ADDR, buff, 6);
 
     *a_x = ((buff[1] << 8) | buff[0]);
@@ -103,10 +111,21 @@ void ADXL345_UpdateData(void)
 {
     double x, y, z;
     ADXL345_ReadAccel(&x, &y, &z);
+    ADXL345_LowPass_Filter(x, y, z);
 
-    _a_x = x;
-    _a_y = y;
-    _a_z = z;
+    _a_x = _lowpass_x;
+    _a_y = _lowpass_y;
+    _a_z = _lowpass_z;
+}
+
+void ADXL345_LowPass_Filter(double x, double y, double z)
+{
+  double alpha = 0.2;
+
+  _lowpass_x = x * alpha + (_lowpass_x * (1.0 - alpha));
+  _lowpass_y = y * alpha + (_lowpass_y * (1.0 - alpha));
+  _lowpass_z = z * alpha + (_lowpass_z * (1.0 - alpha));
+
 }
 
 double ADXL345_GetX(void)
