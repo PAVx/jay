@@ -10,6 +10,8 @@
 #include <util/delay.h>
 #include <avr/io.h>
 
+#define NUM_MOTORS (4)
+
 struct motor {
 	// duty cycle (<= 100)
 	uint8_t current_speed;

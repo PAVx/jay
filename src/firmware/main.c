@@ -56,7 +56,7 @@ int main (void) {
 					motor_set(MOTOR_TWO, 8);
 					motor_set(MOTOR_THREE, 8);
 					motor_set(MOTOR_FOUR, 8);
-
+          
 					o = 1;
 				}
 			}
@@ -68,7 +68,6 @@ int main (void) {
 					motor_set(MOTOR_FOUR, 0);
 					
 					o = 0;
-
 				}
 			}
 		#endif
@@ -249,7 +248,7 @@ int main (void) {
 
 				UART_SendString("--------------------------");
 		 	#endif // ACCEL
-        #endif // IMU_DEBUG
+        	#endif // IMU_DEBUG
 
 		#ifdef GPS_DEBUG
 	        #ifdef GPS
@@ -316,6 +315,6 @@ int main (void) {
 			}
 		#endif // PID_DEBUG
 
-		}
-
 	}
+
+}

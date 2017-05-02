@@ -29,7 +29,7 @@ uint8_t InitializeAttitudeAdjust(void) {
 	PIDSetIntegralLimit(&pidRoll, PID_ROLL_INTEGRATION_LIMIT);
 	PIDSetIntegralLimit(&pidPitch, PID_PITCH_INTEGRATION_LIMIT);
 	PIDSetIntegralLimit(&pidYaw, PID_YAW_INTEGRATION_LIMIT);
-	
+
 	return 1;
 }
 
@@ -50,6 +50,7 @@ void AttitudeAdjustGetError(int motor_changes[NUM_MOTORS]){
 	int yawErrorInt = 0;
 	int pitchErrorInt = 0;
 	int rollErrorInt = 0;
+
 
 	/* Motor Array: [mot1, mot2, mot3, mot4]
 		mot1				mot2
@@ -124,3 +125,4 @@ void AttitudeAdjustSetActuation(int motor_changes[NUM_MOTORS]) {
 	}
 	motor_set(MOTOR_FOUR, (uint8_t)motor_val);
 }
+

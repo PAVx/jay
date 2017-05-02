@@ -4,14 +4,14 @@ BURNER						= avrdude
 CC_AVR						= atmega328p
 F_CPU						= 16000000UL
 BURNER_AVR					= ATMEGA328P
-BURNER_PROGRAMMER			= usbasp # Arduino
-COMPILER_PATH				= /dev/tty.usb*
+BURNER_PROGRAMMER				= usbasp # Arduino
+COMPILER_PATH					= /dev/tty.usb*
 OBJECT_COPY					= avr-objcopy
 BAUDRATE					= 115200
 ###########################################
 
 # CC GLOBAL DEFINES
-CC_GLOBAL_DEFINES 			= -D F_CPU=${F_CPU}
+CC_GLOBAL_DEFINES 				= -D F_CPU=${F_CPU}
 
 ###########################################
 # MAIN SOURCE
@@ -25,7 +25,7 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/uart_driver
 # SOFTUART DRIVER
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/softuart_driver
 # BUFFER
-SEARCHABLE_HEADER_FILE_DIRS += -I drivers/buffer
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I drivers/buffer
 # I2C DRIVER
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/i2c_driver
 # ITG3200
@@ -136,7 +136,7 @@ CSOURCE						+= protocols/com/packet.c
 # ACCEL #
 CSOURCE						+= protocols/accel/accel.c
 # GPS #
-CSOURCE                     += protocols/gps/gps.c
+CSOURCE                     			+= protocols/gps/gps.c
 ####################
 
 ####################
