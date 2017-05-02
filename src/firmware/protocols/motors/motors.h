@@ -17,7 +17,7 @@
 #define MIN_MOTOR_SPEED (0x00) // actual motor value
 
 #define MIN_DUTY_CYCLE (0)
-#define MAX_DUTY_CYCLE (100)
+#define MAX_DUTY_CYCLE (10)
 
 void motors_initialize(void);
 

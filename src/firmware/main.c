@@ -13,7 +13,6 @@
 //#define GPS_DEBUG
 #define LED_DEBUG
 //#define PACKET_DEBUG
-//#define YPR_DEBUG
 #define PID_DEBUG
 
 char testing[10];
@@ -38,26 +37,40 @@ char sys_print[32];
 
 #ifdef PID_DEBUG
 	double ypr[3];
-	int16_t motor_delta[4];
+	int motor_delta[4];
+
+	static uint8_t o = 0;
 #endif
 
 int main (void) {
-
 	system_initialize();
 
-	_delay_ms(3000);
-
-	motor_set(MOTOR_ONE, 50);
-	motor_set(MOTOR_TWO, 50);
-	motor_set(MOTOR_THREE, 50);
-	motor_set(MOTOR_FOUR, 50);
-
-	sprintf(testing, " \nAttitude Initialized: %d\n", InitializeAttitudeAdjust());
-	UART_SendString(testing);
-
-	AttituteAdjustSetDesired(0,0,0);
+	AttituteAdjustSetDesired(0, 0, 0);
 
 	for(;;) {
+
+		#ifdef UART
+			if(!UART_IsEmpty()){
+				if ((UART_GetByte() == 's') && (o == 0)) {
+					motor_set(MOTOR_ONE, 8);
+					motor_set(MOTOR_TWO, 8);
+					motor_set(MOTOR_THREE, 8);
+					motor_set(MOTOR_FOUR, 8);
+          
+					o = 1;
+				}
+			}
+			if(!UART_IsEmpty()) {
+				if(UART_GetByte() == 'k'){
+					motor_set(MOTOR_ONE, 0);
+					motor_set(MOTOR_TWO, 0);
+					motor_set(MOTOR_THREE, 0);
+					motor_set(MOTOR_FOUR, 0);
+					
+					o = 0;
+				}
+			}
+		#endif
 
 		#ifdef MOTOR_TEST
 			if (!UART_IsEmpty()) {
@@ -184,8 +197,8 @@ int main (void) {
 
 		#ifdef LED_DEBUG
 			#ifdef LEDS
-	  			//toggle_led(GP_LED2);
-	  			//toggle_led(GP_LED1);
+	  			toggle_led(GP_LED2);
+	  			toggle_led(GP_LED1);
 		  	#endif
   		#endif
 
@@ -238,67 +251,55 @@ int main (void) {
         	#endif // IMU_DEBUG
 
 		#ifdef GPS_DEBUG
-		        #ifdef GPS
-		            NEO6M_GetChar();
+	        #ifdef GPS
+	            NEO6M_GetChar();
 
-		            if(GPS_NewDataReady()) {
+	            if(GPS_NewDataReady()) {
 
-					UART_SendString("-------***********-------");
+				UART_SendString("-------***********-------");
 
-		                memset(gpsbuffer, '\0', 50);
-		                GPS_UpdateData();
-		                struct tm time = GPS_GetTime();
-		                sprintf(gpsbuffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", time.tm_hour, time.tm_min, time.tm_sec, GPS_GetLatitude(), GPS_GetLongitude(), GPS_GetSpeed(), GPS_GetAltitude());
+	                memset(gpsbuffer, '\0', 50);
+	                GPS_UpdateData();
+	                struct tm time = GPS_GetTime();
+	                sprintf(gpsbuffer, "T: %02d:%02d:%02d\nL: %.0f\nL: %.0f\nS: %.2f\nA: %.2f\n", time.tm_hour, time.tm_min, time.tm_sec, GPS_GetLatitude(), GPS_GetLongitude(), GPS_GetSpeed(), GPS_GetAltitude());
 
-		                while (gpsbuffer[i] != '\0') {
-		                    UART_SendByte(gpsbuffer[i]);
-		                    i++;
-		                }
-		            }
+	                while (gpsbuffer[i] != '\0') {
+	                    UART_SendByte(gpsbuffer[i]);
+	                    i++;
+	                }
+	            }
 
-		        #endif
-	    	#endif
+	        #endif
+    	#endif
 
-		#ifdef YPR_DEBUG
-			Gyro_Update();
-			Accel_Update();
-			imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
-			sprintf(testing, " \nY: %f ", ypr[0]);
-			UART_SendString(testing);
-			sprintf(testing, " P: %f ", ypr[1]);
-			UART_SendString(testing);
-			sprintf(testing, " R: %f\n", ypr[2]);
-			UART_SendString(testing);
-		#endif		// YPR_DEBUG
-
+	
+		
 		#ifdef PID_DEBUG
+			if(PIDGetFlag() == 1) {
 
-			if(!UART_IsEmpty()){
-				if(UART_GetByte() == 'k'){
-					motor_set(MOTOR_ONE, 0);
-					motor_set(MOTOR_TWO, 0);
-					motor_set(MOTOR_THREE, 0);
-					motor_set(MOTOR_FOUR, 0);
-					while(1);
-				}
-			}
-
-			if(PIDGetFlag() == 1){
-				toggle_led(GP_LED2);
 				Gyro_Update();
 				Accel_Update();
+
+				cli();
 				imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
-				AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
-				sprintf(testing, " \n\nY: %f ", ypr[0]);
+				sei();
+
+				sprintf(testing, " \nY: %f ", ypr[0]);
 				UART_SendString(testing);
 				sprintf(testing, " P: %f ", ypr[1]);
 				UART_SendString(testing);
-				sprintf(testing, " R: %f", ypr[2]);
+				sprintf(testing, " R: %f\n", ypr[2]);
 				UART_SendString(testing);
+
+
+				AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
 
 				// Update Motors
 				AttitudeAdjustGetError(motor_delta);
-				AttitudeAdjustSetActuation(motor_delta);
+
+				if (o == 1) {
+					AttitudeAdjustSetActuation(motor_delta);
+				}
 
 				// Debugging
 				sprintf(testing, " \nM1: %d | ", motor_get_speed(MOTOR_ONE));

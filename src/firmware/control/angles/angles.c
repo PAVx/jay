@@ -9,6 +9,7 @@
 // Reference: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 
 #include "angles.h"
+#include "system.h"
 #include <math.h>
 
 void imu2euler(double* ypr, double accX, double accY, double accZ, double magX, double magY){

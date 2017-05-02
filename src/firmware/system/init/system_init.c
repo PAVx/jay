@@ -13,6 +13,10 @@ uint8_t system_initialize(void) {
 		clock_init();
 	#endif
 
+	#ifdef MOTORS
+		motors_initialize();
+	#endif
+
 	#ifdef COM
 		#ifdef SW_UART
 			softuart_init();
@@ -61,15 +65,6 @@ uint8_t system_initialize(void) {
 				UART_SendString("i2c initialized...\n");
 			#endif
 			UART_SendString("magnometer initialized...\n");
-		#endif
-	#endif
-
-
-	#ifdef MOTORS
-		motors_initialize();
-		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-			_uart_driver_FlushTransmitBuffer();
-			UART_SendString("motor drivers initialized...\n");
 		#endif
 	#endif
 

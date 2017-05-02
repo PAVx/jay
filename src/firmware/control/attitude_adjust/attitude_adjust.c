@@ -10,16 +10,16 @@
 #include "pid.h"
 #include "system.h"
 
-#define IMU_UPDATE_DT 1/PID_RATE
+#define IMU_UPDATE_DT (PID_UPDATE_PERIOD_SECONDS)
 
 PID_t pidRoll;
 PID_t pidPitch;
 PID_t pidYaw;
 
 // Yaw Pitch Roll Errors
-int16_t rollError;
-int16_t pitchError;
-int16_t yawError;
+double rollError = 0.0;
+double pitchError = 0.0;
+double yawError = 0.0;
 
 uint8_t InitializeAttitudeAdjust(void) {
 
@@ -45,45 +45,13 @@ void AttituteAdjustUpdatePID(double yawActual, double pitchActual, double rollAc
 	rollError = PIDUpdate(&pidRoll, rollActual, UPDATE_ERROR);
 }
 
-/*
-void AttitudeAdjustCorrectRatePID(
-	double rollRateActual, double pitchRateActual, double yawRateActual,
-	double rollRateDesired, double pitchRateDesired, double yawRateDesired) {
-	PIDSetDesired(&pidRollRate, rollRateDesired);
-	rollOutput = saturateSignedInt16(pidUpdate(&pidRollRate, rollRateActual, UPDATE_ERROR));
-	PIDSetDesired(&pidPitchRate, pitchRateDesired);
-	pitchOutput = saturateSignedInt16(pidUpdate(&pidPitchRate, pitchRateActual, UPDATE_ERROR));
-	PIDSetDesired(&pidYawRate, yawRateDesired);
-	yawOutput = saturateSignedInt16(pidUpdate(&pidYawRate, yawRateActual, UPDATE_ERROR));
-}
-void AttitudeAdjustRunPID(
-	double eulerRollActual, double eulerPitchActual, double eulerYawActual,
-	double eulerRollDesired, double eulerPitchDesired, double eulerYawDesired,
-	double* rollRateDesired, double* pitchRateDesired, double* yawRateDesired)	{
-	double yawError;
-	PIDSetDesired(&pidRoll, eulerRollDesired);
-	*rollRateDesired = PIDUpdate(&pidRoll, eulerRollActual, UPDATE_ERROR);
-	// Update PID for pitch axis
-	PIDSetDesired(&pidPitch, eulerPitchDesired);
-	*pitchRateDesired = PIDUpdate(&pidPitch, eulerPitchActual, UPDATE_ERROR);
-	// Update PID for yaw axis
-	yawError = eulerYawDesired - eulerYawActual;
-	if (yawError > 180.0) {
-		yawError -= 360.0;
-	} else if (yawError < -180.0) {
-		yawError += 360.0;
-	}
-	PIDSetError(&pidYaw, yawError);
-	*yawRateDesired = PIDUpdate(&pidYaw, eulerYawActual, NO_UPDATE);
-}
-void AttitudeAdjustGetActuatorOutput(int16_t* roll, int16_t* pitch, int16_t* yaw) {
-	*roll = rollOutput;
-	*pitch = pitchOutput;
-	*yaw = yawOutput;
-}
-*/
 
-void AttitudeAdjustGetError(int16_t motor_changes[NUM_MOTORS]){
+void AttitudeAdjustGetError(int motor_changes[NUM_MOTORS]){
+	int yawErrorInt = 0;
+	int pitchErrorInt = 0;
+	int rollErrorInt = 0;
+
+
 	/* Motor Array: [mot1, mot2, mot3, mot4]
 		mot1				mot2
 		cw				ccw
@@ -95,49 +63,66 @@ void AttitudeAdjustGetError(int16_t motor_changes[NUM_MOTORS]){
 
 	// pitch forward = positive, pitch backwards = negative
 	// roll left = positive, roll right = negative
+	yawErrorInt 	= (int)(yawError * 10);
+	pitchErrorInt 	= (int)(pitchError * 10);
+	rollErrorInt 	= (int)(rollError * 10);
 
-	motor_changes[0] = (-1 * ((int)yawError)) - ((int)pitchError) - ((int)rollError);
-	motor_changes[1] =  ((int)yawError) - ((int)pitchError) + ((int)rollError);
-	motor_changes[2] =  ((int)yawError) + ((int)pitchError) - ((int)rollError);
-	motor_changes[3] = -1 * ((int)yawError) + ((int)pitchError) + ((int)rollError);
+	yawErrorInt		/= 10;
+	pitchErrorInt	/= 10;
+	rollErrorInt	/= 10;
+
+	motor_changes[MOTOR_ONE - 1] = (-1 * yawErrorInt) - (pitchErrorInt) - (rollErrorInt);
+	motor_changes[MOTOR_TWO - 1] =  (yawErrorInt) - (pitchErrorInt) + (rollErrorInt);
+	motor_changes[MOTOR_THREE - 1] =  (yawErrorInt) + (pitchErrorInt) - (rollErrorInt);
+	motor_changes[MOTOR_FOUR - 1] = (-1 * yawErrorInt) + (pitchErrorInt) + (rollErrorInt);
+
+				char testing[30];
+				sprintf(testing, " \nYAW_ERROR: %d | ", yawErrorInt);
+				UART_SendString(testing);
+				sprintf(testing, " PITCH_ERROR: %d | ", pitchErrorInt);
+				UART_SendString(testing);
+				sprintf(testing, " ROLL_ERROR: %d | ", rollErrorInt);
+				UART_SendString(testing);
+
 }
 
-void AttitudeAdjustSetActuation(int16_t motor_changes[NUM_MOTORS]) {
-	int16_t motor_val = 0;
+void AttitudeAdjustSetActuation(int motor_changes[NUM_MOTORS]) {
+	int motor_val = 0;
 
-	motor_val = motor_get_speed(MOTOR_ONE);
-	if (motor_val + motor_changes[MOTOR_ONE - 1] > MAX_DUTY_CYCLE) {
+	motor_val = (int)motor_get_speed(MOTOR_ONE) + motor_changes[MOTOR_ONE - 1];
+	if (motor_val > MAX_DUTY_CYCLE) {
 		motor_val = MAX_DUTY_CYCLE;
 	}
-	else if (motor_val + motor_changes[MOTOR_ONE - 1] < MIN_DUTY_CYCLE) {
+	else if (motor_val < MIN_DUTY_CYCLE) {
 		motor_val = motor_get_speed(MOTOR_ONE);
 	}
-	motor_set(MOTOR_ONE, motor_val);
+	motor_set(MOTOR_ONE, (uint8_t)motor_val);
 
-	motor_val = motor_get_speed(MOTOR_TWO);
-	if (motor_val + motor_changes[MOTOR_TWO - 1] > MAX_DUTY_CYCLE) {
+	motor_val = (int)motor_get_speed(MOTOR_TWO) + motor_changes[MOTOR_TWO - 1];
+	if (motor_val > MAX_DUTY_CYCLE) {
 		motor_val = MAX_DUTY_CYCLE;
 	}
-	else if (motor_val + motor_changes[MOTOR_TWO - 1] < MIN_DUTY_CYCLE) {
+	else if (motor_val < MIN_DUTY_CYCLE) {
 		motor_val = motor_get_speed(MOTOR_TWO);
 	}
-	motor_set(MOTOR_TWO, motor_val);
+	motor_set(MOTOR_TWO, (uint8_t)motor_val);
 
-	motor_val = motor_get_speed(MOTOR_THREE);
-	if (motor_val + motor_changes[MOTOR_THREE - 1] > MAX_DUTY_CYCLE) {
+	motor_val = (int)motor_get_speed(MOTOR_THREE) + motor_changes[MOTOR_THREE - 1];
+	if (motor_val > MAX_DUTY_CYCLE) {
 		motor_val = MAX_DUTY_CYCLE;
 	}
-	else if (motor_val + motor_changes[MOTOR_THREE - 1] < MIN_DUTY_CYCLE) {
+	else if (motor_val < MIN_DUTY_CYCLE) {
 		motor_val = motor_get_speed(MOTOR_THREE);
 	}
-	motor_set(MOTOR_THREE, motor_val);
+	motor_set(MOTOR_THREE, (uint8_t)motor_val);
 
-	motor_val = motor_get_speed(MOTOR_FOUR);
-	if (motor_val + motor_changes[MOTOR_FOUR - 1] > MAX_DUTY_CYCLE) {
+	motor_val = (int)motor_get_speed(MOTOR_FOUR) + motor_changes[MOTOR_FOUR - 1];
+	if (motor_val > MAX_DUTY_CYCLE) {
 		motor_val = MAX_DUTY_CYCLE;
 	}
-	else if (motor_val + motor_changes[MOTOR_FOUR - 1] < MIN_DUTY_CYCLE) {
+	else if (motor_val < MIN_DUTY_CYCLE) {
 		motor_val = motor_get_speed(MOTOR_FOUR);
 	}
-	motor_set(MOTOR_FOUR, motor_val);
+	motor_set(MOTOR_FOUR, (uint8_t)motor_val);
 }
+
