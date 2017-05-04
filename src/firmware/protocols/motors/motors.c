@@ -14,7 +14,7 @@
 
 struct motor {
 	// duty cycle (<= 100)
-	uint8_t current_speed;
+	uint32_t current_speed;
 };
 typedef struct motor Motor_t;
 
@@ -55,9 +55,9 @@ void motors_initialize(void) {
 	#endif
 
 }
-void motor_set(uint8_t motor_id, int8_t speed) {
+void motor_set(uint8_t motor_id, int32_t speed) {
 	#ifdef MOTORS_SPIN
-		uint16_t motor_val = 0; // we need a big enough container for the multiplication
+		uint32_t motor_val = 0; // we need a big enough container for the multiplication
 	#endif
 
 	if (motor_id > NUM_MOTORS) {
@@ -73,15 +73,15 @@ void motor_set(uint8_t motor_id, int8_t speed) {
 		return; // this would be an error
 	}
 
-	_motors[motor_id - 1].current_speed = (uint8_t)speed; // speed is 0-100
+	_motors[motor_id - 1].current_speed = (uint32_t)speed; // speed is 0-100
 
 	#ifdef MOTORS_SPIN
-		motor_val = (speed * MAX_MOTOR_SPEED * (MOTOR_SCALED_SPEED/100)) / MAX_DUTY_CYCLE;
+		motor_val = ((speed * MAX_MOTOR_SPEED) / MOTOR_SCALED_SPEED);
 		pwm_setval((uint8_t)motor_val, motor_id); // motor_val is 0-255 -- PWM needs this
 	#endif
 }
 
-uint8_t motor_get_speed(uint8_t motor_id) {
+uint32_t motor_get_speed(uint8_t motor_id) {
 	if (motor_id > NUM_MOTORS) return 0;
 	return _motors[motor_id - 1].current_speed;
 }

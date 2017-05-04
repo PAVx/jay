@@ -15,18 +15,14 @@
 
 #define MAX_MOTOR_SPEED (0xFF) // actual motor value
 #define MIN_MOTOR_SPEED (0x00) // actual motor value
-#define MOTOR_SCALED_SPEED (100)	// 100 = full motor range
+#define MOTOR_SCALED_SPEED (10000)	// 100 = full motor range
 
-#if (MOTOR_SCALED_SPEED > 100)
-	#error "Motor Error: 0 < MOTOR_SCALING_FACTOR <= 1"
-#endif
-
-#define MIN_DUTY_CYCLE (0)
-#define MAX_DUTY_CYCLE (100)
+#define MIN_DUTY_CYCLE (2000)
+#define MAX_DUTY_CYCLE (10000)
 
 void motors_initialize(void);
 
-// speed -- a value representing a PWM duty cycle 0-100
-void motor_set(uint8_t motor_id, int8_t speed);
+// speed -- a value representing a PWM duty cycle 0-10000
+void motor_set(uint8_t motor_id, int32_t speed);
 
-uint8_t motor_get_speed(uint8_t motor_id);
+uint32_t motor_get_speed(uint8_t motor_id);

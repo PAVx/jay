@@ -18,6 +18,10 @@
 //#define GPS (1)
 #define PID_CONTROLLER (1)
 
+#ifdef GYRO
+	#define TEMP_SENSOR
+#endif
+
 #define IMU_UPSIDEDOWN (1)
 
 //#define SYSTEM_INIT_DEBUG_PRINTOUTS (1)

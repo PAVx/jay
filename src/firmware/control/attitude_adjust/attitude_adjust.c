@@ -16,6 +16,8 @@ PID_t pidRoll;
 PID_t pidPitch;
 PID_t pidYaw;
 
+static int32_t _throttle = 0;
+
 // Yaw Pitch Roll Errors
 double rollError = 0.0;
 double pitchError = 0.0;
@@ -25,6 +27,7 @@ char testing[30];
 
 uint8_t InitializeAttitudeAdjust(void) {
 
+	_throttle = 0;
 	PIDInit(&pidRoll, 0, PID_ROLL_KP, PID_ROLL_KI, PID_ROLL_KD, IMU_UPDATE_DT);
 	PIDInit(&pidPitch, 0, PID_PITCH_KP, PID_PITCH_KI, PID_PITCH_KD, IMU_UPDATE_DT);
 	PIDInit(&pidYaw, 0, PID_YAW_KP, PID_YAW_KI, PID_YAW_KD, IMU_UPDATE_DT);
@@ -47,6 +50,9 @@ void AttituteAdjustUpdatePID(double yawActual, double pitchActual, double rollAc
 	rollError = PIDUpdate(&pidRoll, rollActual, UPDATE_ERROR);
 }
 
+void AttitudeSetThrottle(int32_t throttle) {
+	_throttle = throttle;
+}
 
 void AttitudeAdjustGetError(int motor_changes[NUM_MOTORS]){
 	int yawErrorInt = 0;
@@ -69,14 +75,16 @@ void AttitudeAdjustGetError(int motor_changes[NUM_MOTORS]){
 	pitchErrorInt 	= (int)(pitchError * 10);
 	rollErrorInt 	= (int)(rollError * 10);
 
-	yawErrorInt	/= 10;
+	yawErrorInt		/= 10;
 	pitchErrorInt	/= 10;
 	rollErrorInt	/= 10;
 
-	motor_changes[MOTOR_ONE - 1] = (-1 * yawErrorInt) - (pitchErrorInt) - (rollErrorInt);
-	motor_changes[MOTOR_TWO - 1] =  (yawErrorInt) - (pitchErrorInt) + (rollErrorInt);
-	motor_changes[MOTOR_THREE - 1] =  (yawErrorInt) + (pitchErrorInt) - (rollErrorInt);
-	motor_changes[MOTOR_FOUR - 1] = (-1 * yawErrorInt) + (pitchErrorInt) + (rollErrorInt);
+    motor_changes[MOTOR_ONE - 1] = _throttle - pitchErrorInt - rollErrorInt + yawErrorInt; 	//Calculate the pulse for esc 4 (front-left - CW)
+	motor_changes[MOTOR_TWO - 1] = _throttle - pitchErrorInt + rollErrorInt - yawErrorInt; 	//Calculate the pulse for esc 1 (front-right - CCW)
+    motor_changes[MOTOR_THREE - 1] = _throttle + pitchErrorInt - rollErrorInt - yawErrorInt; //Calculate the pulse for esc 3 (rear-left - CCW)
+    motor_changes[MOTOR_FOUR - 1] = _throttle + pitchErrorInt + rollErrorInt + yawErrorInt; 	//Calculate the pulse for esc 2 (rear-right - CW)
+
+    _throttle = 0;
 
 	sprintf(testing, "           Y_ERR: {%d} | ", yawErrorInt);
 	UART_SendString(testing);
@@ -97,7 +105,7 @@ void AttitudeAdjustSetActuation(int motor_changes[NUM_MOTORS]) {
 	else if (motor_val < MIN_DUTY_CYCLE) {
 		motor_val = motor_get_speed(MOTOR_ONE);
 	}
-	motor_set(MOTOR_ONE, (uint8_t)motor_val);
+	motor_set(MOTOR_ONE, (int32_t)motor_val);
 
 	motor_val = (int)motor_get_speed(MOTOR_TWO) + motor_changes[MOTOR_TWO - 1];
 	if (motor_val > MAX_DUTY_CYCLE) {
@@ -106,7 +114,7 @@ void AttitudeAdjustSetActuation(int motor_changes[NUM_MOTORS]) {
 	else if (motor_val < MIN_DUTY_CYCLE) {
 		motor_val = motor_get_speed(MOTOR_TWO);
 	}
-	motor_set(MOTOR_TWO, (uint8_t)motor_val);
+	motor_set(MOTOR_TWO, (int32_t)motor_val);
 
 	motor_val = (int)motor_get_speed(MOTOR_THREE) + motor_changes[MOTOR_THREE - 1];
 	if (motor_val > MAX_DUTY_CYCLE) {
@@ -115,7 +123,7 @@ void AttitudeAdjustSetActuation(int motor_changes[NUM_MOTORS]) {
 	else if (motor_val < MIN_DUTY_CYCLE) {
 		motor_val = motor_get_speed(MOTOR_THREE);
 	}
-	motor_set(MOTOR_THREE, (uint8_t)motor_val);
+	motor_set(MOTOR_THREE, (int32_t)motor_val);
 
 	motor_val = (int)motor_get_speed(MOTOR_FOUR) + motor_changes[MOTOR_FOUR - 1];
 	if (motor_val > MAX_DUTY_CYCLE) {
@@ -124,5 +132,5 @@ void AttitudeAdjustSetActuation(int motor_changes[NUM_MOTORS]) {
 	else if (motor_val < MIN_DUTY_CYCLE) {
 		motor_val = motor_get_speed(MOTOR_FOUR);
 	}
-	motor_set(MOTOR_FOUR, (uint8_t)motor_val);
+	motor_set(MOTOR_FOUR, (int32_t)motor_val);
 }

@@ -33,7 +33,7 @@ char op_code;
 
 #ifdef MOTOR_TEST
 	uint8_t byte = 0;
-	uint16_t motor_vals[4] = {0};
+	uint32_t motor_vals[4] = {0};
 	uint8_t motor = 0;
 #endif
 
@@ -51,11 +51,8 @@ char op_code;
 int main (void) {
 	system_initialize();
 
-	AttituteAdjustSetDesired(0, 0, 0);
-
-	//CompInit(PID_UPDATE_PERIOD_SECONDS, 2);
-	//CompStart();
-
+	AttituteAdjustSetDesired(0, 0, 0); // testing this attitude
+ 	AttitudeSetThrottle(0);
 
 	for(;;) {
 
@@ -64,10 +61,7 @@ int main (void) {
 				op_code = UART_GetByte();
 
 				if ((op_code == 's') && (o == 0)) {
-					motor_set(1, 30);
-					motor_set(2, 30);
-					motor_set(3, 30);
-					motor_set(4, 30);
+					AttitudeSetThrottle(4000);
 
 					o = 1;
 				}
@@ -82,133 +76,9 @@ int main (void) {
 			}
 		#endif
 
-		#ifdef MOTOR_TEST
-			if (!UART_IsEmpty()) {
-				byte = UART_GetByte();
-				toggle_led(SYSTEM_LED);
-
-				switch (byte) {
-
-					case '1':
-						motor = 1;
-						break;
-					case '2':
-						motor = 2;
-						break;
-					case '3':
-						motor = 3;
-						break;
-					case '4':
-						motor = 4;
-						break;
-
-					case '5':
-						motor = 5;
-						break;
-
-					case 'w':
-
-						if (motor == 5) {
-							motor_vals[0] += 10;
-							if (motor_vals[0] > 255) {
-								motor_vals[0] = 255;
-							}
-							motor_vals[1] += 10;
-							if (motor_vals[1] > 255) {
-								motor_vals[1] = 255;
-							}
-							motor_vals[2] += 10;
-							if (motor_vals[2] > 255) {
-								motor_vals[2] = 255;
-							}
-							motor_vals[3] += 10;
-							if (motor_vals[3] > 255) {
-								motor_vals[3] = 255;
-							}
-
-							motor_set(1, motor_vals[0]);
-							motor_set(2, motor_vals[1]);
-							motor_set(3, motor_vals[2]);
-							motor_set(4, motor_vals[3]);
-
-
-						} else {
-							motor_vals[motor - 1] += 10;
-							if (motor_vals[motor - 1] > 255) {
-								motor_vals[motor - 1] = 255;
-							}
-							motor_set(motor, (uint8_t)motor_vals[motor - 1]);
-						}
-
-						break;
-					case 's':
-						if (motor == 5) {
-							if (motor_vals[0] > 10) {
-								motor_vals[0] -= 10;
-							} else {
-								motor_vals[0] = 0;
-							}
-
-							if (motor_vals[1] > 10) {
-								motor_vals[1] -= 10;
-							} else {
-								motor_vals[1] = 0;
-							}
-
-							if (motor_vals[2] > 10) {
-								motor_vals[2] -= 10;
-							} else {
-								motor_vals[2] = 0;
-							}
-
-							if (motor_vals[2] > 10) {
-								motor_vals[2] -= 10;
-							} else {
-								motor_vals[2] = 0;
-							}
-
-							motor_set(1, motor_vals[0]);
-							motor_set(2, motor_vals[1]);
-							motor_set(3, motor_vals[2]);
-							motor_set(4, motor_vals[3]);
-						} else {
-							if (motor_vals[motor - 1] > 10) {
-								motor_vals[motor - 1] -= 10;
-							} else {
-								motor_vals[motor - 1] = 0;
-							}
-
-							motor_set(motor, (uint8_t)motor_vals[motor - 1]);
-						}
-
-						break;
-
-					case 'k':
-
-						motor_set(1, 0);
-						motor_set(2, 0);
-						motor_set(3, 0);
-						motor_set(4, 0);
-
-						motor_vals[0] = 0;
-						motor_vals[1] = 0;
-						motor_vals[2] = 0;
-						motor_vals[3] = 0;
-
-
-						break;
-
-					default:
-						break;
-
-				}
-			}
-		#endif // MOTOR_TEST
-
 		#ifdef LED_DEBUG
 			#ifdef LEDS
 	  			toggle_led(GP_LED2);
-	  			toggle_led(GP_LED1);
 		  	#endif
   		#endif
 
@@ -220,45 +90,6 @@ int main (void) {
 		  		packet_send();
 		  	#endif
 		#endif // PACKET_DEBUG
-
-		#ifdef IMU_DEBUG
-			#ifdef GYRO
-	  			Gyro_Update();
-	  		#endif
-
-	  		#ifdef ACCEL
-	  			Accel_Update();
-	  		#endif
-
-		 	#ifdef GYRO
-	  			memset(gbuffer, '\0', 15);
-				UART_SendByte('\n');
-
-				sprintf(gbuffer, "  G_X = %f\n", Gyro_GetX());
-				UART_SendString(gbuffer);
-				sprintf(gbuffer, " G_Y = %f\n", Gyro_GetY());
-				UART_SendString(gbuffer);
-				sprintf(gbuffer, " G_Z = %f\n", Gyro_GetZ());
-				UART_SendString(gbuffer);
-
-				UART_SendByte('\n');
-
-		 	#endif
-
-		 	#ifdef ACCEL
-				memset(abuffer, '\0', 15);
-				UART_SendByte('\n');
-
-				sprintf(abuffer, "  A_X = %f\n", Accel_GetX());
-				UART_SendString(abuffer);
-				sprintf(abuffer, " A_Y = %f\n", Accel_GetY());
-				UART_SendString(abuffer);
-				sprintf(abuffer, " A_Z = %f\n", Accel_GetZ());
-				UART_SendString(abuffer);
-
-				UART_SendString("--------------------------");
-		 	#endif // ACCEL
-        	#endif // IMU_DEBUG
 
 		#ifdef GPS_DEBUG
 	        #ifdef GPS
@@ -282,8 +113,6 @@ int main (void) {
 	        #endif
 	    	#endif
 
-
-
 		#ifdef PID_DEBUG
 			if(PIDGetFlag() == 1) {
 
@@ -291,8 +120,13 @@ int main (void) {
 				Accel_Update();
 				//Mag_Update();
 
+
+				#ifdef LEDS
+		  			toggle_led(GP_LED1);
+			  	#endif
+
 				cli();
-				imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
+				imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
 				sei();
 
 				sprintf(testing, " \nY: {%f} | ", ypr[0]);
@@ -303,7 +137,7 @@ int main (void) {
 				UART_SendString(testing);
 
 
-				AttituteAdjustUpdatePID(0, ypr[1], 0);
+				AttituteAdjustUpdatePID(0, ypr[1], ypr[2]);
 
 				// Update Motors
 				AttitudeAdjustGetError(motor_delta);
@@ -313,13 +147,13 @@ int main (void) {
 				}
 
 				// Debugging
-				sprintf(testing, "           M1: {%d} | ", motor_get_speed(MOTOR_ONE));
+				sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
 				UART_SendString(testing);
-				sprintf(testing, " M2: {%d} | ", motor_get_speed(MOTOR_TWO));
+				sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
 				UART_SendString(testing);
-				sprintf(testing, " M3: {%d} | ", motor_get_speed(MOTOR_THREE));
+				sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
 				UART_SendString(testing);
-				sprintf(testing, " M4: {%d}          ", motor_get_speed(MOTOR_FOUR));
+				sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
 				UART_SendString(testing);
 
 				PIDResetFlag();
@@ -328,11 +162,11 @@ int main (void) {
 
 		#ifdef FILTER_DEBUG
 			if(PIDGetFlag() == 1) {
-				Gyro_Update();
+				//Gyro_Update();
 				Accel_Update();
 
 				CompAccelUpdate(Accel_GetX(), Accel_GetY(), Accel_GetZ());
-				CompGyroUpdate(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ());
+				//CompGyroUpdate(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ());
 				CompUpdate();
 				CompAnglesGet(&compPitch, &compRoll);
 
@@ -345,11 +179,11 @@ int main (void) {
 		#endif
 
 		#ifdef YPR
-			Gyro_Update();
+			//Gyro_Update();
 			Accel_Update();
 
 			cli();
-			imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
+			imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0,0);//Mag_GetX(), Mag_GetY());
 			sei();
 
 			sprintf(testing, " \nY: %f ", ypr[0]);
