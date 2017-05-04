@@ -40,7 +40,7 @@ void setup() {
   cntrlPkt[1] = 0x2; //STX
   cntrlPkt[2] = 0x0; //Manual Control
   cntrlPkt[3] = 0x0; //SRC Add
-  cntrlPkt[12] = 0x04;
+  cntrlPkt[12] = 0x4;
 }
 
 void loop() {
@@ -52,17 +52,18 @@ void loop() {
   throttleVal = (vertLeftPot / MAX_POT_VAL) * MAX_THROT_VAL;
   yawVal  = ((horiLeftPot) / MAX_POT_VAL) * MAX_ROT_VAL - ROT_OFFSET;  
   pitchVal = ((vertRightPot) / MAX_POT_VAL) * MAX_ROT_VAL - ROT_OFFSET;   
-  rollVal = ((horiRightPot) / MAX_POT_VAL) * MAX_ROT_VAL - ROT_OFFSET;Serial.print("t: ");
-  Serial.print(throttleVal);
-   
-  Serial.print("y: ");
-  Serial.print(yawVal);
-  Serial.print("  ");
-  Serial.print("p: ");
-  Serial.print(pitchVal);
-  Serial.print("r: ");
-  Serial.print(rollVal);
-  Serial.print("\n");
+  rollVal = ((horiRightPot) / MAX_POT_VAL) * MAX_ROT_VAL - ROT_OFFSET;
+//  Serial.print("t: ");
+//  Serial.print(throttleVal);
+//   
+//  Serial.print("y: ");
+//  Serial.print(yawVal);
+//  Serial.print("  ");
+//  Serial.print("p: ");
+//  Serial.print(pitchVal);
+//  Serial.print("r: ");
+//  Serial.print(rollVal);
+//  Serial.print("\n");
 
 //button code ------------------------------------
   rightUpButtonState = digitalRead(rightUpButtonPin);
@@ -81,9 +82,9 @@ void loop() {
   prevRightUpButtonState = rightUpButtonState;
   prevLeftUpButtonState = leftUpButtonState;
 
-  Serial.print("Drone currently selected: ");
-  Serial.print(dronePicked);
-  Serial.print("\n"); 
+//  Serial.print("Drone currently selected: ");
+//  Serial.print(dronePicked);
+//  Serial.print("\n"); 
 
 
   cntrlPkt[4] = dronePicked; //droneX
@@ -94,12 +95,13 @@ void loop() {
   cntrlPkt[9] = (rollVal & 0xff00) >> 8;
   cntrlPkt[10] = (rollVal & 0x00ff);
   cntrlPkt[11] = throttleVal & 0x00ff;
-  
+  cntrlPkt[12] = 4;
   for(int i = 0; i < 13; i++)
   {
-    Serial.println(cntrlPkt[i]);
+//    Serial.println(cntrlPkt[i]);
+    Serial.write(cntrlPkt[i]);
   }
-  Serial.print("\n"); 
-  
-  delay(1000);  
+//      Serial.write(55);
+//  Serial.print("\n"); 
+//  delay(1000);  
 }
