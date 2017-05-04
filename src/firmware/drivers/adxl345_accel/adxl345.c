@@ -2,6 +2,7 @@
 // accel.c
 #include "adxl345.h"
 #include "i2c_driver.h"
+#include "system.h"
 #include <util/delay.h>
 #include <stdbool.h>
 
@@ -113,9 +114,15 @@ void ADXL345_UpdateData(void)
     ADXL345_ReadAccel(&x, &y, &z);
     ADXL345_LowPass_Filter(x, y, z);
 
-    _a_x = _lowpass_x;
+    #ifdef IMU_UPSIDEDOWN
+        _a_x = -1 * _lowpass_x;
+        _a_z = -1 * _lowpass_z;
+    #else
+        _a_x = _lowpass_x;
+        _a_z = _lowpass_z;
+    #endif
+
     _a_y = _lowpass_y;
-    _a_z = _lowpass_z;
 }
 
 void ADXL345_LowPass_Filter(double x, double y, double z)

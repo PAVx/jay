@@ -12,11 +12,13 @@
 #define LEDS (1)
 #define MOTORS (1)
 #define SYSTEM_TICK (1)
-#define GYRO (1)
+//#define GYRO (1)
 #define ACCEL (1)
-//#define MAG (1)
+//#define MAGNOMETER (1)
 //#define GPS (1)
 #define PID_CONTROLLER (1)
+
+#define IMU_UPSIDEDOWN (1)
 
 //#define SYSTEM_INIT_DEBUG_PRINTOUTS (1)
 
@@ -71,7 +73,7 @@
 #endif
 
 #ifdef MOTORS
-//	#define MOTORS_SPIN
+	#define MOTORS_SPIN
 #endif
 
 #ifdef SYSTEM_INIT_DEBUG_PRINTOUTS

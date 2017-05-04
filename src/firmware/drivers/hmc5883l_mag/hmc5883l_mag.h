@@ -9,6 +9,6 @@ void HMC5883L_init(void);
 void HMC5883L_Update(void);
 
 // Access Functions
-int16_t HMC5883L_GetX(void);
-int16_t HMC5883L_GetY(void);
-int16_t HMC5883L_GetZ(void);
+double HMC5883L_GetX(void);
+double HMC5883L_GetY(void);
+double HMC5883L_GetZ(void);

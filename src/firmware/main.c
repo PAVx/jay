@@ -13,14 +13,13 @@
 //#define GPS_DEBUG
 #define LED_DEBUG
 //#define PACKET_DEBUG
-//#define PID_DEBUG
+#define PID_DEBUG
 //#define FILTER_DEBUG
-#define YPR
-double ypr[3];
+//#define YPR
 
 char testing[10];
-static uint8_t o = 0;
 char sys_print[32];
+char op_code;
 
 #ifdef IMU_DEBUG
 	char gbuffer[15];
@@ -54,25 +53,25 @@ int main (void) {
 
 	AttituteAdjustSetDesired(0, 0, 0);
 
-	CompInit(PID_UPDATE_PERIOD_SECONDS, 2);
-	CompStart();
+	//CompInit(PID_UPDATE_PERIOD_SECONDS, 2);
+	//CompStart();
 
 
 	for(;;) {
 
 		#ifdef UART
 			if(!UART_IsEmpty()){
-				if ((UART_GetByte() == 's') && (o == 0)) {
-					motor_set(MOTOR_ONE, 8);
-					motor_set(MOTOR_TWO, 8);
-					motor_set(MOTOR_THREE, 8);
-					motor_set(MOTOR_FOUR, 8);
+				op_code = UART_GetByte();
+
+				if ((op_code == 's') && (o == 0)) {
+					motor_set(1, 30);
+					motor_set(2, 30);
+					motor_set(3, 30);
+					motor_set(4, 30);
 
 					o = 1;
 				}
-			}
-			if(!UART_IsEmpty()) {
-				if(UART_GetByte() == 'k'){
+				else if(op_code == 'k'){
 					motor_set(MOTOR_ONE, 0);
 					motor_set(MOTOR_TWO, 0);
 					motor_set(MOTOR_THREE, 0);
@@ -288,22 +287,23 @@ int main (void) {
 		#ifdef PID_DEBUG
 			if(PIDGetFlag() == 1) {
 
-				Gyro_Update();
+				//Gyro_Update();
 				Accel_Update();
+				//Mag_Update();
 
 				cli();
 				imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
 				sei();
 
-				sprintf(testing, " \nY: %f ", ypr[0]);
+				sprintf(testing, " \nY: {%f} | ", ypr[0]);
 				UART_SendString(testing);
-				sprintf(testing, " P: %f ", ypr[1]);
+				sprintf(testing, " P: {%f} | ", ypr[1]);
 				UART_SendString(testing);
-				sprintf(testing, " R: %f\n", ypr[2]);
+				sprintf(testing, " R: {%f}          ", ypr[2]);
 				UART_SendString(testing);
 
 
-				AttituteAdjustUpdatePID(ypr[0], ypr[1], ypr[2]);
+				AttituteAdjustUpdatePID(0, ypr[1], 0);
 
 				// Update Motors
 				AttitudeAdjustGetError(motor_delta);
@@ -313,13 +313,13 @@ int main (void) {
 				}
 
 				// Debugging
-				sprintf(testing, " \nM1: %d | ", motor_get_speed(MOTOR_ONE));
+				sprintf(testing, "           M1: {%d} | ", motor_get_speed(MOTOR_ONE));
 				UART_SendString(testing);
-				sprintf(testing, " M2: %d | ", motor_get_speed(MOTOR_TWO));
+				sprintf(testing, " M2: {%d} | ", motor_get_speed(MOTOR_TWO));
 				UART_SendString(testing);
-				sprintf(testing, " M3: %d | ", motor_get_speed(MOTOR_THREE));
+				sprintf(testing, " M3: {%d} | ", motor_get_speed(MOTOR_THREE));
 				UART_SendString(testing);
-				sprintf(testing, " M4: %d ", motor_get_speed(MOTOR_FOUR));
+				sprintf(testing, " M4: {%d}          ", motor_get_speed(MOTOR_FOUR));
 				UART_SendString(testing);
 
 				PIDResetFlag();

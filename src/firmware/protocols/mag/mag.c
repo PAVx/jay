@@ -12,14 +12,18 @@ void InitializeMag(void) {
 	HMC5883L_init();
 }
 
-float Mag_GetX(void) {
+void Mag_Update(void) {
+	HMC5883L_Update();
+}
+
+double Mag_GetX(void) {
 	return HMC5883L_GetX();
 }
 
-float Mag_GetY(void) {
+double Mag_GetY(void) {
 	return HMC5883L_GetY();
 }
 
-float Mag_GetZ(void) {
+double Mag_GetZ(void) {
 	return HMC5883L_GetZ();
 }

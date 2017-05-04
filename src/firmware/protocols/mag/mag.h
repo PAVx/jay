@@ -7,6 +7,7 @@
 // mag.h
 
 void InitializeMag(void);
-float Mag_GetX(void);
-float Mag_GetY(void);
-float Mag_GetZ(void);
+void Mag_Update(void);
+double Mag_GetX(void);
+double Mag_GetY(void);
+double Mag_GetZ(void);

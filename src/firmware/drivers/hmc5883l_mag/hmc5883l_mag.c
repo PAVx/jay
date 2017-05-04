@@ -8,6 +8,12 @@ int16_t _m_x;
 int16_t _m_y;
 int16_t _m_z;
 
+double _lowpass_x;
+double _lowpass_y;
+double _lowpass_z;
+
+void HMC5883L_LowPass_Filter(int16_t x, int16_t y, int16_t z);
+
 void HMC5883L_init(void){
 	i2c_init();
 
@@ -25,12 +31,13 @@ void HMC5883L_init(void){
 	i2c_write(0x02); // set pointer to measurement mode
 	i2c_write(0x00); // continous measurement
 	i2c_stop();
-}
 
-void HMC5883L_Update(void) {
 	_m_x = 0;
 	_m_y = 0;
 	_m_z = 0;
+}
+
+void HMC5883L_Update(void) {
 
 	i2c_start(HMC5883L_WRITE);
 	i2c_write(0x03); // set pointer to X axis MSB
@@ -47,16 +54,33 @@ void HMC5883L_Update(void) {
 	_m_y = ((uint8_t)i2c_read_ack())<<8;
 	_m_y |= i2c_read_nack();
 
+
 	i2c_stop();
+
+	HMC5883L_LowPass_Filter(_m_x, _m_y, _m_z);
+	_m_x = (int16_t)_lowpass_x;
+	_m_y = (int16_t)_lowpass_y;
+	_m_z = (int16_t)_lowpass_z;
+
 }
 
-int16_t HMC5883L_GetX(void){
-	return _m_x;
+void HMC5883L_LowPass_Filter(int16_t x, int16_t y, int16_t z)
+{
+  double alpha = 0.2;
+
+  _lowpass_x = x * alpha + (_lowpass_x * (1.0 - alpha));
+  _lowpass_y = y * alpha + (_lowpass_y * (1.0 - alpha));
+  _lowpass_z = z * alpha + (_lowpass_z * (1.0 - alpha));
+
 }
 
-int16_t HMC5883L_GetY(void){
-	return _m_y;
+double HMC5883L_GetX(void){
+	return (double)_m_x;
 }
-int16_t HMC5883L_GetZ(void){
-	return _m_z;
+
+double HMC5883L_GetY(void){
+	return (double)_m_y;
+}
+double HMC5883L_GetZ(void){
+	return (double)_m_z;
 }

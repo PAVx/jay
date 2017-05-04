@@ -57,7 +57,7 @@ uint8_t system_initialize(void) {
 		#endif
 	#endif
 
-	#ifdef MAG
+	#ifdef MAGNOMETER
 		InitializeMag();
 		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
 			#ifndef GYRO

@@ -76,7 +76,7 @@ void motor_set(uint8_t motor_id, int8_t speed) {
 	_motors[motor_id - 1].current_speed = (uint8_t)speed; // speed is 0-100
 
 	#ifdef MOTORS_SPIN
-		motor_val = (speed * MAX_MOTOR_SPEED) / MAX_DUTY_CYCLE;
+		motor_val = (speed * MAX_MOTOR_SPEED * (MOTOR_SCALED_SPEED/100)) / MAX_DUTY_CYCLE;
 		pwm_setval((uint8_t)motor_val, motor_id); // motor_val is 0-255 -- PWM needs this
 	#endif
 }

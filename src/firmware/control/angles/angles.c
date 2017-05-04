@@ -12,10 +12,14 @@
 #include "system.h"
 #include <math.h>
 
+char testing[30];
+
 void imu2euler(double* ypr, double accX, double accY, double accZ, double magX, double magY){
+
         ypr[YAW_ANGLE] = (atan2(magY,magX)*180.0)/M_PI;
         ypr[PITCH_ANGLE] = (atan2(accX, sqrt(accY*accY + accZ*accZ))*180.0)/M_PI;
         ypr[ROLL_ANGLE] = (atan2(-accY, accZ)*180.0)/M_PI;
+
 }
 
 void euler2quat(double* q, double yaw, double pitch, double roll){

@@ -21,6 +21,8 @@ double rollError = 0.0;
 double pitchError = 0.0;
 double yawError = 0.0;
 
+char testing[30];
+
 uint8_t InitializeAttitudeAdjust(void) {
 
 	PIDInit(&pidRoll, 0, PID_ROLL_KP, PID_ROLL_KI, PID_ROLL_KD, IMU_UPDATE_DT);
@@ -67,7 +69,7 @@ void AttitudeAdjustGetError(int motor_changes[NUM_MOTORS]){
 	pitchErrorInt 	= (int)(pitchError * 10);
 	rollErrorInt 	= (int)(rollError * 10);
 
-	yawErrorInt		/= 10;
+	yawErrorInt	/= 10;
 	pitchErrorInt	/= 10;
 	rollErrorInt	/= 10;
 
@@ -76,13 +78,12 @@ void AttitudeAdjustGetError(int motor_changes[NUM_MOTORS]){
 	motor_changes[MOTOR_THREE - 1] =  (yawErrorInt) + (pitchErrorInt) - (rollErrorInt);
 	motor_changes[MOTOR_FOUR - 1] = (-1 * yawErrorInt) + (pitchErrorInt) + (rollErrorInt);
 
-				char testing[30];
-				sprintf(testing, " \nYAW_ERROR: %d | ", yawErrorInt);
-				UART_SendString(testing);
-				sprintf(testing, " PITCH_ERROR: %d | ", pitchErrorInt);
-				UART_SendString(testing);
-				sprintf(testing, " ROLL_ERROR: %d | ", rollErrorInt);
-				UART_SendString(testing);
+	sprintf(testing, "           Y_ERR: {%d} | ", yawErrorInt);
+	UART_SendString(testing);
+	sprintf(testing, " P_ERR: {%d} | ", pitchErrorInt);
+	UART_SendString(testing);
+	sprintf(testing, " R_ERR: {%d} | ", rollErrorInt);
+	UART_SendString(testing);
 
 }
 
@@ -125,4 +126,3 @@ void AttitudeAdjustSetActuation(int motor_changes[NUM_MOTORS]) {
 	}
 	motor_set(MOTOR_FOUR, (uint8_t)motor_val);
 }
-

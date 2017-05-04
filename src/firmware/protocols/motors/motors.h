@@ -1,8 +1,8 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 #include <stdint.h>
 
@@ -15,9 +15,14 @@
 
 #define MAX_MOTOR_SPEED (0xFF) // actual motor value
 #define MIN_MOTOR_SPEED (0x00) // actual motor value
+#define MOTOR_SCALED_SPEED (100)	// 100 = full motor range
+
+#if (MOTOR_SCALED_SPEED > 100)
+	#error "Motor Error: 0 < MOTOR_SCALING_FACTOR <= 1"
+#endif
 
 #define MIN_DUTY_CYCLE (0)
-#define MAX_DUTY_CYCLE (10)
+#define MAX_DUTY_CYCLE (100)
 
 void motors_initialize(void);
 
