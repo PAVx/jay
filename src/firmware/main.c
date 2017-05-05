@@ -42,6 +42,7 @@ char op_code;
 	int motor_delta[4];
 
 	static uint8_t o = 0;
+	static uint8_t pid_print_flag = 0;
 #endif
 
 #ifdef FILTER_DEBUG
@@ -129,14 +130,6 @@ int main (void) {
 				imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
 				sei();
 
-				sprintf(testing, " \nY: {%f} | ", ypr[0]);
-				UART_SendString(testing);
-				sprintf(testing, " P: {%f} | ", ypr[1]);
-				UART_SendString(testing);
-				sprintf(testing, " R: {%f}          ", ypr[2]);
-				UART_SendString(testing);
-
-
 				AttituteAdjustUpdatePID(0, ypr[1], ypr[2]);
 
 				// Update Motors
@@ -147,14 +140,25 @@ int main (void) {
 				}
 
 				// Debugging
-				sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
-				UART_SendString(testing);
-				sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
-				UART_SendString(testing);
-				sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
-				UART_SendString(testing);
-				sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
-				UART_SendString(testing);
+				if(pid_print_flag == 100){
+					sprintf(testing, " \nY: {%f} | ", ypr[0]);
+					UART_SendString(testing);
+					sprintf(testing, " P: {%f} | ", ypr[1]);
+					UART_SendString(testing);
+					sprintf(testing, " R: {%f}          ", ypr[2]);
+					UART_SendString(testing);
+
+					sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
+					UART_SendString(testing);
+					sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
+					UART_SendString(testing);
+					sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
+					UART_SendString(testing);
+					sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
+					UART_SendString(testing);
+					pid_print_flag = 0;
+				}
+				else pid_print_flag ++;
 
 				PIDResetFlag();
 			}

@@ -69,7 +69,7 @@ cBuffer suartTxBuffer;				///< uart transmit buffer
 
 static softUART channel[SOFTUART_CHANNELS];
 static uint8_t _isrFlag = 0;
-static uint16_t isr_period_counter = 0;
+static uint64_t isr_period_counter = 0;
 
 void set_tx_pin_high(int i) {
 		#ifdef SOFTUART_TXPORT_1

@@ -24,6 +24,7 @@ double pitchError = 0.0;
 double yawError = 0.0;
 
 char testing[30];
+static uint8_t pid_print_flag = 0;
 
 uint8_t InitializeAttitudeAdjust(void) {
 
@@ -75,23 +76,27 @@ void AttitudeAdjustGetError(int motor_changes[NUM_MOTORS]){
 	pitchErrorInt 	= (int)(pitchError * 10);
 	rollErrorInt 	= (int)(rollError * 10);
 
-	yawErrorInt		/= 10;
+	yawErrorInt	/= 10;
 	pitchErrorInt	/= 10;
 	rollErrorInt	/= 10;
 
-    motor_changes[MOTOR_ONE - 1] = _throttle - pitchErrorInt - rollErrorInt + yawErrorInt; 	//Calculate the pulse for esc 4 (front-left - CW)
+	motor_changes[MOTOR_ONE - 1] = _throttle - pitchErrorInt - rollErrorInt + yawErrorInt; 	//Calculate the pulse for esc 4 (front-left - CW)
 	motor_changes[MOTOR_TWO - 1] = _throttle - pitchErrorInt + rollErrorInt - yawErrorInt; 	//Calculate the pulse for esc 1 (front-right - CCW)
-    motor_changes[MOTOR_THREE - 1] = _throttle + pitchErrorInt - rollErrorInt - yawErrorInt; //Calculate the pulse for esc 3 (rear-left - CCW)
-    motor_changes[MOTOR_FOUR - 1] = _throttle + pitchErrorInt + rollErrorInt + yawErrorInt; 	//Calculate the pulse for esc 2 (rear-right - CW)
+	motor_changes[MOTOR_THREE - 1] = _throttle + pitchErrorInt - rollErrorInt - yawErrorInt; //Calculate the pulse for esc 3 (rear-left - CCW)
+	motor_changes[MOTOR_FOUR - 1] = _throttle + pitchErrorInt + rollErrorInt + yawErrorInt; 	//Calculate the pulse for esc 2 (rear-right - CW)
 
-    _throttle = 0;
+	_throttle = 0;
 
-	sprintf(testing, "           Y_ERR: {%d} | ", yawErrorInt);
-	UART_SendString(testing);
-	sprintf(testing, " P_ERR: {%d} | ", pitchErrorInt);
-	UART_SendString(testing);
-	sprintf(testing, " R_ERR: {%d} | ", rollErrorInt);
-	UART_SendString(testing);
+	if(pid_print_flag == 100){
+		// sprintf(testing, "           Y_ERR: {%d} | ", yawErrorInt);
+		// UART_SendString(testing);
+		// sprintf(testing, " P_ERR: {%d} | ", pitchErrorInt);
+		// UART_SendString(testing);
+		// sprintf(testing, " R_ERR: {%d} | ", rollErrorInt);
+		// UART_SendString(testing);
+		pid_print_flag = 0;
+	}
+	else pid_print_flag ++;
 
 }
 

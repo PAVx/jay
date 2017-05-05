@@ -14,14 +14,14 @@
 
 #include <stdint.h>
 
-#define PID_ROLL_KP  0.5
+#define PID_ROLL_KP  2.8
 #define PID_ROLL_KI  0.0
-#define PID_ROLL_KD  0.0
+#define PID_ROLL_KD  1.6
 #define PID_ROLL_INTEGRATION_LIMIT    30.0
 
-#define PID_PITCH_KP  0.5
+#define PID_PITCH_KP  2.8
 #define PID_PITCH_KI  0.0
-#define PID_PITCH_KD  0.0
+#define PID_PITCH_KD  1.6
 #define PID_PITCH_INTEGRATION_LIMIT   30.0
 
 #define PID_YAW_KP  0.0
@@ -29,8 +29,8 @@
 #define PID_YAW_KD  0.0
 #define PID_YAW_INTEGRATION_LIMIT     360.0
 
-#define PID_INACTIVE_LOWER_THRESHOLD (0.1)
-#define DEFAULT_PID_INTEGRATION_LIMIT  5000.0
+#define PID_INACTIVE_LOWER_THRESHOLD (0.000001)
+#define DEFAULT_PID_INTEGRATION_LIMIT  30.0
 
 typedef enum Success_t{
 	NO_BUENO = 0,

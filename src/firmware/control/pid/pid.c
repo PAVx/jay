@@ -38,6 +38,11 @@ double PIDUpdate(PID_t* pid, const double measured, const UpdateFlag_t updateErr
         pid->error = pid->desired - measured;
     }
 
+    if (pid->error >= -1 && pid->error <= 1){
+            PIDReset(pid);
+            return 0;
+    }
+
     pid->integral += pid->error * pid->dt;
     if (pid->integral > pid->iCeiling) {
         pid->integral = pid->iCeiling;
