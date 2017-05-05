@@ -17,12 +17,15 @@ double g_offx = 0;
 double g_offy = 0;
 double g_offz = 0;
 
+double _lowpass_x = 0.0;
+double _lowpass_y = 0.0;
+double _lowpass_z = 0.0;
+
 bool initialized = false;
 
+void ITG3200_LowPass_Filter(double x, double y, double z);
 void ITG3200_Calibrate(void);
-
 double _Calculate_G_Temp(double _t_raw);
-
 void ITG3200_ReadGyro(double *temp, double *g_x, double *g_y, double *g_z);
 
 void InitializeITG3200(void)
@@ -69,20 +72,20 @@ void ITG3200_Calibrate(void)
     g_offy = 0;
     g_offz = 0;
 
-    // take the mean from 10 gyro probes and divide
+    // take the mean from GYRO_CALIBRATION_ITERATIONS gyro probes and divide
     // it from the current probe
-    for (uint8_t i = 0; i < 10; i++)
+    for (uint16_t i = 0; i < GYRO_CALIBRATION_ITERATIONS; i++)
     {
         ITG3200_UpdateData();
         tmpx += _g_x;
         tmpy += _g_y;
         tmpz += _g_z;
-        _delay_ms(50);
+        _delay_ms(2);
     }
 
-    g_offx = tmpx / 10;
-    g_offy = tmpy / 10;
-    g_offz = tmpz / 10;
+    g_offx = tmpx / GYRO_CALIBRATION_ITERATIONS;
+    g_offy = tmpy / GYRO_CALIBRATION_ITERATIONS;
+    g_offz = tmpz / GYRO_CALIBRATION_ITERATIONS;
 }
 
 
@@ -108,25 +111,37 @@ void ITG3200_UpdateData(void)
     double t, x, y, z;
     ITG3200_ReadGyro(&t, &x, &y, &z);
 
+    ITG3200_LowPass_Filter(x, y, z);
+
     _g_t = _Calculate_G_Temp(t);
-    _g_x = x;
-    _g_y = y;
-    _g_z = z;
+    _g_x = _lowpass_x;
+    _g_y = _lowpass_y;
+    _g_z = _lowpass_z;
+}
+
+void ITG3200_LowPass_Filter(double x, double y, double z)
+{
+  double alpha = 0.2;
+
+  _lowpass_x = x * alpha + (_lowpass_x * (1.0 - alpha));
+  _lowpass_y = y * alpha + (_lowpass_y * (1.0 - alpha));
+  _lowpass_z = z * alpha + (_lowpass_z * (1.0 - alpha));
+
 }
 
 double ITG3200_GetX(void)
 {
-    return _g_x / 14.375;
+    return _g_x / GYRO_SENSITIVITY;
 }
 
 double ITG3200_GetY(void)
 {
-    return _g_y / 14.375;
+    return _g_y / GYRO_SENSITIVITY;
 }
 
 double ITG3200_GetZ(void)
 {
-    return _g_z / 14.375;
+    return _g_z / GYRO_SENSITIVITY;
 }
 
 double ITG3200_GetTemp(void)

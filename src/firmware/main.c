@@ -117,7 +117,7 @@ int main (void) {
 		#ifdef PID_DEBUG
 			if(PIDGetFlag() == 1) {
 
-				//Gyro_Update();
+				Gyro_Update();
 				Accel_Update();
 				//Mag_Update();
 
@@ -127,7 +127,7 @@ int main (void) {
 			  	#endif
 
 				cli();
-				imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
+				imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), 0, 0);
 				sei();
 
 				AttituteAdjustUpdatePID(0, ypr[1], ypr[2]);
@@ -141,11 +141,11 @@ int main (void) {
 
 				// Debugging
 				if(pid_print_flag == 100){
-					sprintf(testing, " \nY: {%f} | ", ypr[0]);
+					sprintf(testing, " \nY: {%lf} | ", ypr[0]);
 					UART_SendString(testing);
-					sprintf(testing, " P: {%f} | ", ypr[1]);
+					sprintf(testing, " P: {%lf} | ", ypr[1]);
 					UART_SendString(testing);
-					sprintf(testing, " R: {%f}          ", ypr[2]);
+					sprintf(testing, " R: {%lf}          ", ypr[2]);
 					UART_SendString(testing);
 
 					sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));

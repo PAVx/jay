@@ -12,7 +12,7 @@
 #define LEDS (1)
 #define MOTORS (1)
 #define SYSTEM_TICK (1)
-//#define GYRO (1)
+#define GYRO (1)
 #define ACCEL (1)
 //#define MAGNOMETER (1)
 //#define GPS (1)

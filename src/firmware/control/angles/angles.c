@@ -12,38 +12,60 @@
 #include "system.h"
 #include <math.h>
 
-char testing[30];
+double pitch_level_adjust = 0;
+double roll_level_adjust = 0;
+bool level_adjust = false;
 
-void imu2euler(double* ypr, double accX, double accY, double accZ, double magX, double magY){
+#define SQUARE(x) (x * x)
+#define GYRO_ANGLE_TO_RADIAN (.000000607071044) // GYRO_ANGLE_DEGREE_CONVERSION (0.0000347826) * (pi / 180)
+#define RADIAN_TO_DEGREE (57.296) // 180 / pi
+#define NEGATIVE_RADIAN_TO_DEGREE (-RADIAN_TO_DEGREE)
 
-        ypr[YAW_ANGLE] = (atan2(magY,magX)*180.0)/M_PI;
-        ypr[PITCH_ANGLE] = (atan2(accX, sqrt(accY*accY + accZ*accZ))*180.0)/M_PI;
-        ypr[ROLL_ANGLE] = (atan2(-accY, accZ)*180.0)/M_PI;
+#define GYRO_TO_ACCEL_RATIO (0.70)
+#define ACCEL_TO_GYRO_RATIO (1 - GYRO_TO_ACCEL_RATIO)
+
+void imu2euler(double* ypr, double accX, double accY, double accZ, double gyroX, double gyroY, double gyroZ, double magX, double magY){
+        static double roll_gyro = 0.0;
+        static double pitch_gyro = 0.0;
+        static double roll_accel = 0.0;
+        static double pitch_accel = 0.0;
+
+        double temp = 0.0;
+
+        double accel_vector_magnitude = 0.0;
+
+        roll_gyro += gyroX * GYRO_ANGLE_DEGREE_CONVERSION;
+        pitch_gyro += gyroY * GYRO_ANGLE_DEGREE_CONVERSION;
+
+        temp = sin(gyroZ * GYRO_ANGLE_TO_RADIAN);
+
+        roll_gyro -= pitch_gyro * temp;
+        pitch_gyro += roll_gyro * temp;
+
+        accel_vector_magnitude = sqrt((SQUARE(accX)) + (SQUARE(accY)) + (SQUARE(accZ)));
+
+        if (abs(accY) < accel_vector_magnitude) {                              
+                roll_accel = asin(accY / accel_vector_magnitude) * RADIAN_TO_DEGREE;
+        }
+        if (abs(accX) < accel_vector_magnitude) {                              
+                pitch_accel = asin(accX / accel_vector_magnitude) * NEGATIVE_RADIAN_TO_DEGREE;
+        }
+
+        roll_gyro = roll_gyro * GYRO_TO_ACCEL_RATIO + roll_accel * ACCEL_TO_GYRO_RATIO;
+        pitch_gyro = pitch_gyro * GYRO_TO_ACCEL_RATIO + pitch_accel * ACCEL_TO_GYRO_RATIO;
+
+        if (level_adjust) {
+                roll_level_adjust = roll_gyro * 15;
+                pitch_level_adjust = pitch_gyro * 15;
+        } else {
+                pitch_level_adjust = 0;
+                roll_level_adjust = 0;
+        }
+
+        ypr[0] = 0.0 * magY * magX;
+        ypr[1] = pitch_gyro;
+        ypr[2] = roll_gyro;
+
 
 }
 
-void euler2quat(double* q, double yaw, double pitch, double roll){
-
-        double cos_phi_2    = cos(yaw * 0.5);
-        double cos_theta_2  = cos(pitch * 0.5);
-        double cos_psi_2    = cos(roll * 0.5);
-        double sin_phi_2    = sin(yaw * 0.5);
-        double sin_theta_2  = sin(pitch * 0.5);
-        double sin_psi_2    = sin(roll * 0.5);
-
-        q[0] = cos_phi_2*cos_theta_2*cos_psi_2 + sin_phi_2*sin_theta_2*sin_psi_2;
-        q[1] = sin_phi_2*cos_theta_2*cos_psi_2 - cos_phi_2*sin_theta_2*sin_psi_2;
-        q[2] = cos_phi_2*sin_theta_2*cos_psi_2 + sin_phi_2*cos_theta_2*sin_psi_2;
-        q[3] = cos_phi_2*cos_theta_2*sin_psi_2 - sin_phi_2*sin_theta_2*cos_psi_2;
-}
-
-void quat2euler(double* ypr, double* q){
-
-        ypr[0] = atan2(2*(q[0]*q[1] + q[2]*q[3]), 1-2*(q[1]*q[1] + q[2]*q[2]));
-        ypr[2] = atan2(2*(q[0]*q[3] + q[1]*q[2]), 1-2*(q[2]*q[2] + q[3]*q[3]));
-
-        double t0 = +2.0 * (q[0] * q[2] - q[3] * q[1]);
-        t0 = t0 > 1.0 ? 1.0 : t0;
-        t0 = t0 < -1.0 ? -1.0 : t0;
-        ypr[1] = asin(t0);
-}
