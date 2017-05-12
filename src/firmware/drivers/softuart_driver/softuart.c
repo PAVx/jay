@@ -154,7 +154,7 @@ ISR(SOFTUART_T_COMP_LABEL)
 	//system_tick();
 	_isrFlag = 1;
 
-	if(PIDGetFlag() == 0){
+	//if(PIDGetFlag() == 0){
 		isr_period_counter++;
 
 		if(isr_period_counter >= PID_PERIOD){
@@ -163,7 +163,7 @@ ISR(SOFTUART_T_COMP_LABEL)
 			PIDSetFlag();
 			isr_period_counter = 0;
 		}
-	}
+	//}
 	run_isr();
 }
 
