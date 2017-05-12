@@ -52,6 +52,7 @@ char op_code;
 int main (void) {
 	system_initialize();
 
+	sensfusion6Init();
 	AttituteAdjustSetDesired(0, 0, 0); // testing this attitude
  	AttitudeSetThrottle(0);
 
@@ -127,7 +128,8 @@ int main (void) {
 			  	#endif
 
 				cli();
-				imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), 0, 0);
+				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), PID_UPDATE_PERIOD_SECONDS);
+				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
 				sei();
 
 				AttituteAdjustUpdatePID(0, ypr[1], ypr[2]);

@@ -92,6 +92,8 @@ SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/attitude_adjust
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/pid
 # COMPLIMENTARY FILTER #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I control/complimentary
+# SENSOR FUSION #
+SEARCHABLE_HEADER_FILE_DIRS	+= -I control/sensor_fusion
 
 ######################################################
 
@@ -169,6 +171,8 @@ CSOURCE						+= control/attitude_adjust/attitude_adjust.c
 CSOURCE						+= control/pid/pid.c
 # COMPLIMENTARY FILTER #
 CSOURCE						+= control/complimentary/comp_filter.c
+# SENSOR FUSION #
+CSOURCE						+= control/sensor_fusion/sensfusion.c
 
 ######################################################
 
