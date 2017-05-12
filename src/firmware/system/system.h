@@ -37,7 +37,7 @@
 #define DEVICE_ADDRESS (0x01)
 ////////////////////////////
 #define BROADCAST_ALL_DESTINATION_ADDRESS (0xAA)
-
+#define u_sec 1000000
 #ifndef F_CPU
 	#define F_CPU 16000000UL
 #endif
@@ -66,6 +66,7 @@
 
 			#define SOFTUART_TIMERTOP (F_CPU/TIMER0_PRESCALE/SOFTUART_BAUD_RATE/3 - 1)
 			#define TIMER0_PERIOD (SOFTUART_TIMERTOP)
+            #define TICK_PERIOD_us ((SOFTUART_TIMERTOP * TIMER0_PRESCALE * u_sec)/ F_CPU) 
 		#endif
 
 		#define PID_RATE (F_CPU/TIMER0_PRESCALE/SOFTUART_BAUD_RATE)	// 52.08Hz
