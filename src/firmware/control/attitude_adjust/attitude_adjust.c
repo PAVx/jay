@@ -85,7 +85,7 @@ void AttitudeAdjustGetError(int motor_changes[NUM_MOTORS]){
 	motor_changes[MOTOR_THREE - 1] = _throttle + pitchErrorInt - rollErrorInt - yawErrorInt; //Calculate the pulse for esc 3 (rear-left - CCW)
 	motor_changes[MOTOR_FOUR - 1] = _throttle + pitchErrorInt + rollErrorInt + yawErrorInt; 	//Calculate the pulse for esc 2 (rear-right - CW)
 
-	_throttle = 0;
+	//_throttle = 0;
 
 	if(pid_print_flag == 100){
 		// sprintf(testing, "           Y_ERR: {%d} | ", yawErrorInt);

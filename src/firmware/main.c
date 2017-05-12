@@ -62,7 +62,7 @@ int main (void) {
 				op_code = UART_GetByte();
 
 				if ((op_code == 's') && (o == 0)) {
-					AttitudeSetThrottle(4000);
+					AttitudeSetThrottle(3000);
 
 					o = 1;
 				}
