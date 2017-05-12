@@ -10,7 +10,6 @@
 uint8_t system_initialize(void) {
 	// initialize protcols
 	#ifdef SYSTEM_TICK
-		clock_init();
 	#endif
 
 	#ifdef MOTORS

@@ -23,7 +23,7 @@ void double_to_byte_array(double val, uint8_t buff[8]) {
 	uint8_t i = 0;
 
 	for (i = 0; i < 8; i++) {
-		buff[i] = (bin >> 8 * (i + 1)) & 0x00000000000000FF;
+		buff[i] = (bin >> (8 * i)) & 0x00000000000000FF;
 	}
 
 }
