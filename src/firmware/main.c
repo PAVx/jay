@@ -37,7 +37,7 @@ char op_code;
 	uint8_t motor = 0;
 #endif
 
-#ifdef PID_DEBUG
+#if defined(PID_DEBUG) || defined(YPR)
 	double ypr[3];
 	int motor_delta[4];
 
@@ -63,7 +63,7 @@ int main (void) {
 				op_code = UART_GetByte();
 
 				if ((op_code == 's') && (o == 0)) {
-					AttitudeSetThrottle(3000);
+					AttitudeSetThrottle(5000);
 
 					o = 1;
 				}
@@ -149,15 +149,15 @@ int main (void) {
 					UART_SendString(testing);
 					sprintf(testing, " R: {%lf}          ", ypr[2]);
 					UART_SendString(testing);
-
-					sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
-					UART_SendString(testing);
-					sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
-					UART_SendString(testing);
-					sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
-					UART_SendString(testing);
-					sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
-					UART_SendString(testing);
+				//
+				// 	sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
+				// 	UART_SendString(testing);
+				// 	sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
+				// 	UART_SendString(testing);
+				// 	sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
+				// 	UART_SendString(testing);
+				// 	sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
+				// 	UART_SendString(testing);
 					pid_print_flag = 0;
 				}
 				else pid_print_flag ++;
@@ -185,19 +185,36 @@ int main (void) {
 		#endif
 
 		#ifdef YPR
-			//Gyro_Update();
-			Accel_Update();
+			//if(PIDGetFlag() == 1) {
 
-			cli();
-			imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0,0);//Mag_GetX(), Mag_GetY());
-			sei();
+				Gyro_Update();
+				Accel_Update();
+				//Mag_Update();
 
-			sprintf(testing, " \nY: %f ", ypr[0]);
-			UART_SendString(testing);
-			sprintf(testing, " P: %f ", ypr[1]);
-			UART_SendString(testing);
-			sprintf(testing, " R: %f\n", ypr[2]);
-			UART_SendString(testing);
+
+				#ifdef LEDS
+					toggle_led(GP_LED1);
+				#endif
+
+				cli();
+				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), PID_UPDATE_PERIOD_SECONDS);
+				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
+				sei();
+
+				// Debugging
+				if(pid_print_flag == 100){
+					sprintf(testing, " \nY: {%lf} | ", ypr[0]);
+					UART_SendString(testing);
+					sprintf(testing, " P: {%lf} | ", ypr[1]);
+					UART_SendString(testing);
+					sprintf(testing, " R: {%lf}          ", ypr[2]);
+					UART_SendString(testing);
+					pid_print_flag = 0;
+				}
+				else pid_print_flag ++;
+
+			//	PIDResetFlag();
+			//}
 		#endif
 
 	}

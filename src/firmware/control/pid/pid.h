@@ -14,9 +14,9 @@
 
 #include <stdint.h>
 
-#define PID_ROLL_KP  0.8
-#define PID_ROLL_KI  0
-#define PID_ROLL_KD  0
+#define PID_ROLL_KP  0.5
+#define PID_ROLL_KI  0.0
+#define PID_ROLL_KD  0.0
 #define PID_ROLL_INTEGRATION_LIMIT    30.0
 
 #define PID_PITCH_KP  PID_ROLL_KP
