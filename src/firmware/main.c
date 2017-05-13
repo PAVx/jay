@@ -149,15 +149,15 @@ int main (void) {
 					UART_SendString(testing);
 					sprintf(testing, " R: {%lf}          ", ypr[2]);
 					UART_SendString(testing);
-				//
-				// 	sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
-				// 	UART_SendString(testing);
-				// 	sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
-				// 	UART_SendString(testing);
-				// 	sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
-				// 	UART_SendString(testing);
-				// 	sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
-				// 	UART_SendString(testing);
+				
+					sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
+					UART_SendString(testing);
+					sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
+					UART_SendString(testing);
+					sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
+					UART_SendString(testing);
+					sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
+					UART_SendString(testing);
 					pid_print_flag = 0;
 				}
 				else pid_print_flag ++;
