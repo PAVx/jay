@@ -48,8 +48,7 @@
 #include <util/delay.h>
 
 #include "softuart.h"
-#include "gyro.h"
-#include "accel.h"
+#include "system.h"
 
 char testing[10];
 double ypr[3];
@@ -154,16 +153,14 @@ ISR(SOFTUART_T_COMP_LABEL)
 	//system_tick();
 	_isrFlag = 1;
 
-	//if(PIDGetFlag() == 0){
+	
+	if(PIDGetFlag() == 0){
 		isr_period_counter++;
-
-		if(isr_period_counter >= PID_PERIOD){
-			// Gyro_Update();
-			// Accel_Update();
+		if(isr_period_counter >= 1000) {
 			PIDSetFlag();
 			isr_period_counter = 0;
 		}
-	//}
+	}
 	run_isr();
 }
 

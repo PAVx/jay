@@ -27,6 +27,12 @@
 #define GP_LED2_PIN (PORTC3)
 #define GP_LED2_DDPORT (DDC3)
 
+#define DIGITAL_PIN_1 (4)
+#define DIGITAL_PIN_1_DDR (DDRD)
+#define DIGITAL_PIN_1_PORT (PORTD)
+#define DIGITAL_PIN_1_PIN (PORTD7)
+#define DIGITAL_PIN_1_DDPORT (DDD7)
+
 void leds_init(uint8_t led);
 void toggle_led(uint8_t led);
 void led_off(uint8_t led);

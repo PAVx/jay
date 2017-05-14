@@ -46,6 +46,10 @@ void AttituteAdjustSetDesired(double yawDesired, double pitchDesired, double rol
 }
 
 void AttituteAdjustUpdatePID(double yawActual, double pitchActual, double rollActual){
+	if (pitchActual < (1.3 + pidPitch.desired) && pitchActual > (pidPitch.desired - 1.3)) {
+		pitchActual = pidPitch.desired;
+		PIDReset(&pidPitch);
+	}
 	yawError = PIDUpdate(&pidYaw, yawActual, UPDATE_ERROR);
 	pitchError = PIDUpdate(&pidPitch, pitchActual, UPDATE_ERROR);
 	rollError = PIDUpdate(&pidRoll, rollActual, UPDATE_ERROR);
@@ -59,7 +63,6 @@ void AttitudeAdjustGetError(int motor_changes[NUM_MOTORS]){
 	int yawErrorInt = 0;
 	int pitchErrorInt = 0;
 	int rollErrorInt = 0;
-
 
 	/* Motor Array: [mot1, mot2, mot3, mot4]
 		mot1				mot2
@@ -76,7 +79,7 @@ void AttitudeAdjustGetError(int motor_changes[NUM_MOTORS]){
 	pitchErrorInt 	= (int)(pitchError * 10);
 	rollErrorInt 	= (int)(rollError * 10);
 
-	yawErrorInt	/= 10;
+	yawErrorInt		/= 10;
 	pitchErrorInt	/= 10;
 	rollErrorInt	/= 10;
 

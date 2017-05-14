@@ -20,6 +20,9 @@ void leds_init(uint8_t led) {
 	else if (led == GP_LED2) {
 		GP_LED2_DDR |= (1 << GP_LED2_DDPORT);
 	}
+	else if (led == DIGITAL_PIN_1) {
+		DIGITAL_PIN_1_DDR |= (1 << DIGITAL_PIN_1_DDPORT);
+	}
 }
 void toggle_led(uint8_t led) {
 	if (led == SYSTEM_LED) {
@@ -30,6 +33,9 @@ void toggle_led(uint8_t led) {
 	}
 	else if (led == GP_LED2) {
 		GP_LED2_PORT ^= (1 << GP_LED2_PIN);
+	}
+	else if (led == DIGITAL_PIN_1) {
+		DIGITAL_PIN_1_PORT ^= (1 << DIGITAL_PIN_1_PIN);
 	}
 }
 void led_off(uint8_t led){
@@ -42,6 +48,9 @@ void led_off(uint8_t led){
 	else if (led == GP_LED2) {
 		GP_LED2_PORT &= ~(1 << GP_LED2_PIN);
 	}
+	else if (led == DIGITAL_PIN_1) {
+		DIGITAL_PIN_1_PORT &= ~(1 << DIGITAL_PIN_1_PIN);
+	}
 
 }
 void led_on(uint8_t led){
@@ -53,5 +62,8 @@ void led_on(uint8_t led){
 	}
 	else if (led == GP_LED2) {
 		GP_LED2_PORT |= (1 << GP_LED2_PIN);
+	}
+		else if (led == DIGITAL_PIN_1) {
+		DIGITAL_PIN_1_PORT |= (1 << DIGITAL_PIN_1_PIN);
 	}
 }

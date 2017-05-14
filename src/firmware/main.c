@@ -14,8 +14,13 @@
 #define LED_DEBUG
 //#define PACKET_DEBUG
 #define PID_DEBUG
+#define PID_PRINT_DEBUG
+#define PID_TIME_TEST
+
 //#define FILTER_DEBUG
 //#define YPR
+
+static uint8_t ref_init = 0;
 
 char testing[10];
 char sys_print[32];
@@ -42,7 +47,9 @@ char op_code;
 	int motor_delta[4];
 
 	static uint8_t o = 0;
-	static uint8_t pid_print_flag = 0;
+	#ifdef PID_PRINT_DEBUG
+		static uint16_t pid_print_flag = 0;
+	#endif
 #endif
 
 #ifdef FILTER_DEBUG
@@ -56,6 +63,11 @@ int main (void) {
 	AttituteAdjustSetDesired(0, 0, 0); // testing this attitude
  	AttitudeSetThrottle(0);
 
+ 	#ifdef PID_TIME_TEST 
+ 		leds_init(DIGITAL_PIN_1);
+ 		led_off(DIGITAL_PIN_1);
+ 	#endif
+
 	for(;;) {
 
 		#ifdef UART
@@ -63,16 +75,15 @@ int main (void) {
 				op_code = UART_GetByte();
 
 				if ((op_code == 's') && (o == 0)) {
-					AttitudeSetThrottle(5000);
-
+					AttitudeSetThrottle(4500);
+					ref_init = 0;
 					o = 1;
 				}
-				else if(op_code == 'k'){
+				else if(op_code == 'k') {
 					motor_set(MOTOR_ONE, 0);
 					motor_set(MOTOR_TWO, 0);
 					motor_set(MOTOR_THREE, 0);
 					motor_set(MOTOR_FOUR, 0);
-
 					o = 0;
 				}
 			}
@@ -113,10 +124,14 @@ int main (void) {
 	            }
 
 	        #endif
-	    	#endif
+	    #endif
 
 		#ifdef PID_DEBUG
 			if(PIDGetFlag() == 1) {
+
+				#ifdef PID_TIME_TEST 
+ 					led_on(DIGITAL_PIN_1);
+ 				#endif
 
 				Gyro_Update();
 				Accel_Update();
@@ -132,7 +147,12 @@ int main (void) {
 				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
 				sei();
 
-				AttituteAdjustUpdatePID(0, ypr[1], ypr[2]);
+				if (ref_init == 0) {
+					AttituteAdjustSetDesired(0, ypr[1], 0); // testing this attitude
+					ref_init = 1;
+				}
+
+				AttituteAdjustUpdatePID(0, ypr[1], 0);
 
 				// Update Motors
 				AttitudeAdjustGetError(motor_delta);
@@ -142,28 +162,41 @@ int main (void) {
 				}
 
 				// Debugging
-				if(pid_print_flag == 100){
-					sprintf(testing, " \nY: {%lf} | ", ypr[0]);
-					UART_SendString(testing);
-					sprintf(testing, " P: {%lf} | ", ypr[1]);
-					UART_SendString(testing);
-					sprintf(testing, " R: {%lf}          ", ypr[2]);
-					UART_SendString(testing);
-				
-					sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
-					UART_SendString(testing);
-					sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
-					UART_SendString(testing);
-					sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
-					UART_SendString(testing);
-					sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
-					UART_SendString(testing);
-					pid_print_flag = 0;
+				if (abs(ypr[1]) > 15 || abs(ypr[2]) > 15) {
+					motor_set(MOTOR_ONE, 0);
+					motor_set(MOTOR_TWO, 0);
+					motor_set(MOTOR_THREE, 0);
+					motor_set(MOTOR_FOUR, 0);
+					o = 0;
 				}
-				else pid_print_flag ++;
+
+				#ifdef PID_PRINT_DEBUG
+					if(pid_print_flag == 50){
+						sprintf(testing, " \nY: {%lf} | ", ypr[0]);
+						UART_SendString(testing);
+						sprintf(testing, " P: {%lf} | ", ypr[1]);
+						UART_SendString(testing);
+						sprintf(testing, " R: {%lf}          ", ypr[2]);
+						UART_SendString(testing);
+					
+						sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
+						UART_SendString(testing);
+						sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
+						UART_SendString(testing);
+						sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
+						UART_SendString(testing);
+						sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
+						UART_SendString(testing);
+						pid_print_flag = 0;
+					}
+					else pid_print_flag ++;
+				#endif
 
 				PIDResetFlag();
 			}
+			#ifdef PID_TIME_TEST 
+					led_off(DIGITAL_PIN_1);
+			#endif
 		#endif // PID_DEBUG
 
 		#ifdef FILTER_DEBUG
@@ -185,7 +218,7 @@ int main (void) {
 		#endif
 
 		#ifdef YPR
-			//if(PIDGetFlag() == 1) {
+			if(PIDGetFlag() == 1) {
 
 				Gyro_Update();
 				Accel_Update();
