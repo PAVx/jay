@@ -40,7 +40,8 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adxl345_accel
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/nmea
 # IR SENSOR
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/d6t8l_ir
-
+# ADC DRIVER
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adc
 
 ####################
 # PROTOCOL HEADERS #
@@ -61,6 +62,8 @@ SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/com
 SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/accel
 # GPS #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/gps
+# BATTERY #
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/battery
 
 ####################
 # SYSTEM HEADERS #
@@ -117,6 +120,8 @@ CSOURCE						+= drivers/pwm/pwm_driver.c
 CSOURCE						+= drivers/adxl345_accel/adxl345.c
 # NMEA #
 CSOURCE						+= drivers/nmea/nmea.c
+# ADC #
+CSOURCE						+= drivers/adc/adc.c
 # IR #
 #CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
 ####################
@@ -140,7 +145,9 @@ CSOURCE						+= protocols/com/packet.c
 # ACCEL #
 CSOURCE						+= protocols/accel/accel.c
 # GPS #
-CSOURCE                     			+= protocols/gps/gps.c
+CSOURCE                    	+= protocols/gps/gps.c
+# BATTERY #
+CSOURCE                    	+= protocols/battery/battery.c
 ####################
 
 ####################

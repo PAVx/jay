@@ -16,4 +16,6 @@
 #include "softuart.h"
 #include "uart_driver.h"
 #include "nmea.h"
+#include "adc.h"
+
 #endif

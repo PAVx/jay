@@ -16,6 +16,10 @@ uint8_t system_initialize(void) {
 		motors_initialize();
 	#endif
 
+	#ifdef BATTERY
+		battery_initialize();
+	#endif
+
 	#ifdef COM
 		#ifdef SW_UART
 			softuart_init();

@@ -17,6 +17,7 @@
 //#define MAGNOMETER (1)
 //#define GPS (1)
 #define PID_CONTROLLER (1)
+#define BATTERY (1)
 
 #ifdef GYRO
 	#define TEMP_SENSOR

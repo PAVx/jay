@@ -13,6 +13,10 @@
 //#define GPS_DEBUG
 #define LED_DEBUG
 //#define PACKET_DEBUG
+#ifdef BATTERY
+	#define BATTERY_DEBUG
+	char batt_debug[30];
+#endif
 #define PID_DEBUG
 #define PID_PRINT_DEBUG
 #define PID_TIME_TEST
@@ -86,6 +90,16 @@ int main (void) {
 					motor_set(MOTOR_FOUR, 0);
 					o = 0;
 				}
+			}
+		#endif
+
+		#ifdef BATTERY_DEBUG
+			if (!battery_charged()) {
+				motor_set(MOTOR_ONE, 0);
+				motor_set(MOTOR_TWO, 0);
+				motor_set(MOTOR_THREE, 0);
+				motor_set(MOTOR_FOUR, 0);
+				o = 0;
 			}
 		#endif
 

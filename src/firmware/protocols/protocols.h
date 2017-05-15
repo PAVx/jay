@@ -15,5 +15,6 @@
 #include "motors.h"
 #include "temperature.h"
 #include "uart.h"
+#include "battery.h"
 
 #endif
