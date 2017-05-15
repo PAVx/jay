@@ -156,7 +156,7 @@ ISR(SOFTUART_T_COMP_LABEL)
 	
 	if(PIDGetFlag() == 0){
 		isr_period_counter++;
-		if(isr_period_counter >= 1000) {
+		if(isr_period_counter >= 500) {
 			PIDSetFlag();
 			isr_period_counter = 0;
 		}

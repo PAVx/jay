@@ -19,7 +19,7 @@
 #endif
 #define PID_DEBUG
 #define PID_PRINT_DEBUG
-//#define PID_TIME_TEST
+#define PID_TIME_TEST
 
 //#define FILTER_DEBUG
 //#define YPR
@@ -94,13 +94,17 @@ int main (void) {
 		#endif
 
 		#ifdef BATTERY_DEBUG
-			if (!battery_charged()) {
+			battery_charged();
+			//if (!battery_charged()) {
+				/*
 				motor_set(MOTOR_ONE, 0);
 				motor_set(MOTOR_TWO, 0);
 				motor_set(MOTOR_THREE, 0);
 				motor_set(MOTOR_FOUR, 0);
+
 				o = 0;
-			}
+				*/
+			//}
 		#endif
 
 		#ifdef LED_DEBUG
@@ -186,6 +190,8 @@ int main (void) {
 
 				#ifdef PID_PRINT_DEBUG
 					if(pid_print_flag == 50){
+						sprintf(testing, " \nBATT: {%d} | ", (int)battery_get_voltage());
+						UART_SendString(testing);
 						sprintf(testing, " \nY: {%lf} | ", ypr[0]);
 						UART_SendString(testing);
 						sprintf(testing, " P: {%lf} | ", ypr[1]);

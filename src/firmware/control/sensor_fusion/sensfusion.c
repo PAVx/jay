@@ -35,7 +35,7 @@
 #ifdef MADWICK_QUATERNION_IMU
   #define BETA_DEF     0.01    // 2 * proportional gain
 #else // MAHONY_QUATERNION_IMU
-    #define TWO_KP_DEF  (2.0 * 0.04) // 2 * proportional gain
+    #define TWO_KP_DEF  (2.0 * 0.08) // 2 * proportional gain
     #define TWO_KI_DEF  (2.0 * 0.00001) // 2 * integral gain
 #endif
 

@@ -70,9 +70,9 @@
             #define TICK_PERIOD_us (2*(SOFTUART_TIMERTOP * TIMER0_PRESCALE * u_sec)/ F_CPU)
 		#endif
 
-		#define PID_RATE (13.88)	// Hz
+		#define PID_RATE (26.31)	// Hz
 		#define PID_PERIOD ((TICK_PERIOD_us * u_sec)/PID_RATE)
-		#define PID_UPDATE_PERIOD_SECONDS (0.072)
+		#define PID_UPDATE_PERIOD_SECONDS (0.0379)
 
 		#define TIMER_PERIOD ((TIMER0_PERIOD * 1000) / F_CPU)
 
