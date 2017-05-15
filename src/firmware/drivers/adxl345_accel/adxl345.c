@@ -54,7 +54,7 @@ void InitializeADXL345(void)
     _lowpass_x = 0;
 
     _delay_ms(2); // Arbitrary delay amount
-    // ADXL345_Calibrate();
+    ADXL345_Calibrate();
 }
 
 void ADXL345_Calibrate(void)
@@ -68,22 +68,22 @@ void ADXL345_Calibrate(void)
     uint8_t a_offz = 0;
 
 
-    // take the mean from 10 gyro probes and divide
+    // take the mean from 1000 accel probes and divide
     // it from the current probe
-    for (uint8_t i = 0; i < 10; i++)
+    for (uint16_t i = 0; i < 1000; i++)
     {
         ADXL345_UpdateData();
         tmpx += _a_x;
         tmpy += _a_y;
         tmpz += _a_z;
-        _delay_ms(20); // Arbitrary delay amount
+        _delay_ms(1); // Arbitrary delay amount
     }
 
     // Each LSB of output in full-resolution is one-quarter of an
     // LSB of the offset register. (Datasheet: Offset Calibration)
-    a_offx = -round(tmpx / 10 / 4);
-    a_offy = -round(tmpy / 10 / 4) ;
-    a_offz = -round(((tmpz / 10) - 256) / 4) ;
+    a_offx = -round(tmpx / 1000 / 4);
+    a_offy = -round(tmpy / 1000 / 4) ;
+    a_offz = -round(((tmpz / 1000) - 256) / 4) ;
 
     // Set calibrated offset values
     i2c_writeReg(ADXL345_ADDR, 0x1E, &a_offx, 1);

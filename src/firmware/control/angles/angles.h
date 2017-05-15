@@ -18,7 +18,6 @@
 #define ROLL_ANGLE (2)
 
 void imu2euler(double* ypr, double accX, double accY, double accZ, double gyroX, double gyroY, double gyroZ, double magX, double magY);
-void euler2quat(double* q, double yaw, double pitch, double roll);
-void quat2euler(double* ypr, double* q);
+void imu2euler_simple(double* ypr, double accX, double accY, double accZ, double magX, double magY);
 
 #endif	// _ANGLES_H_

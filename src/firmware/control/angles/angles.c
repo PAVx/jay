@@ -44,10 +44,10 @@ void imu2euler(double* ypr, double accX, double accY, double accZ, double gyroX,
 
         accel_vector_magnitude = sqrt((SQUARE(accX)) + (SQUARE(accY)) + (SQUARE(accZ)));
 
-        if (abs(accY) < accel_vector_magnitude) {                              
+        if (abs(accY) < accel_vector_magnitude) {
                 roll_accel = asin(accY / accel_vector_magnitude) * RADIAN_TO_DEGREE;
         }
-        if (abs(accX) < accel_vector_magnitude) {                              
+        if (abs(accX) < accel_vector_magnitude) {
                 pitch_accel = asin(accX / accel_vector_magnitude) * NEGATIVE_RADIAN_TO_DEGREE;
         }
 
@@ -65,7 +65,10 @@ void imu2euler(double* ypr, double accX, double accY, double accZ, double gyroX,
         ypr[0] = 0.0 * magY * magX;
         ypr[1] = pitch_gyro;
         ypr[2] = roll_gyro;
-
-
 }
 
+void imu2euler_simple(double* ypr, double accX, double accY, double accZ, double magX, double magY){
+         ypr[YAW_ANGLE] = (atan2(magY,magX)*180.0)/M_PI;
+         ypr[PITCH_ANGLE] = (atan2(accX, sqrt(accY*accY + accZ*accZ))*180.0)/M_PI;
+         ypr[ROLL_ANGLE] = (atan2(-accY, accZ)*180.0)/M_PI;
+ }

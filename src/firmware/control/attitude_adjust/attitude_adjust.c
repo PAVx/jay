@@ -46,7 +46,7 @@ void AttituteAdjustSetDesired(double yawDesired, double pitchDesired, double rol
 }
 
 void AttituteAdjustUpdatePID(double yawActual, double pitchActual, double rollActual){
-	if (pitchActual < (1.3 + pidPitch.desired) && pitchActual > (pidPitch.desired - 1.3)) {
+	if (pitchActual < (1.0 + pidPitch.desired) && pitchActual > (pidPitch.desired - 1.0)) {
 		pitchActual = pidPitch.desired;
 		PIDReset(&pidPitch);
 	}
