@@ -35,8 +35,8 @@
 #ifdef MADWICK_QUATERNION_IMU
   #define BETA_DEF     0.01    // 2 * proportional gain
 #else // MAHONY_QUATERNION_IMU
-    #define TWO_KP_DEF  (2.0 * 0.4) // 2 * proportional gain
-    #define TWO_KI_DEF  (2.0 * 0.001) // 2 * integral gain
+    #define TWO_KP_DEF  (2.0 * 0.04) // 2 * proportional gain
+    #define TWO_KI_DEF  (2.0 * 0.00001) // 2 * integral gain
 #endif
 
 #ifdef MADWICK_QUATERNION_IMU
@@ -267,7 +267,7 @@ void sensfusion6GetEulerRPY(double* roll, double* pitch, double* yaw)
   if (gx>1) gx=1;
   if (gx<-1) gx=-1;
 
-  *yaw = atan2(2*(q0*q3 + q1*q2), q0*q0 + q1*q1 - q2*q2 - q3*q3) * 180 / M_PI_F;
+  *yaw = 0;//atan2(2*(q0*q3 + q1*q2), q0*q0 + q1*q1 - q2*q2 - q3*q3) * 180 / M_PI_F;
   *pitch = asin(gx) * 180 / M_PI_F; //Pitch seems to be inverted
   *roll = atan2(gy, gz) * 180 / M_PI_F;
 }
