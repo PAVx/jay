@@ -19,9 +19,9 @@
 #define PID_ROLL_KD  0.0
 #define PID_ROLL_INTEGRATION_LIMIT    30.0
 
-#define PID_PITCH_KP  7.0
-#define PID_PITCH_KI  0.00001
-#define PID_PITCH_KD  10.0
+#define PID_PITCH_KP  10.0
+#define PID_PITCH_KI  0.001
+#define PID_PITCH_KD  2.0
 #define PID_PITCH_INTEGRATION_LIMIT   30.0
 
 #define PID_YAW_KP  0.0
