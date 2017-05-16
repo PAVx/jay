@@ -20,6 +20,8 @@
 #define PID_DEBUG
 #define PID_PRINT_DEBUG
 #define PID_TIME_TEST
+static uint8_t roll_static_count = 0;
+static uint8_t pitch_static_count = 0;
 
 //#define FILTER_DEBUG
 //#define YPR
@@ -48,6 +50,7 @@ char op_code;
 
 #if defined(PID_DEBUG) || defined(YPR)
 	double ypr[3] = {0};
+	double last_ypr[3] = {0};
 	int motor_delta[4];
 
 	static uint8_t o = 0;
@@ -157,6 +160,38 @@ int main (void) {
 				cli();
 				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS);
 				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
+				
+				if (((abs(ypr[1]) - abs(last_ypr[1])) / IMU_UPDATE_PERIOD_SECONDS) > 60) {
+					pitch_static_count++;
+
+					if (pitch_static_count > (int)IMU_UPDATE_RATE * .5) {
+						last_ypr[1] = ypr[1];
+						pitch_static_count = 0;
+					} else {
+						ypr[1] = last_ypr[1];
+						pitch_static_count = 0;
+					}
+
+				} else {
+					last_ypr[1] = ypr[1];
+					pitch_static_count = 0;
+				}
+
+				if (((abs(ypr[2]) - abs(last_ypr[2])) / IMU_UPDATE_PERIOD_SECONDS) > 80) {
+					roll_static_count++;
+
+					if (roll_static_count > (int)IMU_UPDATE_RATE * .1) {
+						last_ypr[2] = ypr[2];
+						roll_static_count = 0;
+					} else {
+						ypr[2] = last_ypr[2];
+						roll_static_count = 0;
+					}
+				} else {
+					last_ypr[2] = ypr[2];
+					roll_static_count = 0;
+				}
+
 				sei();
 
 				IMUResetFlag();
