@@ -88,13 +88,13 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I control/status
 # MANUAL CONTROL #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/manual
 # ANGLES #
-SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/angles
+#SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/angles
 # ATTITUDE ADJUST #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/attitude_adjust
 # PID #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/pid
 # COMPLIMENTARY FILTER #
-SEARCHABLE_HEADER_FILE_DIRS	+= -I control/complimentary
+#SEARCHABLE_HEADER_FILE_DIRS	+= -I control/complimentary
 # SENSOR FUSION #
 SEARCHABLE_HEADER_FILE_DIRS	+= -I control/sensor_fusion
 
@@ -171,13 +171,13 @@ CSOURCE						+= control/status/status.c
 # MANUAL CONTROL #
 CSOURCE						+= control/manual/manual_control.c
 # ANGLES #
-CSOURCE						+= control/angles/angles.c
+#CSOURCE						+= control/angles/angles.c
 # ATTITUDE ADJUST #
 CSOURCE						+= control/attitude_adjust/attitude_adjust.c
 # PID #
 CSOURCE						+= control/pid/pid.c
 # COMPLIMENTARY FILTER #
-CSOURCE						+= control/complimentary/comp_filter.c
+#CSOURCE						+= control/complimentary/comp_filter.c
 # SENSOR FUSION #
 CSOURCE						+= control/sensor_fusion/sensfusion.c
 

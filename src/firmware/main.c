@@ -47,7 +47,7 @@ char op_code;
 #endif
 
 #if defined(PID_DEBUG) || defined(YPR)
-	double ypr[3];
+	double ypr[3] = {0};
 	int motor_delta[4];
 
 	static uint8_t o = 0;
@@ -145,25 +145,35 @@ int main (void) {
 	    #endif
 
 		#ifdef PID_DEBUG
-			if(PIDGetFlag() == 1) {
 
+			if (IMUGetFlag() == 1) {
 				#ifdef PID_TIME_TEST
  					led_on(DIGITAL_PIN_1);
  				#endif
-
 				Gyro_Update();
 				Accel_Update();
 				//Mag_Update();
 
+				cli();
+				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS);
+				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
+				sei();
+
+				IMUResetFlag();
+			} else {
+				#ifdef PID_TIME_TEST
+ 					led_off(DIGITAL_PIN_1);
+ 				#endif
+			}
+		
+
+			if(PIDGetFlag() == 1) {
 
 				#ifdef LEDS
 		  			toggle_led(GP_LED1);
 			  	#endif
 
-				cli();
-				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), PID_UPDATE_PERIOD_SECONDS);
-				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
-				sei();
+
 
 				if (ref_init == 0) {
 					AttituteAdjustSetDesired(0, 0, 0); // testing this attitude
@@ -189,7 +199,7 @@ int main (void) {
 				}
 
 				#ifdef PID_PRINT_DEBUG
-					if(pid_print_flag == 50){
+					if(pid_print_flag == 10){
 						sprintf(testing, " \nBATT: {%d} | ", (int)battery_get_voltage());
 						UART_SendString(testing);
 						sprintf(testing, " TEMP: {%lf}\n", Temperature_Get());

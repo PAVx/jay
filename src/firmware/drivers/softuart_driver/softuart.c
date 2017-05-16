@@ -69,6 +69,7 @@ cBuffer suartTxBuffer;				///< uart transmit buffer
 static softUART channel[SOFTUART_CHANNELS];
 static uint8_t _isrFlag = 0;
 static uint64_t isr_period_counter = 0;
+static uint64_t imu_period_counter = 0;
 
 void set_tx_pin_high(int i) {
 		#ifdef SOFTUART_TXPORT_1
@@ -161,6 +162,15 @@ ISR(SOFTUART_T_COMP_LABEL)
 			isr_period_counter = 0;
 		}
 	}
+
+	if (IMUGetFlag() == 0) {
+		imu_period_counter++;
+		if (imu_period_counter >= 250) {
+			IMUSetFlag();
+			imu_period_counter = 0;
+		}
+	}
+
 	run_isr();
 }
 

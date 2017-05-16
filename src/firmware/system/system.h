@@ -69,6 +69,8 @@
 			#define TIMER0_PERIOD (SOFTUART_TIMERTOP)
             #define TICK_PERIOD_us (2*(SOFTUART_TIMERTOP * TIMER0_PRESCALE * u_sec)/ F_CPU)
 		#endif
+		#define IMU_UPDATE_RATE (47.28)
+		#define IMU_UPDATE_PERIOD_SECONDS (0.02115)
 
 		#define PID_RATE (26.31)	// Hz
 		#define PID_PERIOD ((TICK_PERIOD_us * u_sec)/PID_RATE)

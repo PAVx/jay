@@ -30,6 +30,10 @@
 void sensfusion6Init(void);
 bool sensfusion6Test(void);
 
+uint8_t IMUGetFlag(void);
+void IMUSetFlag(void);
+void IMUResetFlag(void);
+
 void sensfusion6UpdateQ(double gx, double gy, double gz, double ax, double ay, double az, double dt);
 void sensfusion6GetEulerRPY(double* roll, double* pitch, double* yaw);
 double sensfusion6GetAccZWithoutGravity(const double ax, const double ay, const double az);
