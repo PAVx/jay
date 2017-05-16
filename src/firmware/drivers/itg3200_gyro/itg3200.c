@@ -146,10 +146,10 @@ double ITG3200_GetZ(void)
 
 double ITG3200_GetTemp(void)
 {
-    return _Calculate_G_Temp(_g_t);
+    return _g_t;//_Calculate_G_Temp(_g_t);
 }
 
 double _Calculate_G_Temp(double _t_raw)
 {
-    return (35 + (((double)_t_raw + 13200) / 280));;
+    return (35 + ((_t_raw + 13200) / 280));;
 }

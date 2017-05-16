@@ -78,7 +78,7 @@ int main (void) {
 			if(!UART_IsEmpty()){
 				op_code = UART_GetByte();
 
-				if ((op_code == 's') && (o == 0)) {
+				if ((op_code == 's') && (o == 0) && battery_charged()) {
 					AttitudeSetThrottle(4500);
 					ref_init = 0;
 					o = 1;
@@ -192,6 +192,9 @@ int main (void) {
 					if(pid_print_flag == 50){
 						sprintf(testing, " \nBATT: {%d} | ", (int)battery_get_voltage());
 						UART_SendString(testing);
+						sprintf(testing, " TEMP: {%lf}\n", Temperature_Get());
+						UART_SendString(testing);
+						
 						sprintf(testing, " \nY: {%lf} | ", ypr[0]);
 						UART_SendString(testing);
 						sprintf(testing, " P: {%lf} | ", ypr[1]);
@@ -207,7 +210,7 @@ int main (void) {
 						UART_SendString(testing);
 						sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
 						UART_SendString(testing);
-
+					/*
 						sprintf(testing, "           M1: {%d} | ", (int)motor_delta[0]);
 						UART_SendString(testing);
 						sprintf(testing, " M2: {%d} | ", (int)motor_delta[1]);
@@ -216,7 +219,9 @@ int main (void) {
 						UART_SendString(testing);
 						sprintf(testing, " M4: {%d}          ", (int)motor_delta[3]);
 						UART_SendString(testing);
+					*/
 						pid_print_flag = 0;
+					
 					}
 					else pid_print_flag ++;
 				#endif

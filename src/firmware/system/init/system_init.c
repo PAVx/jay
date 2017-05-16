@@ -9,6 +9,9 @@
 
 uint8_t system_initialize(void) {
 	// initialize protcols
+
+	char print_buffer[30];
+
 	#ifdef SYSTEM_TICK
 	#endif
 
@@ -96,9 +99,8 @@ uint8_t system_initialize(void) {
 
 	#ifdef UART
 		UART_SendString("\n\nPAVx Jay UAV System v3.0\n\n");
-		UART_SendString("\n\n--Device Address: ");
-		UART_SendByte(DEVICE_ADDRESS + ASCII_NUMBER_OFFSET);
-		UART_SendString("is online\n\n");
+		sprintf(print_buffer, " DEVICE ADDRESS %d IS ONLINE\n\n", DEVICE_ADDRESS);
+		UART_SendString(print_buffer);
 	#endif
 
 	return TRUE;

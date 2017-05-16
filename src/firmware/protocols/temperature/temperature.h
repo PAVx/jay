@@ -11,6 +11,6 @@
 
 void InitializeTemperature(void);
 // Celsius
-float Temperature_Get(void);
+double Temperature_Get(void);
 
 #endif
