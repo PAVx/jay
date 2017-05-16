@@ -18,4 +18,18 @@
 #define BAR_GRAVITY_ACCELERATION (double)9.80665//m/s^2
 #define BAR_MOLAR_MASS_AIR (double)0.0289644//kg*mol
 
+/* Function Prototypes */
+
+// Converts ADC value to voltage (Volts)
+double adc_to_voltage(uint16_t adc);
+
+// Converts voltage (Volts) to pressure (kPA)
+double voltage_to_pressure(double voltage);
+
+// Converts pressure (kPA), with respect to base temperature (K), to altitude (m)
+double pressure_to_altitude(double pressure, double temp);
+
+// Chain conversion of ADC, with respect to base temperature (K), to altitude (m)
+double get_altitude(uint16_t adc, double temp);
+
 #endif
