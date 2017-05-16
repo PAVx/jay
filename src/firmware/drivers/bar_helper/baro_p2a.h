@@ -29,6 +29,9 @@ double voltage_to_pressure(double voltage);
 // Converts pressure (kPA), with respect to base temperature (K), to altitude (m)
 double pressure_to_altitude(double pressure, double temp);
 
+// Chain conversion of ADC to pressure
+double get_pressure(uint16_t adc);
+
 // Chain conversion of ADC, with respect to base temperature (K), to altitude (m)
 double get_altitude(uint16_t adc, double temp);
 

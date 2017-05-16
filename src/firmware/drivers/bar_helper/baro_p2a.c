@@ -24,6 +24,23 @@ double pressure_to_altitude(double pressure, double temp){
     return altitude;
 }
 
+double get_pressure(uint16_t adc){
+#ifdef BAR_DEBUG_MODE
+    printf("ADC: %d\n", adc);
+#endif
+    // Convert ADC to corresponding voltage
+    double volt = adc_to_voltage(adc);
+#ifdef BAR_DEBUG_MODE
+    printf("Voltage: %lf V\n", volt);
+#endif
+    // Convert voltage to corresponding pressure in kPa
+    double pressure = voltage_to_pressure(volt);
+#ifdef BAR_DEBUG_MODE
+    printf("Pressure: %lf kPA\n", pressure);
+#endif
+    return pressure;
+}
+
 double get_altitude(uint16_t adc, double temp){
 #ifdef BAR_DEBUG_MODE
     printf("ADC: %d\n", adc);
