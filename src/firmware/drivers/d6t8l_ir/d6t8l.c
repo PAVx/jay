@@ -89,3 +89,8 @@ uint8_t* D6T8L_GetData(void)
 {
         return heatmap;
 }
+
+uint8_t D6T8L_GetAvgData)void)
+{
+        return heat_avg;
+}
