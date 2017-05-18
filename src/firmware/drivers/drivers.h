@@ -1,8 +1,8 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 #ifndef _DRIVERS_H_
 #define _DRIVERS_H_
@@ -17,5 +17,6 @@
 #include "uart_driver.h"
 #include "nmea.h"
 #include "adc.h"
+#include "d6t8l.h"
 
 #endif

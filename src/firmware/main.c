@@ -17,17 +17,18 @@
 	#define BATTERY_DEBUG
 	char batt_debug[30];
 #endif
-#define PID_DEBUG
-#define PID_PRINT_DEBUG
+//#define PID_DEBUG
+//#define PID_PRINT_DEBUG
 #define PID_TIME_TEST
-static uint8_t roll_static_count = 0;
-static uint8_t pitch_static_count = 0;
+//static uint8_t roll_static_count = 0;
+//static uint8_t pitch_static_count = 0;
 
 //#define FILTER_DEBUG
 //#define YPR
+#define ADC_TEST
 
 static uint8_t ref_init = 0;
-
+static uint8_t o = 0;
 char testing[10];
 char sys_print[32];
 char op_code;
@@ -53,7 +54,6 @@ char op_code;
 	double last_ypr[3] = {0};
 	int motor_delta[4];
 
-	static uint8_t o = 0;
 	#ifdef PID_PRINT_DEBUG
 		static uint16_t pid_print_flag = 0;
 	#endif
@@ -65,7 +65,7 @@ char op_code;
 
 int main (void) {
 	system_initialize();
-
+	InitializeD6T8L();
 	sensfusion6Init();
 	AttituteAdjustSetDesired(0, 0, 0); // testing this attitude
  	AttitudeSetThrottle(0);
@@ -160,37 +160,37 @@ int main (void) {
 				cli();
 				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS);
 				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
-				
-				if (((abs(ypr[1]) - abs(last_ypr[1])) / IMU_UPDATE_PERIOD_SECONDS) > 60) {
-					pitch_static_count++;
 
-					if (pitch_static_count > (int)IMU_UPDATE_RATE * .5) {
-						last_ypr[1] = ypr[1];
-						pitch_static_count = 0;
-					} else {
-						ypr[1] = last_ypr[1];
-						pitch_static_count = 0;
-					}
-
-				} else {
-					last_ypr[1] = ypr[1];
-					pitch_static_count = 0;
-				}
-
-				if (((abs(ypr[2]) - abs(last_ypr[2])) / IMU_UPDATE_PERIOD_SECONDS) > 80) {
-					roll_static_count++;
-
-					if (roll_static_count > (int)IMU_UPDATE_RATE * .1) {
-						last_ypr[2] = ypr[2];
-						roll_static_count = 0;
-					} else {
-						ypr[2] = last_ypr[2];
-						roll_static_count = 0;
-					}
-				} else {
-					last_ypr[2] = ypr[2];
-					roll_static_count = 0;
-				}
+				// if (((abs(ypr[1]) - abs(last_ypr[1])) / IMU_UPDATE_PERIOD_SECONDS) > 60) {
+				// 	pitch_static_count++;
+				//
+				// 	if (pitch_static_count > (int)IMU_UPDATE_RATE * .5) {
+				// 		last_ypr[1] = ypr[1];
+				// 		pitch_static_count = 0;
+				// 	} else {
+				// 		ypr[1] = last_ypr[1];
+				// 		pitch_static_count = 0;
+				// 	}
+				//
+				// } else {
+				// 	last_ypr[1] = ypr[1];
+				// 	pitch_static_count = 0;
+				// }
+				//
+				// if (((abs(ypr[2]) - abs(last_ypr[2])) / IMU_UPDATE_PERIOD_SECONDS) > 80) {
+				// 	roll_static_count++;
+				//
+				// 	if (roll_static_count > (int)IMU_UPDATE_RATE * .1) {
+				// 		last_ypr[2] = ypr[2];
+				// 		roll_static_count = 0;
+				// 	} else {
+				// 		ypr[2] = last_ypr[2];
+				// 		roll_static_count = 0;
+				// 	}
+				// } else {
+				// 	last_ypr[2] = ypr[2];
+				// 	roll_static_count = 0;
+				// }
 
 				sei();
 
@@ -200,7 +200,7 @@ int main (void) {
  					led_off(DIGITAL_PIN_1);
  				#endif
 			}
-		
+
 
 			if(PIDGetFlag() == 1) {
 
@@ -234,12 +234,12 @@ int main (void) {
 				}
 
 				#ifdef PID_PRINT_DEBUG
-					if(pid_print_flag == 10){
+					if(pid_print_flag == 1){
 						sprintf(testing, " \nBATT: {%d} | ", (int)battery_get_voltage());
 						UART_SendString(testing);
 						sprintf(testing, " TEMP: {%lf}\n", Temperature_Get());
 						UART_SendString(testing);
-						
+
 						sprintf(testing, " \nY: {%lf} | ", ypr[0]);
 						UART_SendString(testing);
 						sprintf(testing, " P: {%lf} | ", ypr[1]);
@@ -266,7 +266,7 @@ int main (void) {
 						UART_SendString(testing);
 					*/
 						pid_print_flag = 0;
-					
+
 					}
 					else pid_print_flag ++;
 				#endif
@@ -324,6 +324,22 @@ int main (void) {
 					pid_print_flag = 0;
 				}
 				else pid_print_flag ++;
+
+		#endif
+
+		#ifdef ADC_TEST
+			Gyro_Update();
+			Accel_Update();
+			printf(testing, " \nax{%lf} ay{%lf} az{%lf} gx{%lf} gy{%lf} gz{%lf}", Accel_GetX(), Accel_GetY(), Accel_GetZ(), Gyro_GetX(), Gyro_GetY(), Gyro_GetZ());
+			UART_SendString(testing);
+			// uint8_t* heat;
+			// heat = D6T8L_GetData();
+			// for (int ii = 0; ii < 8; ii++){
+			// 	sprintf(testing, " {%d} ", heat[ii]);
+			// 	UART_SendString(testing);
+			// }
+			// sprintf(testing, " \n");
+			// UART_SendString(testing);
 
 		#endif
 

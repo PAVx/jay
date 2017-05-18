@@ -123,7 +123,7 @@ CSOURCE						+= drivers/nmea/nmea.c
 # ADC #
 CSOURCE						+= drivers/adc/adc.c
 # IR #
-#CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
+CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
 ####################
 
 ####################

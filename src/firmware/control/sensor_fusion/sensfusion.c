@@ -25,13 +25,21 @@
  */
 #include <math.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "sensfusion.h"
 
 #define M_PI_F ((double) M_PI)
 
+#define EULER_SCALING_PITCH 2.0
+#define EULER_SCALING_ROLL 2.0
+
 //#define MADWICK_QUATERNION_IMU
 static uint8_t _update_flag = 0;
+
+static double _prev_pitch = 0;
+static double _prev_roll = 0;
+
 
 uint8_t IMUGetFlag(void) {
 	return _update_flag;
@@ -65,7 +73,7 @@ void IMUResetFlag(void) {
   double derivativeFBx = 0.0;
   double derivativeFBy = 0.0;
   double derivativeFBz = 0.0;  // derivative error terms scaled by Kd
-  
+
 #endif
 
 double q0 = 1.0;
@@ -241,7 +249,7 @@ static void sensfusion6UpdateQImpl(double gx, double gy, double gz, double ax, d
 	  derivativeFBx = (twoKd * halfex) * (twoKd * ((halfex - last_halfex) / dt));
 	  derivativeFBy = (twoKd * halfey) * (twoKd * ((halfey - last_halfey) / dt));
 	  derivativeFBz = (twoKd * halfez) * (twoKd * ((halfez - last_halfez) / dt));
-	
+
 	  if (derivativeFBx > 50 && derivativeFBy > 50 && derivativeFBz > 50) {
 		  gx += derivativeFBx;
 		  gy += derivativeFBy;
@@ -309,12 +317,22 @@ void sensfusion6GetEulerRPY(double* roll, double* pitch, double* yaw)
   double gy = gravY;
   double gz = gravZ;
 
+  double _cur_pitch = 0;
+  double _cur_roll = 0;
+
   if (gx>1) gx=1;
   if (gx<-1) gx=-1;
 
   *yaw = 0;//atan2(2*(q0*q3 + q1*q2), q0*q0 + q1*q1 - q2*q2 - q3*q3) * 180 / M_PI_F;
-  *pitch = asin(gx) * 180 / M_PI_F; //Pitch seems to be inverted
-  *roll = atan2(gy, gz) * 180 / M_PI_F;
+  _cur_pitch = asin(gx) * 180 / M_PI_F; //Pitch seems to be inverted
+  _cur_roll = (atan2(gy, gz) * 180 / M_PI_F);
+
+  *pitch = _cur_pitch;// * EULER_SCALING_PITCH * (_cur_roll - _prev_roll)/_cur_roll;
+  *roll = _cur_roll * EULER_SCALING_ROLL * (_cur_pitch - _prev_pitch)/_cur_pitch;
+
+  _prev_pitch = _cur_pitch;
+  _prev_roll = _cur_roll;
+
 }
 
 double sensfusion6GetAccZWithoutGravity(const double ax, const double ay, const double az)
