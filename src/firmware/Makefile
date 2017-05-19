@@ -88,7 +88,7 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I control/status
 # MANUAL CONTROL #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/manual
 # ANGLES #
-#SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/angles
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/angles
 # ATTITUDE ADJUST #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/attitude_adjust
 # PID #
@@ -96,7 +96,7 @@ SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/pid
 # COMPLIMENTARY FILTER #
 #SEARCHABLE_HEADER_FILE_DIRS	+= -I control/complimentary
 # SENSOR FUSION #
-SEARCHABLE_HEADER_FILE_DIRS	+= -I control/sensor_fusion
+#SEARCHABLE_HEADER_FILE_DIRS	+= -I control/sensor_fusion
 
 ######################################################
 
@@ -111,7 +111,7 @@ CSOURCE						+= drivers/buffer/buffer.c
 # I2C #
 CSOURCE						+= drivers/i2c_driver/i2c_driver.c
 # ITG3200 #
-CSOURCE						+= drivers/itg3200_gyro/itg3200.c
+#CSOURCE						+= drivers/itg3200_gyro/itg3200.c
 # HMC5883L #
 CSOURCE						+= drivers/hmc5883l_mag/hmc5883l_mag.c
 # PWM #
@@ -123,7 +123,7 @@ CSOURCE						+= drivers/nmea/nmea.c
 # ADC #
 CSOURCE						+= drivers/adc/adc.c
 # IR #
-#CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
+CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
 ####################
 
 ####################
@@ -135,13 +135,13 @@ CSOURCE						+= drivers/softuart_driver/softuart.c
 # MAG #
 CSOURCE						+= protocols/mag/mag.c
 # GYRO #
-CSOURCE						+= protocols/gyro/gyro.c
+#CSOURCE						+= protocols/gyro/gyro.c
 # TEMP #
-CSOURCE						+= protocols/temperature/temperature.c
+#CSOURCE						+= protocols/temperature/temperature.c
 # MOTORS #
 CSOURCE						+= protocols/motors/motors.c
 # COMMUNICATION #
-CSOURCE						+= protocols/com/packet.c
+#CSOURCE						+= protocols/com/packet.c
 # ACCEL #
 CSOURCE						+= protocols/accel/accel.c
 # GPS #
@@ -171,7 +171,7 @@ CSOURCE						+= control/status/status.c
 # MANUAL CONTROL #
 CSOURCE						+= control/manual/manual_control.c
 # ANGLES #
-#CSOURCE						+= control/angles/angles.c
+CSOURCE						+= control/angles/angles.c
 # ATTITUDE ADJUST #
 CSOURCE						+= control/attitude_adjust/attitude_adjust.c
 # PID #
@@ -179,7 +179,7 @@ CSOURCE						+= control/pid/pid.c
 # COMPLIMENTARY FILTER #
 #CSOURCE						+= control/complimentary/comp_filter.c
 # SENSOR FUSION #
-CSOURCE						+= control/sensor_fusion/sensfusion.c
+#CSOURCE						+= control/sensor_fusion/sensfusion.c
 
 ######################################################
 

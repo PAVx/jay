@@ -94,6 +94,11 @@ uint8_t system_initialize(void) {
 		#endif
 	#endif
 
+	#ifdef IR_CAM
+		InitializeD6T8L();
+		//set_tick_period(IR_CAM_TIMER_ID, IR_CAM_TIMER_UPDATE_TIME_MS);
+	#endif
+
 	// PID initialize
 	#ifdef PID_CONTROLLER
 		InitializeAttitudeAdjust();

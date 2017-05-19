@@ -23,7 +23,6 @@ double rollError = 0.0;
 double pitchError = 0.0;
 double yawError = 0.0;
 
-char testing[30];
 static uint8_t pid_print_flag = 0;
 
 uint8_t InitializeAttitudeAdjust(void) {

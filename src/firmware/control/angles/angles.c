@@ -17,13 +17,17 @@ double roll_level_adjust = 0;
 bool level_adjust = false;
 
 #define SQUARE(x) (x * x)
-#define GYRO_ANGLE_TO_RADIAN (.000000607071044) // GYRO_ANGLE_DEGREE_CONVERSION (0.0000347826) * (pi / 180)
-#define RADIAN_TO_DEGREE (57.296) // 180 / pi
-#define NEGATIVE_RADIAN_TO_DEGREE (-RADIAN_TO_DEGREE)
 
-#define GYRO_TO_ACCEL_RATIO (0.5)
-#define ACCEL_TO_GYRO_RATIO (1 - GYRO_TO_ACCEL_RATIO)
+#ifdef GYRO
+    #define GYRO_ANGLE_TO_RADIAN (.000000607071044) // GYRO_ANGLE_DEGREE_CONVERSION (0.0000347826) * (pi / 180)
+    #define RADIAN_TO_DEGREE (57.296) // 180 / pi
+    #define NEGATIVE_RADIAN_TO_DEGREE (-RADIAN_TO_DEGREE)
 
+    #define GYRO_TO_ACCEL_RATIO (0.5)
+    #define ACCEL_TO_GYRO_RATIO (1 - GYRO_TO_ACCEL_RATIO)
+#endif 
+
+#ifdef GYRO
 void imu2euler(double* ypr, double accX, double accY, double accZ, double gyroX, double gyroY, double gyroZ, double magX, double magY){
         static double roll_gyro = 0.0;
         static double pitch_gyro = 0.0;
@@ -66,6 +70,7 @@ void imu2euler(double* ypr, double accX, double accY, double accZ, double gyroX,
         ypr[1] = pitch_gyro;
         ypr[2] = roll_gyro;
 }
+#endif
 
 void imu2euler_simple(double* ypr, double accX, double accY, double accZ, double magX, double magY){
          ypr[YAW_ANGLE] = (atan2(magY,magX)*180.0)/M_PI;

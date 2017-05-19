@@ -13,13 +13,14 @@
 #define MOTORS (1)
 #define SYSTEM_TICK (1)
 #define IMU (1)
+#define IR_CAM (1)
 //#define GPS (1)
 #define PID_CONTROLLER (1)
 #define BATTERY (1)
 
 
 #ifdef IMU
-	#define GYRO (1)
+	//#define GYRO (1)
 	#define ACCEL (1)
 	//#define MAGNOMETER (1)
 	#ifdef GYRO
@@ -50,6 +51,9 @@
 #ifndef DEFAULT_NUM_SIBLINGS
 	#define DEFAULT_NUM_SIBLINGS (8) // a max value -- be conservative for packet memory reasons
 #endif
+
+#define IR_CAM_TIMER_ID (2)
+#define IR_CAM_TIMER_UPDATE_TIME_MS (500)
 
 #ifdef COM
 	#define UART (1)

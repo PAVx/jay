@@ -8,12 +8,12 @@
 #define _PROTOCOLS_H_
 
 //#include "packet.h"
-#include "gyro.h"
+//#include "gyro.h"
 #include "accel.h"
 #include "gps.h"
 #include "mag.h"
 #include "motors.h"
-#include "temperature.h"
+//#include "temperature.h"
 #include "uart.h"
 #include "battery.h"
 
