@@ -149,11 +149,10 @@ int main (void) {
 
 		#ifdef PID_DEBUG
 
-			if (IMUGetFlag() == 1) {
+			if (tick_timer_flag(IMU_TIMER_ID)) {
 				#ifdef PID_TIME_TEST
  					led_on(DIGITAL_PIN_1);
  				#endif
-				Gyro_Update();
 				Accel_Update();
 				//Mag_Update();
 
@@ -161,7 +160,7 @@ int main (void) {
 				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS);
 				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
 				
-				if (((abs(ypr[1]) - abs(last_ypr[1])) / IMU_UPDATE_PERIOD_SECONDS) > 60) {
+				if (((abs(ypr[1]) - abs(last_ypr[1])) / IMU_UPDATE_PERIOD_SECONDS) > 400) {
 					pitch_static_count++;
 
 					if (pitch_static_count > (int)IMU_UPDATE_RATE * .5) {
@@ -177,7 +176,7 @@ int main (void) {
 					pitch_static_count = 0;
 				}
 
-				if (((abs(ypr[2]) - abs(last_ypr[2])) / IMU_UPDATE_PERIOD_SECONDS) > 80) {
+				if (((abs(ypr[2]) - abs(last_ypr[2])) / IMU_UPDATE_PERIOD_SECONDS) > 400) {
 					roll_static_count++;
 
 					if (roll_static_count > (int)IMU_UPDATE_RATE * .1) {
@@ -194,7 +193,7 @@ int main (void) {
 
 				sei();
 
-				IMUResetFlag();
+				clear_tick_timer_flag(IMU_TIMER_ID);
 			} else {
 				#ifdef PID_TIME_TEST
  					led_off(DIGITAL_PIN_1);
@@ -202,7 +201,7 @@ int main (void) {
 			}
 		
 
-			if(PIDGetFlag() == 1) {
+			if(tick_timer_flag(PID_TIMER_ID)) {
 
 				#ifdef LEDS
 		  			toggle_led(GP_LED1);
@@ -271,7 +270,7 @@ int main (void) {
 					else pid_print_flag ++;
 				#endif
 
-				PIDResetFlag();
+				clear_tick_timer_flag(PID_TIMER_ID);
 			}
 			#ifdef PID_TIME_TEST
 					led_off(DIGITAL_PIN_1);

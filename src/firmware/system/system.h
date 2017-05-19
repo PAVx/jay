@@ -12,18 +12,22 @@
 #define LEDS (1)
 #define MOTORS (1)
 #define SYSTEM_TICK (1)
-#define GYRO (1)
-#define ACCEL (1)
-//#define MAGNOMETER (1)
+#define IMU (1)
 //#define GPS (1)
 #define PID_CONTROLLER (1)
 #define BATTERY (1)
 
-#ifdef GYRO
-	#define TEMP_SENSOR
-#endif
 
-#define IMU_UPSIDEDOWN (1)
+#ifdef IMU
+	#define GYRO (1)
+	#define ACCEL (1)
+	//#define MAGNOMETER (1)
+	#ifdef GYRO
+		#define TEMP_SENSOR
+	#endif
+
+	#define IMU_UPSIDEDOWN (1)
+#endif
 
 //#define SYSTEM_INIT_DEBUG_PRINTOUTS (1)
 
@@ -67,14 +71,21 @@
 
 			#define SOFTUART_TIMERTOP (F_CPU/TIMER0_PRESCALE/SOFTUART_BAUD_RATE/3 - 1)
 			#define TIMER0_PERIOD (SOFTUART_TIMERTOP)
-            #define TICK_PERIOD_us (2*(SOFTUART_TIMERTOP * TIMER0_PRESCALE * u_sec)/ F_CPU)
+            #define TICK_PERIOD_us ((SOFTUART_TIMERTOP * TIMER0_PRESCALE * u_sec)/ F_CPU)
 		#endif
-		#define IMU_UPDATE_RATE (47.28)
-		#define IMU_UPDATE_PERIOD_SECONDS (0.02115)
+
+		#ifdef IMU
+			#define IMU_UPDATE_RATE (47.28)
+			#define IMU_UPDATE_PERIOD_SECONDS (0.02115)
+			#define IMU_UPDATE_TIME_MS (21) //ms
+			#define IMU_TIMER_ID (1)
+		#endif
 
 		#define PID_RATE (26.31)	// Hz
 		#define PID_PERIOD ((TICK_PERIOD_us * u_sec)/PID_RATE)
 		#define PID_UPDATE_PERIOD_SECONDS (0.0379)
+		#define PID_TIMER_UPDATE_TIME_MS (38) //ms for timer
+		#define PID_TIMER_ID (0)
 
 		#define TIMER_PERIOD ((TIMER0_PERIOD * 1000) / F_CPU)
 

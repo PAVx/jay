@@ -50,10 +50,6 @@
 #include "softuart.h"
 #include "system.h"
 
-char testing[10];
-double ypr[3];
-int16_t motor_delta[4];
-
 #define SU_TRUE    1
 #define SU_FALSE   0
 
@@ -68,8 +64,6 @@ cBuffer suartTxBuffer;				///< uart transmit buffer
 
 static softUART channel[SOFTUART_CHANNELS];
 static uint8_t _isrFlag = 0;
-static uint64_t isr_period_counter = 0;
-static uint64_t imu_period_counter = 0;
 
 void set_tx_pin_high(int i) {
 		#ifdef SOFTUART_TXPORT_1
@@ -151,25 +145,8 @@ int get_rx_pin_status(int i) {
 
 ISR(SOFTUART_T_COMP_LABEL)
 {
-	//system_tick();
+	system_tick();
 	_isrFlag = 1;
-
-	
-	if(PIDGetFlag() == 0){
-		isr_period_counter++;
-		if(isr_period_counter >= 500) {
-			PIDSetFlag();
-			isr_period_counter = 0;
-		}
-	}
-
-	if (IMUGetFlag() == 0) {
-		imu_period_counter++;
-		if (imu_period_counter >= 250) {
-			IMUSetFlag();
-			imu_period_counter = 0;
-		}
-	}
 
 	run_isr();
 }

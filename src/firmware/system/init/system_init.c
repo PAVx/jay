@@ -40,38 +40,42 @@ uint8_t system_initialize(void) {
 
 	#endif
 
+	#ifdef IMU
 
-	#ifdef GYRO
-		InitializeGyro();
-		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-			_uart_driver_FlushTransmitBuffer();
-			UART_SendString(" i2c initialized...\n");
-			_uart_driver_FlushTransmitBuffer();
-			UART_SendString(" gyroscope initialized...\n");
-			_uart_driver_FlushTransmitBuffer();
-		#endif
-	#endif
-
-	#ifdef ACCEL
-		InitializeAccel();
-		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-			#ifndef GYRO
+		#ifdef GYRO
+			InitializeGyro();
+			#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
 				_uart_driver_FlushTransmitBuffer();
 				UART_SendString(" i2c initialized...\n");
-			#endif
-			UART_SendString("accel initialized...\n");
-		#endif
-	#endif
-
-	#ifdef MAGNOMETER
-		InitializeMag();
-		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-			#ifndef GYRO
 				_uart_driver_FlushTransmitBuffer();
-				UART_SendString("i2c initialized...\n");
+				UART_SendString(" gyroscope initialized...\n");
+				_uart_driver_FlushTransmitBuffer();
 			#endif
-			UART_SendString("magnometer initialized...\n");
 		#endif
+
+		#ifdef ACCEL
+			InitializeAccel();
+			#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
+				#ifndef GYRO
+					_uart_driver_FlushTransmitBuffer();
+					UART_SendString(" i2c initialized...\n");
+				#endif
+				UART_SendString("accel initialized...\n");
+			#endif
+		#endif
+
+		#ifdef MAGNOMETER
+			InitializeMag();
+			#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
+				#ifndef GYRO
+					_uart_driver_FlushTransmitBuffer();
+					UART_SendString("i2c initialized...\n");
+				#endif
+				UART_SendString("magnometer initialized...\n");
+			#endif
+		#endif
+
+		set_tick_period(IMU_TIMER_ID, IMU_UPDATE_TIME_MS);
 	#endif
 
 	// initialize system components
@@ -93,6 +97,8 @@ uint8_t system_initialize(void) {
 	// PID initialize
 	#ifdef PID_CONTROLLER
 		InitializeAttitudeAdjust();
+		// initialize timer
+		set_tick_period(PID_TIMER_ID, PID_TIMER_UPDATE_TIME_MS);
 	#endif
 
 	sei();
@@ -103,5 +109,8 @@ uint8_t system_initialize(void) {
 		UART_SendString(print_buffer);
 	#endif
 
+
+	clock_start();
+	
 	return TRUE;
 }
