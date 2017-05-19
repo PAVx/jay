@@ -11,7 +11,7 @@
 //#define MOTOR_TEST
 //#define IMU_DEBUG
 //#define GPS_DEBUG
-#define LED_DEBUG
+//#define LED_DEBUG
 //#define PACKET_DEBUG
 #ifdef BATTERY
 	#define BATTERY_DEBUG
@@ -19,20 +19,20 @@
 #endif
 //#define PID_DEBUG
 //#define PID_PRINT_DEBUG
-#define PID_TIME_TEST
+//#define PID_TIME_TEST
 //static uint8_t roll_static_count = 0;
 //static uint8_t pitch_static_count = 0;
 
 //#define FILTER_DEBUG
 //#define YPR
 #define ADC_TEST
-
+/*
 static uint8_t ref_init = 0;
 static uint8_t o = 0;
-char testing[10];
 char sys_print[32];
 char op_code;
-
+*/
+//char testing[20];
 #ifdef IMU_DEBUG
 	char gbuffer[15];
 	char abuffer[15];
@@ -65,19 +65,22 @@ char op_code;
 
 int main (void) {
 	system_initialize();
-	InitializeD6T8L();
-	sensfusion6Init();
+	//InitializeD6T8L();
+	/*
+    sensfusion6Init();
 	AttituteAdjustSetDesired(0, 0, 0); // testing this attitude
  	AttitudeSetThrottle(0);
-
+*/
+    UART_SendString("Hi\n");
  	#ifdef PID_TIME_TEST
  		leds_init(DIGITAL_PIN_1);
  		led_off(DIGITAL_PIN_1);
  	#endif
-
+    
 	for(;;) {
-
+    
 		#ifdef UART
+        /*
 			if(!UART_IsEmpty()){
 				op_code = UART_GetByte();
 
@@ -93,7 +96,7 @@ int main (void) {
 					motor_set(MOTOR_FOUR, 0);
 					o = 0;
 				}
-			}
+			}*/
 		#endif
 
 		#ifdef BATTERY_DEBUG
@@ -328,19 +331,22 @@ int main (void) {
 		#endif
 
 		#ifdef ADC_TEST
+        /*
 			Gyro_Update();
 			Accel_Update();
 			printf(testing, " \nax{%lf} ay{%lf} az{%lf} gx{%lf} gy{%lf} gz{%lf}", Accel_GetX(), Accel_GetY(), Accel_GetZ(), Gyro_GetX(), Gyro_GetY(), Gyro_GetZ());
 			UART_SendString(testing);
-			// uint8_t* heat;
-			// heat = D6T8L_GetData();
-			// for (int ii = 0; ii < 8; ii++){
-			// 	sprintf(testing, " {%d} ", heat[ii]);
-			// 	UART_SendString(testing);
-			// }
-			// sprintf(testing, " \n");
-			// UART_SendString(testing);
-
+            */
+            /*
+			 uint8_t* heat;
+			 heat = D6T8L_GetData();
+			 for (int ii = 0; ii < 19; ii++){
+			 	sprintf(testing, " {%d} ", heat[ii]);
+			 	UART_SendString(testing);
+			 }
+			 sprintf(testing, " \n");
+			 UART_SendString(testing);
+*/
 		#endif
 
 	}

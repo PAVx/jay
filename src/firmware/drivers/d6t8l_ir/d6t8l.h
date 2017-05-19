@@ -12,6 +12,6 @@ void InitializeD6T8L(void);
 void D6T8L_UpdateData(void);
 
 uint8_t* D6T8L_GetData(void);
-uint8_t* D6T8L_GetAvgData(void);
+uint8_t D6T8L_GetAvgData(void);
 
 #endif
