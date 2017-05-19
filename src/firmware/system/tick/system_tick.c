@@ -12,7 +12,7 @@
 #include "system.h"
 #include "drivers.h"
 #include "protocols.h"
-#define NUM_COMP 3
+#define NUM_COMP 4
 #define MAX_COMPARE_VALUE 65535
 #define SYSTEM_TIMEOUT (20) 
 typedef struct {

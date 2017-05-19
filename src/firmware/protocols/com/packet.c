@@ -189,13 +189,13 @@ uint8_t packet_data_inject(uint8_t packet_opcode, uint8_t data_packet_position, 
 uint8_t packet_send(uint8_t packet_opcode) {
 	if (packet_opcode < MAX_NUMBER_PACKET_TYPES) {
 		if (packet_opcodes[packet_opcode].transmit_enabled) {
-			int i = 0;
+		/*	int i = 0;
             while ( i < packet_opcodes[packet_opcode].constant_packet_data_length + CONSTANT_PACKET_BYTE_LENGTH) {
                 _uart_driver_SendByte(packet_opcodes[packet_opcode].tx_buffer[i]);
                 i++;
             }
-
-            //UART_SendBuffer((char*)packet_opcodes[packet_opcode].tx_buffer, packet_opcodes[packet_opcode].constant_packet_data_length + CONSTANT_PACKET_BYTE_LENGTH);
+		*/
+            UART_SendBuffer((char*)packet_opcodes[packet_opcode].tx_buffer, packet_opcodes[packet_opcode].constant_packet_data_length + CONSTANT_PACKET_BYTE_LENGTH);
 		}
 
 		return TRUE;

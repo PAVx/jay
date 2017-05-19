@@ -8,17 +8,13 @@
 #include <string.h>
 #include <util/delay.h>
 
-//#define MOTOR_TEST
-//#define IMU_DEBUG
-//#define GPS_DEBUG
 #define LED_DEBUG
 //#define PACKET_DEBUG
 #ifdef BATTERY
 	#define BATTERY_DEBUG
-	char batt_debug[30];
 #endif
 #define PID_DEBUG
-#define PID_PRINT_DEBUG
+//#define PID_PRINT_DEBUG
 #define PID_TIME_TEST
 static uint8_t roll_static_count = 0;
 static uint8_t pitch_static_count = 0;
@@ -27,40 +23,22 @@ static uint8_t pitch_static_count = 0;
 
 static uint8_t ref_init = 0;
 
-char testing[10];
+char testing[30];
 char sys_print[32];
 char op_code;
 
-#ifdef IMU_DEBUG
-	char gbuffer[15];
-	char abuffer[15];
-#endif
+static uint8_t o = 0;
 
-#ifdef GPS_DEBUG
-	char gpsbuffer[50];
-	int i = 0;
-#endif
-
-#ifdef MOTOR_TEST
-	uint8_t byte = 0;
-	uint32_t motor_vals[4] = {0};
-	uint8_t motor = 0;
-#endif
-
-#if defined(PID_DEBUG) || defined(YPR)
+#ifdef PID_DEBUG
 	double ypr[3] = {0};
 	double last_ypr[3] = {0};
 	int motor_delta[4];
 
-	static uint8_t o = 0;
 	#ifdef PID_PRINT_DEBUG
 		static uint16_t pid_print_flag = 0;
 	#endif
 #endif
 
-#ifdef FILTER_DEBUG
-	double compPitch, compRoll;
-#endif
 
 int main (void) {
 	system_initialize();
@@ -96,24 +74,10 @@ int main (void) {
 
 		#ifdef BATTERY_DEBUG
 			battery_charged();
-			//if (!battery_charged()) {
-				/*
-				motor_set(MOTOR_ONE, 0);
-				motor_set(MOTOR_TWO, 0);
-				motor_set(MOTOR_THREE, 0);
-				motor_set(MOTOR_FOUR, 0);
-
-				o = 0;
-				*/
-			//}
+			
 		#endif
 
-		#ifdef LED_DEBUG
-			#ifdef LEDS
-	  			toggle_led(GP_LED2);
-		  	#endif
-  		#endif
-
+		
 		#ifdef PACKET_DEBUG
 		  	#ifdef COM
 		  		#ifdef UART
@@ -148,13 +112,15 @@ int main (void) {
 		#ifdef PID_DEBUG
 
 			if (tick_timer_flag(IMU_TIMER_ID)) {
+			
+
 				#ifdef PID_TIME_TEST
  					led_on(DIGITAL_PIN_1);
  				#endif
 				Accel_Update();
 				//Mag_Update();
 
-				cli();
+				//cli();
 				
 				imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
 
@@ -189,8 +155,8 @@ int main (void) {
 					roll_static_count = 0;
 				}
 
-				sei();
-
+				//sei();
+	
 				clear_tick_timer_flag(IMU_TIMER_ID);
 			} else {
 				#ifdef PID_TIME_TEST
@@ -206,11 +172,6 @@ int main (void) {
 			  	#endif
 
 
-
-				if (ref_init == 0) {
-					AttituteAdjustSetDesired(0, 0, 0); // testing this attitude
-					ref_init = 1;
-				}
 
 				AttituteAdjustUpdatePID(0, ypr[1], 0);
 
@@ -232,10 +193,8 @@ int main (void) {
 
 				#ifdef PID_PRINT_DEBUG
 					if(pid_print_flag == 10){
-						sprintf(testing, " \nBATT: {%d} | ", (int)battery_get_voltage());
-						UART_SendString(testing);
-						sprintf(testing, " TEMP: {%lf}\n", Temperature_Get());
-						UART_SendString(testing);
+						//sprintf(testing, " \nBATT: {%d} | ", (int)battery_get_voltage());
+						//UART_SendString(testing);
 						
 						sprintf(testing, " \nY: {%lf} | ", ypr[0]);
 						UART_SendString(testing);
@@ -252,87 +211,43 @@ int main (void) {
 						UART_SendString(testing);
 						sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
 						UART_SendString(testing);
-					/*
-						sprintf(testing, "           M1: {%d} | ", (int)motor_delta[0]);
-						UART_SendString(testing);
-						sprintf(testing, " M2: {%d} | ", (int)motor_delta[1]);
-						UART_SendString(testing);
-						sprintf(testing, " M3: {%d} | ", (int)motor_delta[2]);
-						UART_SendString(testing);
-						sprintf(testing, " M4: {%d}          ", (int)motor_delta[3]);
-						UART_SendString(testing);
-					*/
+
 						pid_print_flag = 0;
 					
 					}
 					else pid_print_flag ++;
 				#endif
-
+			/**/
 				clear_tick_timer_flag(PID_TIMER_ID);
 			}
+
 			#ifdef PID_TIME_TEST
 					led_off(DIGITAL_PIN_1);
 			#endif
 		#endif // PID_DEBUG
 
-		#ifdef FILTER_DEBUG
-			if(PIDGetFlag() == 1) {
-				//Gyro_Update();
-				Accel_Update();
 
-				CompAccelUpdate(Accel_GetX(), Accel_GetY(), Accel_GetZ());
-				//CompGyroUpdate(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ());
-				CompUpdate();
-				CompAnglesGet(&compPitch, &compRoll);
+		#ifdef PACKET	
+			if (tick_timer_flag(PACKET_TIMER_ID)) {
+				#ifdef LED_DEBUG
+					#ifdef LEDS
+		  				toggle_led(GP_LED2);
+			  		#endif
+	  			#endif
+				status_update_time(0xFFFFFFFFFFFFFFFF);
+				status_update_longitude(0xFFFFFFFFFFFFFFFF);
+				status_update_latitude(0xFFFFFFFFFFFFFFFF);
 
-				sprintf(testing, " \nP: %f ", compPitch);
-				UART_SendString(testing);
-				sprintf(testing, " R: %f", compRoll);
-				UART_SendString(testing);
-				PIDResetFlag();
+				packet_send(STATUS_PACKET_TYPE);
+				clear_tick_timer_flag(PACKET_TIMER_ID);
 			}
 		#endif
-
-		#ifdef YPR
-
-				Gyro_Update();
-				Accel_Update();
-				//Mag_Update();
-
-
-				#ifdef LEDS
-					toggle_led(GP_LED1);
-				#endif
-
-				cli();
-				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), PID_UPDATE_PERIOD_SECONDS);
-				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
-				//imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
-				sei();
-
-				// Debugging
-				if(pid_print_flag == 1){
-					sprintf(testing, " \nYaw: {%lf} | ", ypr[0]);
-					UART_SendString(testing);
-					sprintf(testing, " P: {%lf} | ", ypr[1]);
-					UART_SendString(testing);
-					sprintf(testing, " R: {%lf}          ", ypr[2]);
-					UART_SendString(testing);
-					pid_print_flag = 0;
-				}
-				else pid_print_flag ++;
-
-		#endif
-
-		
 
 		#ifdef IR_CAM_DEBUG
 			if (tick_timer_flag(IR_CAM_TIMER_ID)) {
 				
 				D6T8L_UpdateData();
-				sprintf(testing, " \nir_cam: %d\n", (int)D6T8L_GetAvgData());
-				UART_SendString(testing);
-
+				status_update_status_vector((uint64_t)D6T8L_GetAvgData());
 
 				clear_tick_timer_flag(IR_CAM_TIMER_ID);
 			}

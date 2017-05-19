@@ -8,13 +8,9 @@
 #include "system.h"
 
 uint8_t system_initialize(void) {
+	char print_buffer[30] = {0};
+
 	// initialize protcols
-
-	char print_buffer[30];
-
-	#ifdef SYSTEM_TICK
-	#endif
-
 	#ifdef MOTORS
 		motors_initialize();
 	#endif
@@ -31,11 +27,12 @@ uint8_t system_initialize(void) {
 		#ifdef UART
 			InitializeUART(HW_UART_BAUD);
 		#endif
-	//	packet_init();
+	
+		#ifdef PACKET
+			initialize_packet_handler();
+			inititialize_status_packet();
 
-		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-			_uart_driver_FlushTransmitBuffer();
-			UART_SendString(" communication substrate initialized...\n");
+			set_tick_period(PACKET_TIMER_ID, PACKET_UPDATE_TIME_MS);
 		#endif
 
 	#endif
@@ -84,14 +81,9 @@ uint8_t system_initialize(void) {
 		leds_init(GP_LED1);
 		leds_init(GP_LED2);
 
-		led_on(SYSTEM_LED);
+		
 		led_on(GP_LED1);
 		led_off(GP_LED2);
-
-		#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-			_uart_driver_FlushTransmitBuffer();
-			UART_SendString("system leds initialized...\n");
-		#endif
 	#endif
 
 	// PID initialize
@@ -106,7 +98,9 @@ uint8_t system_initialize(void) {
 		set_tick_period(IR_CAM_TIMER_ID, IR_CAM_TIMER_UPDATE_TIME_MS);
 	#endif
 	
+	clock_start();
 	sei();
+
 
 	#ifdef UART
 		UART_SendString("\n\nPAVx Jay UAV System v3.0\n\n");
@@ -115,7 +109,6 @@ uint8_t system_initialize(void) {
 	#endif
 
 
-	clock_start();
 	
 	return TRUE;
 }

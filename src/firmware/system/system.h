@@ -9,6 +9,7 @@
 
 // SYSTEM DEFINES
 #define COM (1)
+#define PACKET (1)
 #define LEDS (1)
 #define MOTORS (1)
 #define SYSTEM_TICK (1)
@@ -24,7 +25,7 @@
 #endif
 
 #ifdef IMU
-	#define GYRO (1)
+	//#define GYRO (1)
 	#define ACCEL (1)
 	//#define MAGNOMETER (1)
 	#ifdef GYRO
@@ -84,6 +85,11 @@
 			#define IMU_UPDATE_PERIOD_SECONDS (0.02115)
 			#define IMU_UPDATE_TIME_MS (21) //ms
 			#define IMU_TIMER_ID (1)
+		#endif
+
+		#ifdef PACKET
+			#define PACKET_TIMER_ID (3)
+			#define PACKET_UPDATE_TIME_MS (200)
 		#endif
 
 		#define PID_RATE (26.31)	// Hz

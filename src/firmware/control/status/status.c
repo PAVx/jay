@@ -29,13 +29,6 @@ void GetSiblingStatus(StatusPacket_t *data, uint8_t sibling_device_address) {
 void inititialize_status_packet(void) {
 	uint8_t val = 0;
 
-	for (val = 0; val < DEFAULT_NUM_SIBLINGS; val++) {
-		statuses[val].longitude = 0.0;
-		statuses[val].latitude = 0.0;
-		statuses[val].time = 0;
-		statuses[val].status = 0;
-	}
-
 	this_status_packet.longitude = 0.0;
 	this_status_packet.latitude = 0.0;
 	this_status_packet.time = 0;
@@ -85,6 +78,7 @@ void status_update_longitude(double longitude) {
 	uint8_t buff[8];
 
 	double_to_byte_array(longitude, buff);
+	memset(&buff[4], 0, 4);
 	packet_data_inject(STATUS_PACKET_TYPE, LONGITUDE_DATA_POS, 8, buff);
 }
 
@@ -92,12 +86,14 @@ void status_update_latitude(double latitude) {
 	uint8_t buff[8];
 
 	double_to_byte_array(latitude, buff);
+	memset(&buff[4], 0, 4);
 	packet_data_inject(STATUS_PACKET_TYPE, LATITUDE_DATA_POS, 8, buff);
 }
 void status_update_time(uint64_t time) {
 	uint8_t buff[8];
 
 	double_to_byte_array(binary_to_double(time), buff);
+	memset(&buff[4], 0, 4);
 	packet_data_inject(STATUS_PACKET_TYPE, TIME_DATA_POS, 8, buff);
 }
 
@@ -105,6 +101,7 @@ void status_update_status_vector(uint64_t status) {
 	uint8_t buff[8];
 
 	double_to_byte_array(binary_to_double(status), buff);
+	memset(&buff[4], 0, 4);
 	packet_data_inject(STATUS_PACKET_TYPE, STATUS_DATA_POS, 8, buff);
 }
 
