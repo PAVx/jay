@@ -23,8 +23,7 @@
 static uint8_t roll_static_count = 0;
 static uint8_t pitch_static_count = 0;
 
-//#define FILTER_DEBUG
-//#define YPR
+#define IR_CAM_DEBUG (1)
 
 static uint8_t ref_init = 0;
 
@@ -66,7 +65,6 @@ char op_code;
 int main (void) {
 	system_initialize();
 
-	sensfusion6Init();
 	AttituteAdjustSetDesired(0, 0, 0); // testing this attitude
  	AttitudeSetThrottle(0);
 
@@ -157,9 +155,9 @@ int main (void) {
 				//Mag_Update();
 
 				cli();
-				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS);
-				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
 				
+				imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
+
 				if (((abs(ypr[1]) - abs(last_ypr[1])) / IMU_UPDATE_PERIOD_SECONDS) > 400) {
 					pitch_static_count++;
 
@@ -324,6 +322,20 @@ int main (void) {
 				}
 				else pid_print_flag ++;
 
+		#endif
+
+		
+
+		#ifdef IR_CAM_DEBUG
+			if (tick_timer_flag(IR_CAM_TIMER_ID)) {
+				
+				D6T8L_UpdateData();
+				sprintf(testing, " \nir_cam: %d\n", (int)D6T8L_GetAvgData());
+				UART_SendString(testing);
+
+
+				clear_tick_timer_flag(IR_CAM_TIMER_ID);
+			}
 		#endif
 
 	}

@@ -101,6 +101,11 @@ uint8_t system_initialize(void) {
 		set_tick_period(PID_TIMER_ID, PID_TIMER_UPDATE_TIME_MS);
 	#endif
 
+	#ifdef IR_CAM
+		InitializeD6T8L();
+		set_tick_period(IR_CAM_TIMER_ID, IR_CAM_TIMER_UPDATE_TIME_MS);
+	#endif
+	
 	sei();
 
 	#ifdef UART
