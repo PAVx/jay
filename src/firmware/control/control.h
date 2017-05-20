@@ -9,5 +9,6 @@
 #include "angles.h"
 #include "attitude_adjust.h"
 #include "pid.h"
+#include "init_packet.h"
 //#include "comp_filter.h"
 //#include "sensfusion.h"

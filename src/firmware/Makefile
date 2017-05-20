@@ -93,6 +93,8 @@ SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/angles
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/attitude_adjust
 # PID #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/pid
+# INITIALIZATION PACKETS #
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/init_packets
 # COMPLIMENTARY FILTER #
 #SEARCHABLE_HEADER_FILE_DIRS	+= -I control/complimentary
 # SENSOR FUSION #
@@ -176,6 +178,8 @@ CSOURCE						+= control/angles/angles.c
 CSOURCE						+= control/attitude_adjust/attitude_adjust.c
 # PID #
 CSOURCE						+= control/pid/pid.c
+# INIT PACKETS #
+CSOURCE						+= control/init_packets/init_packet.c
 # COMPLIMENTARY FILTER #
 #CSOURCE						+= control/complimentary/comp_filter.c
 # SENSOR FUSION #

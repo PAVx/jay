@@ -48,6 +48,8 @@
 #define DEVICE_ADDRESS (0x01)
 ////////////////////////////
 #define BROADCAST_ALL_DESTINATION_ADDRESS (0xAA)
+#define GROUND_STATION_ADDRESS (0xCC)
+
 #define u_sec 1000000
 #ifndef F_CPU
 	#define F_CPU 16000000UL
