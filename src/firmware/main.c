@@ -14,13 +14,19 @@
 	#define BATTERY_DEBUG
 #endif
 #define PID_DEBUG
-#define PID_PRINT_DEBUG
-#define PID_TIME_TEST
+//#define PID_PRINT_DEBUG
+//#define PID_TIME_TEST
 //static uint8_t roll_static_count = 0;
 //static uint8_t pitch_static_count = 0;
 
-#ifdef IR_CAM
-	#define IR_CAM_DEBUG (1)
+#define SEND_STATUS_PACKET
+
+#ifdef SEND_STATUS_PACKET
+	#ifdef IR_CAM
+		#define IR_CAM_DEBUG (1)
+	#endif
+	static uint8_t battery_level = 0xFF;
+	static uint16_t altitude = 420;
 #endif
 
 static uint8_t ref_init = 0;
@@ -73,12 +79,6 @@ int main (void) {
 				}
 			}
 		#endif
-
-		#ifdef BATTERY_DEBUG
-			battery_charged();
-			
-		#endif
-
 		
 		#ifdef PACKET_DEBUG
 		  	#ifdef COM
@@ -225,14 +225,32 @@ int main (void) {
 
 		#ifdef PACKET	
 			if (tick_timer_flag(PACKET_TIMER_ID)) {
+				
+				// update IR cam data
+				D6T8L_UpdateData();
+
 				#ifdef LED_DEBUG
 					#ifdef LEDS
 		  				toggle_led(GP_LED2);
 			  		#endif
 	  			#endif
-				status_update_time(0xABCDEF12);
-				status_update_longitude(420.69);
-				status_update_latitude(420.69);
+
+				status_update_time(420);
+				status_update_longitude(-122.063338);
+				status_update_latitude(37.000273);
+				if (battery_charged()) {
+					battery_level = 0xFF;
+				} else {
+					battery_level = 0x00;
+				}
+				
+				status_update_status_vector( 
+					(uint64_t)(((uint64_t)altitude 		<< 48) 	& 0xFFFF000000000000) | 
+					(uint64_t)(((uint64_t)ypr[2] 		<< 32) 	& 0x0000FFFF00000000) | 
+					(uint64_t)(((uint64_t)ypr[1] 		<< 16) 	& 0x00000000FFFF0000) | 
+					(uint64_t)(((uint64_t)battery_level << 8) 	& 0x000000000000FF00) | 
+					(uint64_t)((D6T8L_GetAvgData() 		<< 0)	& 0x00000000000000FF)
+					);
 
 				packet_send(STATUS_PACKET_TYPE);
 				clear_tick_timer_flag(PACKET_TIMER_ID);
@@ -242,8 +260,9 @@ int main (void) {
 		#ifdef IR_CAM_DEBUG
 			if (tick_timer_flag(IR_CAM_TIMER_ID)) {
 				
-				D6T8L_UpdateData();
-				status_update_status_vector((uint64_t)D6T8L_GetAvgData());
+				
+				
+				
 
 				clear_tick_timer_flag(IR_CAM_TIMER_ID);
 			}

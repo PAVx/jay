@@ -14,9 +14,9 @@ static StatusPacket_t this_status_packet;
 #define SOURCE_ADDRESS_DATA_POS (0)
 #define DESTINATION_ADDRESS_DATA_POS (1)
 #define LONGITUDE_DATA_POS (2)
-#define LATITUDE_DATA_POS (10)
-#define TIME_DATA_POS (18)
-#define STATUS_DATA_POS (26)
+#define LATITUDE_DATA_POS (6)
+#define TIME_DATA_POS (10)
+#define STATUS_DATA_POS (18)
 
 void GetSiblingStatus(StatusPacket_t *data, uint8_t sibling_device_address) {
 	if ((sibling_device_address < DEFAULT_NUM_SIBLINGS) &&
@@ -55,10 +55,10 @@ uint8_t status_packet_handler(uint8_t *input_buffer) {
 			return TRUE; // packet received successfully, but its irrelevent to this device
 		}
 
-		parse_sub_packet(&bit_buffer, 8, input_buffer, LONGITUDE_DATA_POS);
+		parse_sub_packet(&bit_buffer, 4, input_buffer, LONGITUDE_DATA_POS);
 		statuses[_source_address].longitude = binary_to_double(bit_buffer);
 
-		parse_sub_packet(&bit_buffer, 8, input_buffer, LATITUDE_DATA_POS);
+		parse_sub_packet(&bit_buffer, 4, input_buffer, LATITUDE_DATA_POS);
 		statuses[_source_address].latitude = binary_to_double(bit_buffer);
 
 		parse_sub_packet(&(statuses[_source_address].time), 8, input_buffer, TIME_DATA_POS);
@@ -74,32 +74,32 @@ void send_status_packet(uint8_t destination_address) {
 }
 
 void status_update_longitude(double longitude) {
-	uint8_t buff[8];
+	uint8_t buff[4];
 	uint64_t binary_double = 0;
 	uint8_t i = 0;
 
 	memcpy(&binary_double, &longitude, sizeof(double));
 
 
-	for (i = 0; i < 8; i++) {
-		buff[7 - i] = (uint8_t)((binary_double >> (i * 8)) & 0x00000000000000FF);
+	for (i = 0; i < 4; i++) {
+		buff[3 - i] = (uint8_t)((binary_double >> (i * 8)) & 0x000000FF);
 	}
 
-	packet_data_inject(STATUS_PACKET_TYPE, LONGITUDE_DATA_POS, 8, buff);
+	packet_data_inject(STATUS_PACKET_TYPE, LONGITUDE_DATA_POS, 4, buff);
 }
 
 void status_update_latitude(double latitude) {
-	uint8_t buff[8];
+	uint8_t buff[4];
 	uint64_t binary_double = 0;
 	uint8_t i = 0;
 
 	memcpy(&binary_double, &latitude, sizeof(double));
 
-	for (i = 0; i < 8; i++) {
-		buff[7 - i] = (uint8_t)((binary_double >> (i * 8)) & 0x00000000000000FF);
+	for (i = 0; i < 4; i++) {
+		buff[3 - i] = (uint8_t)((binary_double >> (i * 8)) & 0x000000FF);
 	}
 
-	packet_data_inject(STATUS_PACKET_TYPE, LATITUDE_DATA_POS, 8, buff);
+	packet_data_inject(STATUS_PACKET_TYPE, LATITUDE_DATA_POS, 4, buff);
 }
 void status_update_time(uint64_t time) {
 	uint8_t buff[8];
