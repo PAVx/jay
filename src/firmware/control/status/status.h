@@ -20,7 +20,7 @@ typedef struct _status_packet StatusPacket_t;
 
 // define packet and pos
 #define STATUS_PACKET_TYPE (1)
-#define STATUS_PACKET_DATA_LENGTH (34) // 4*8 (GPS DATA) + 1 (SOURCE) + 1 (DESTINATION) 
+#define STATUS_PACKET_DATA_LENGTH (26) // 2*4 (GPS) + 2*8 (STATUS AND TIME DATA) + 1 (SOURCE) + 1 (DESTINATION) 
 
 void GetSiblingStatus(StatusPacket_t *data, uint8_t sibling_device_address);
 
