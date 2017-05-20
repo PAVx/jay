@@ -6,6 +6,7 @@
 
 #include "status.h"
 #include "manual_control.h"
+#include "ctrl_pkt.h"
 #include "angles.h"
 #include "attitude_adjust.h"
 #include "pid.h"

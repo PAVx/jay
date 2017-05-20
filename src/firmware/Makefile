@@ -4,8 +4,8 @@ BURNER						= avrdude
 CC_AVR						= atmega328p
 F_CPU						= 16000000UL
 BURNER_AVR					= ATMEGA328P
-BURNER_PROGRAMMER				= usbasp # Arduino
-COMPILER_PATH					= /dev/tty.usb*
+BURNER_PROGRAMMER				= Arduino
+COMPILER_PATH					= COM4 #/dev/tty.usb*
 OBJECT_COPY					= avr-objcopy
 BAUDRATE					= 115200
 ###########################################
@@ -87,6 +87,8 @@ SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/
 SEARCHABLE_HEADER_FILE_DIRS	+= -I control/status
 # MANUAL CONTROL #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/manual
+# CONTROL PACKETS #
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/control_packets
 # ANGLES #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/angles
 # ATTITUDE ADJUST #
@@ -170,6 +172,8 @@ CSOURCE						+= system/memory/nonvolatile/nvmem.c
 # CONTROL #
 # STATUS #
 CSOURCE						+= control/status/status.c
+# CONTROL PACKETS #
+CSOURCE						+= control/control_packets/ctrl_pkt.c
 # MANUAL CONTROL #
 CSOURCE						+= control/manual/manual_control.c
 # ANGLES #

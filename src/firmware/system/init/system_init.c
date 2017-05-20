@@ -32,7 +32,8 @@ uint8_t system_initialize(void) {
 			initialize_packet_handler();
 			inititialize_status_packet();
 			inititialize_init_packet();
-			
+            inititialize_control_packet();
+
 			set_tick_period(PACKET_TIMER_ID, PACKET_UPDATE_TIME_MS);
 		#endif
 
