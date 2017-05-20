@@ -37,7 +37,7 @@ struct _variable_packet_descriptor {
 // type 2 - control packet from ground (control/control_packets.h
 // type 3 - initialization packets -- need an ack from the ground to init (control/init_packet.h)
 
-#define MAX_NUMBER_PACKET_TYPES (3)
+#define MAX_NUMBER_PACKET_TYPES (4)
 
 typedef struct _variable_packet_descriptor PacketDescriptor_t;
 PacketDescriptor_t packet_opcodes[MAX_NUMBER_PACKET_TYPES];
