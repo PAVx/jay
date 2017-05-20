@@ -9,7 +9,7 @@
 #include <util/delay.h>
 
 #define LED_DEBUG
-#define WAIT_FOR_SYSTEM_ACK
+//#define WAIT_FOR_SYSTEM_ACK
 //#define PACKET_DEBUG
 #ifdef BATTERY
 	#define BATTERY_DEBUG
