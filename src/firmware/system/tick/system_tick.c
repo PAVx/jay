@@ -81,9 +81,9 @@ void system_tick(void) {
     }
 
 }
-void set_tick_period(uint8_t compare_x, uint64_t ms) {
+void set_tick_period(uint8_t compare_x, uint64_t us) {
     if (compare_x < NUM_COMP) {
-        compare[compare_x].period = (ms * 1000) / TICK_PERIOD_us;
+        compare[compare_x].period = (us * 1) / TICK_PERIOD_us;
         compare[compare_x].value = compare[compare_x].period;
         compare[compare_x].enable = true;
     }

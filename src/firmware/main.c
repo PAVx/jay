@@ -14,12 +14,14 @@
 	#define BATTERY_DEBUG
 #endif
 #define PID_DEBUG
-//#define PID_PRINT_DEBUG
+#define PID_PRINT_DEBUG
 #define PID_TIME_TEST
-static uint8_t roll_static_count = 0;
-static uint8_t pitch_static_count = 0;
+//static uint8_t roll_static_count = 0;
+//static uint8_t pitch_static_count = 0;
 
-#define IR_CAM_DEBUG (1)
+#ifdef IR_CAM
+	#define IR_CAM_DEBUG (1)
+#endif
 
 static uint8_t ref_init = 0;
 
@@ -112,18 +114,13 @@ int main (void) {
 		#ifdef PID_DEBUG
 
 			if (tick_timer_flag(IMU_TIMER_ID)) {
-			
-
-				#ifdef PID_TIME_TEST
- 					led_on(DIGITAL_PIN_1);
- 				#endif
 				Accel_Update();
 				//Mag_Update();
 
 				//cli();
 				
 				imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
-
+/*
 				if (((abs(ypr[1]) - abs(last_ypr[1])) / IMU_UPDATE_PERIOD_SECONDS) > 400) {
 					pitch_static_count++;
 
@@ -154,16 +151,11 @@ int main (void) {
 					last_ypr[2] = ypr[2];
 					roll_static_count = 0;
 				}
-
+*/
 				//sei();
 	
 				clear_tick_timer_flag(IMU_TIMER_ID);
-			} else {
-				#ifdef PID_TIME_TEST
- 					led_off(DIGITAL_PIN_1);
- 				#endif
-			}
-		
+			} 
 
 			if(tick_timer_flag(PID_TIMER_ID)) {
 
@@ -171,9 +163,12 @@ int main (void) {
 		  			toggle_led(GP_LED1);
 			  	#endif
 
+		  		#ifdef PID_TIME_TEST
+ 					led_on(DIGITAL_PIN_1);
+ 				#endif
 
-
-				AttituteAdjustUpdatePID(0, ypr[1], 0);
+		  		
+				AttituteAdjustUpdatePID(0, ypr[1], ypr[2]);
 
 				// Update Motors
 				AttitudeAdjustGetError(motor_delta);
@@ -183,16 +178,17 @@ int main (void) {
 				}
 
 				// Debugging
-				if (abs(ypr[1]) > 45 || abs(ypr[2]) > 45) {
+				/*if (abs(ypr[1]) > 45 || abs(ypr[2]) > 45) {
 					motor_set(MOTOR_ONE, 0);
 					motor_set(MOTOR_TWO, 0);
 					motor_set(MOTOR_THREE, 0);
 					motor_set(MOTOR_FOUR, 0);
 					o = 0;
 				}
+				*/
 
 				#ifdef PID_PRINT_DEBUG
-					if(pid_print_flag == 10){
+					if(pid_print_flag == 10) {
 						//sprintf(testing, " \nBATT: {%d} | ", (int)battery_get_voltage());
 						//UART_SendString(testing);
 						
@@ -220,10 +216,10 @@ int main (void) {
 			/**/
 				clear_tick_timer_flag(PID_TIMER_ID);
 			}
-
 			#ifdef PID_TIME_TEST
 					led_off(DIGITAL_PIN_1);
-			#endif
+				#endif
+
 		#endif // PID_DEBUG
 
 
@@ -234,9 +230,9 @@ int main (void) {
 		  				toggle_led(GP_LED2);
 			  		#endif
 	  			#endif
-				status_update_time(0xFFFFFFFFFFFFFFFF);
-				status_update_longitude(0xFFFFFFFFFFFFFFFF);
-				status_update_latitude(0xFFFFFFFFFFFFFFFF);
+				status_update_time(0xABCDEF12);
+				status_update_longitude(420.69);
+				status_update_latitude(420.69);
 
 				packet_send(STATUS_PACKET_TYPE);
 				clear_tick_timer_flag(PACKET_TIMER_ID);

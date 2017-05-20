@@ -18,6 +18,12 @@ void ADXL345_ReadAccel(double *a_x, double *a_y, double *a_z);
 void ADXL345_LowPass_Filter(double x, double y, double z);
 void ADXL345_Calibrate(void);
 
+static double alpha = 0.2;
+
+static double ux = 0; 
+static double uy = 0; 
+static double uz = 0;
+
 void InitializeADXL345(void)
 {
     uint8_t zero = 0;
@@ -54,7 +60,7 @@ void InitializeADXL345(void)
     _lowpass_x = 0;
 
     _delay_ms(2); // Arbitrary delay amount
-    ADXL345_Calibrate();
+    //ADXL345_Calibrate();
 }
 
 void ADXL345_Calibrate(void)
@@ -110,9 +116,8 @@ void ADXL345_ReadAccel(double *a_x, double *a_y, double *a_z)
 
 void ADXL345_UpdateData(void)
 {
-    double x, y, z;
-    ADXL345_ReadAccel(&x, &y, &z);
-    ADXL345_LowPass_Filter(x, y, z);
+    ADXL345_ReadAccel(&ux, &uy, &uz);
+    ADXL345_LowPass_Filter(ux, uy, uz);
 
     #ifdef IMU_UPSIDEDOWN
         _a_x = -1 * _lowpass_x;
@@ -127,8 +132,6 @@ void ADXL345_UpdateData(void)
 
 void ADXL345_LowPass_Filter(double x, double y, double z)
 {
-  double alpha = 0.2;
-
   _lowpass_x = x * alpha + (_lowpass_x * (1.0 - alpha));
   _lowpass_y = y * alpha + (_lowpass_y * (1.0 - alpha));
   _lowpass_z = z * alpha + (_lowpass_z * (1.0 - alpha));

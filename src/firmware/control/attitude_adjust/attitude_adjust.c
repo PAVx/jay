@@ -83,10 +83,10 @@ void AttitudeAdjustGetError(int motor_changes[NUM_MOTORS]){
 	pitchErrorInt	/= 10;
 	rollErrorInt	/= 10;
 
-	motor_changes[MOTOR_ONE - 1] = _throttle - pitchErrorInt - rollErrorInt + yawErrorInt; 	//Calculate the pulse for esc 4 (front-left - CW)
-	motor_changes[MOTOR_TWO - 1] = _throttle - pitchErrorInt + rollErrorInt - yawErrorInt; 	//Calculate the pulse for esc 1 (front-right - CCW)
-	motor_changes[MOTOR_THREE - 1] = _throttle + pitchErrorInt - rollErrorInt - yawErrorInt; //Calculate the pulse for esc 3 (rear-left - CCW)
-	motor_changes[MOTOR_FOUR - 1] = _throttle + pitchErrorInt + rollErrorInt + yawErrorInt; 	//Calculate the pulse for esc 2 (rear-right - CW)
+	motor_changes[MOTOR_ONE - 1] = _throttle - pitchErrorInt + rollErrorInt + yawErrorInt; 	//Calculate the pulse for esc 4 (front-left - CW)
+	motor_changes[MOTOR_TWO - 1] = _throttle - pitchErrorInt - rollErrorInt - yawErrorInt; 	//Calculate the pulse for esc 1 (front-right - CCW)
+	motor_changes[MOTOR_THREE - 1] = _throttle + pitchErrorInt + rollErrorInt - yawErrorInt; //Calculate the pulse for esc 3 (rear-left - CCW)
+	motor_changes[MOTOR_FOUR - 1] = _throttle + pitchErrorInt - rollErrorInt + yawErrorInt; 	//Calculate the pulse for esc 2 (rear-right - CW)
 
 	_throttle = 0;
 

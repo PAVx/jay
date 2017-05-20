@@ -7,7 +7,6 @@
 #include "status.h"
 #include "packet.h"
 #include "system.h"
-#include "types.h"
 
 static StatusPacket_t statuses[DEFAULT_NUM_SIBLINGS + 1];
 static StatusPacket_t this_status_packet;
@@ -76,32 +75,51 @@ void send_status_packet(uint8_t destination_address) {
 
 void status_update_longitude(double longitude) {
 	uint8_t buff[8];
+	uint64_t binary_double = 0;
+	uint8_t i = 0;
 
-	double_to_byte_array(longitude, buff);
-	memset(&buff[4], 0, 4);
+	memcpy(&binary_double, &longitude, sizeof(double));
+
+
+	for (i = 0; i < 8; i++) {
+		buff[7 - i] = (uint8_t)((binary_double >> (i * 8)) & 0x00000000000000FF);
+	}
+
 	packet_data_inject(STATUS_PACKET_TYPE, LONGITUDE_DATA_POS, 8, buff);
 }
 
 void status_update_latitude(double latitude) {
 	uint8_t buff[8];
+	uint64_t binary_double = 0;
+	uint8_t i = 0;
 
-	double_to_byte_array(latitude, buff);
-	memset(&buff[4], 0, 4);
+	memcpy(&binary_double, &latitude, sizeof(double));
+
+	for (i = 0; i < 8; i++) {
+		buff[7 - i] = (uint8_t)((binary_double >> (i * 8)) & 0x00000000000000FF);
+	}
+
 	packet_data_inject(STATUS_PACKET_TYPE, LATITUDE_DATA_POS, 8, buff);
 }
 void status_update_time(uint64_t time) {
 	uint8_t buff[8];
+	uint8_t i = 0;
 
-	double_to_byte_array(binary_to_double(time), buff);
-	memset(&buff[4], 0, 4);
+	for (i = 0; i < 8; i++) {
+		buff[7 - i] = (uint8_t)((time >> (i * 8)) & 0x00000000000000FF);
+	}
+	
 	packet_data_inject(STATUS_PACKET_TYPE, TIME_DATA_POS, 8, buff);
 }
 
 void status_update_status_vector(uint64_t status) {
 	uint8_t buff[8];
+	uint8_t i = 0;
 
-	double_to_byte_array(binary_to_double(status), buff);
-	memset(&buff[4], 0, 4);
+	for (i = 0; i < 8; i++) {
+		buff[7 - i] = (uint8_t)((status >> (i * 8)) & 0x00000000000000FF);
+	}
+
 	packet_data_inject(STATUS_PACKET_TYPE, STATUS_DATA_POS, 8, buff);
 }
 
