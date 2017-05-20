@@ -1,8 +1,8 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -12,9 +12,9 @@
 #include "system.h"
 #include "drivers.h"
 #include "protocols.h"
-#define NUM_COMP 4
+#define NUM_COMP 3
 #define MAX_COMPARE_VALUE 65535
-#define SYSTEM_TIMEOUT (20) 
+#define SYSTEM_TIMEOUT (20)
 typedef struct {
     uint16_t value;
     uint16_t period;
@@ -49,7 +49,7 @@ void system_tick(void) {
 	_tick_count++;
 
 	if ((lapsed >= SYSTEM_TIMEOUT) && (_ticked == FALSE)) {
-    
+
 		_ticked = TRUE;
 		lapsed = 0;
 	}
@@ -61,14 +61,14 @@ void system_tick(void) {
         _tick_count++;
         for(uint8_t i = 0; i < NUM_COMP; i++) {
             if (compare[i].enable) {
-                if(_tick_count >= compare[i].value && !compare[i].overflow) {  
-                
+                if(_tick_count >= compare[i].value && !compare[i].overflow) {
+
                     compare[i].value += compare[i].period;
                     if (compare[i].value <= _tick_count) {
-                        compare[i].overflow = true;    
+                        compare[i].overflow = true;
                     }
                     compare[i].flag = true;
-                }   
+                }
             }
         }
         if (_tick_count > MAX_COMPARE_VALUE) {
@@ -94,4 +94,3 @@ bool tick_timer_flag(uint8_t compare_x) {
 void clear_tick_timer_flag(uint8_t compare_x) {
     compare[compare_x].flag = false;
 }
-

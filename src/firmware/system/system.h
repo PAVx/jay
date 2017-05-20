@@ -9,7 +9,7 @@
 
 // SYSTEM DEFINES
 #define COM (1)
-//#define PACKET (1)
+#define PACKET (1)
 #define LEDS (1)
 #define MOTORS (1)
 #define SYSTEM_TICK (1)
@@ -18,11 +18,6 @@
 #define PID_CONTROLLER (1)
 #define BATTERY (1)
 #define IR_CAM (1)
-
-#ifdef IR_CAM
-	#define IR_CAM_TIMER_ID (2)
-	#define IR_CAM_TIMER_UPDATE_TIME_MS (1000000)
-#endif
 
 #ifdef IMU
 	#define GYRO (1)
@@ -48,6 +43,8 @@
 #define DEVICE_ADDRESS (0x01)
 ////////////////////////////
 #define BROADCAST_ALL_DESTINATION_ADDRESS (0xAA)
+#define GROUND_STATION_ADDRESS (0xCC)
+
 #define u_sec 1000000
 #ifndef F_CPU
 	#define F_CPU 16000000UL
@@ -84,21 +81,20 @@
 
 		#ifdef IMU
 			#define IMU_UPDATE_RATE (250)
-			#define IMU_UPDATE_PERIOD_SECONDS (0.004)//(0.002420) // measured with OScope -> 0.0033
-			#define IMU_UPDATE_TIME_MS (4000) //us
+			//#define IMU_UPDATE_PERIOD_SECONDS (0.004)//(0.002420) // measured with OScope -> 0.0033
+			#define IMU_UPDATE_TIME_US (4000) //us
 			#define IMU_TIMER_ID (1)
 		#endif
 
 		#ifdef PACKET
-			#define PACKET_TIMER_ID (3)
+			#define PACKET_TIMER_ID (2)
 			#define PACKET_UPDATE_TIME_MS (200000)
 		#endif
 
 		#define PID_RATE (125)	// Hz
-		#define PID_PERIOD ((TICK_PERIOD_us * u_sec)/PID_RATE)
 		// timer0 is limited to 52 Hz -- DEAL WITH IT
 		#define PID_UPDATE_PERIOD_SECONDS (0.008)
-		#define PID_TIMER_UPDATE_TIME_MS (8000) //ms for timer
+		#define PID_TIMER_UPDATE_TIME_US (8000) // us for timer
 		#define PID_TIMER_ID (0)
 
 		#define TIMER_PERIOD ((TIMER0_PERIOD * 1000) / F_CPU)

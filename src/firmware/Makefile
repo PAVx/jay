@@ -4,8 +4,8 @@ BURNER						= avrdude
 CC_AVR						= atmega328p
 F_CPU						= 16000000UL
 BURNER_AVR					= ATMEGA328P
-BURNER_PROGRAMMER				= usbasp # Arduino
-COMPILER_PATH					= /dev/tty.usb*
+BURNER_PROGRAMMER				= Arduino
+COMPILER_PATH					= COM4 #/dev/tty.usb*
 OBJECT_COPY					= avr-objcopy
 BAUDRATE					= 115200
 ###########################################
@@ -87,12 +87,16 @@ SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/
 SEARCHABLE_HEADER_FILE_DIRS	+= -I control/status
 # MANUAL CONTROL #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/manual
+# CONTROL PACKETS #
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/control_packets
 # ANGLES #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/angles
 # ATTITUDE ADJUST #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/attitude_adjust
 # PID #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/pid
+# INITIALIZATION PACKETS #
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/init_packets
 # COMPLIMENTARY FILTER #
 #SEARCHABLE_HEADER_FILE_DIRS	+= -I control/complimentary
 # SENSOR FUSION #
@@ -168,6 +172,8 @@ CSOURCE						+= system/memory/nonvolatile/nvmem.c
 # CONTROL #
 # STATUS #
 CSOURCE						+= control/status/status.c
+# CONTROL PACKETS #
+CSOURCE						+= control/control_packets/ctrl_pkt.c
 # MANUAL CONTROL #
 CSOURCE						+= control/manual/manual_control.c
 # ANGLES #
@@ -176,6 +182,8 @@ CSOURCE						+= control/angles/angles.c
 CSOURCE						+= control/attitude_adjust/attitude_adjust.c
 # PID #
 CSOURCE						+= control/pid/pid.c
+# INIT PACKETS #
+CSOURCE						+= control/init_packets/init_packet.c
 # COMPLIMENTARY FILTER #
 #CSOURCE						+= control/complimentary/comp_filter.c
 # SENSOR FUSION #
