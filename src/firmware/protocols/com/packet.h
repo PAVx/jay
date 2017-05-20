@@ -34,7 +34,8 @@ struct _variable_packet_descriptor {
 
 // type 0 - manual control packet type (control/manual_control.h)
 // type 1 - status packets from other vehicles (control/status.h)
-#define MAX_NUMBER_PACKET_TYPES (2)
+// type 2 - control packet from ground (control/control_packets.h
+#define MAX_NUMBER_PACKET_TYPES (3)
 
 typedef struct _variable_packet_descriptor PacketDescriptor_t;
 PacketDescriptor_t packet_opcodes[MAX_NUMBER_PACKET_TYPES];

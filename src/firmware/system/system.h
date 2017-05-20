@@ -9,14 +9,14 @@
 
 // SYSTEM DEFINES
 #define COM (1)
-//#define PACKET (1)
-#define LEDS (1)
-#define MOTORS (1)
+#define PACKET (1)
+//#define LEDS (1)
+//#define MOTORS (1)
 #define SYSTEM_TICK (1)
-#define IMU (1)
+//#define IMU (1)
 //#define GPS (1)
-#define PID_CONTROLLER (1)
-#define BATTERY (1)
+//#define PID_CONTROLLER (1)
+//#define BATTERY (1)
 //#define IR_CAM (1)
 
 #ifdef IR_CAM

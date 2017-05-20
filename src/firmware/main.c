@@ -8,14 +8,14 @@
 #include <string.h>
 #include <util/delay.h>
 
-#define LED_DEBUG
+//#define LED_DEBUG
 //#define PACKET_DEBUG
 #ifdef BATTERY
 	#define BATTERY_DEBUG
 #endif
-#define PID_DEBUG
-#define PID_PRINT_DEBUG
-#define PID_TIME_TEST
+//#define PID_DEBUG
+//#define PID_PRINT_DEBUG
+//#define PID_TIME_TEST
 //static uint8_t roll_static_count = 0;
 //static uint8_t pitch_static_count = 0;
 
@@ -44,7 +44,6 @@ static uint8_t o = 0;
 
 int main (void) {
 	system_initialize();
-
 	AttituteAdjustSetDesired(0, 0, 0); // testing this attitude
  	AttitudeSetThrottle(0);
 
@@ -225,16 +224,20 @@ int main (void) {
 
 		#ifdef PACKET	
 			if (tick_timer_flag(PACKET_TIMER_ID)) {
+                
+                //UART_SendString(" main\n");
 				#ifdef LED_DEBUG
 					#ifdef LEDS
 		  				toggle_led(GP_LED2);
 			  		#endif
 	  			#endif
-				status_update_time(0xABCDEF12);
-				status_update_longitude(420.69);
-				status_update_latitude(420.69);
+				control_update_command(0xFF);
+				control_update_left(420.69);
+				control_update_right(420.69);
+				control_update_top(420.69);
+				control_update_bottom(420.69);
 
-				packet_send(STATUS_PACKET_TYPE);
+				packet_send(CONTROL_PACKET_TYPE);
 				clear_tick_timer_flag(PACKET_TIMER_ID);
 			}
 		#endif
