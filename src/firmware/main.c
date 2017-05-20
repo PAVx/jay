@@ -20,7 +20,7 @@
 //static uint8_t pitch_static_count = 0;
 
 #ifdef IR_CAM
-	#define IR_CAM_DEBUG (1)
+	//#define IR_CAM_DEBUG (1)
 #endif
 
 static uint8_t ref_init = 0;
@@ -76,10 +76,10 @@ int main (void) {
 
 		#ifdef BATTERY_DEBUG
 			battery_charged();
-			
+
 		#endif
 
-		
+
 		#ifdef PACKET_DEBUG
 		  	#ifdef COM
 		  		#ifdef UART
@@ -109,16 +109,20 @@ int main (void) {
 	            }
 
 	        #endif
-	    #endif
+	    	#endif
 
 		#ifdef PID_DEBUG
 
 			if (tick_timer_flag(IMU_TIMER_ID)) {
+				#ifdef PID_TIME_TEST
+ 					led_on(DIGITAL_PIN_1);
+ 				#endif
+
 				Accel_Update();
 				//Mag_Update();
-
+				Gyro_GetTemp();
 				//cli();
-				
+
 				imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
 /*
 				if (((abs(ypr[1]) - abs(last_ypr[1])) / IMU_UPDATE_PERIOD_SECONDS) > 400) {
@@ -153,9 +157,12 @@ int main (void) {
 				}
 */
 				//sei();
-	
+
 				clear_tick_timer_flag(IMU_TIMER_ID);
-			} 
+				#ifdef PID_TIME_TEST
+					led_off(DIGITAL_PIN_1);
+				#endif
+			}
 
 			if(tick_timer_flag(PID_TIMER_ID)) {
 
@@ -163,11 +170,6 @@ int main (void) {
 		  			toggle_led(GP_LED1);
 			  	#endif
 
-		  		#ifdef PID_TIME_TEST
- 					led_on(DIGITAL_PIN_1);
- 				#endif
-
-		  		
 				AttituteAdjustUpdatePID(0, ypr[1], ypr[2]);
 
 				// Update Motors
@@ -191,39 +193,36 @@ int main (void) {
 					if(pid_print_flag == 10) {
 						//sprintf(testing, " \nBATT: {%d} | ", (int)battery_get_voltage());
 						//UART_SendString(testing);
-						
-						sprintf(testing, " \nY: {%lf} | ", ypr[0]);
-						UART_SendString(testing);
-						sprintf(testing, " P: {%lf} | ", ypr[1]);
-						UART_SendString(testing);
-						sprintf(testing, " R: {%lf}          ", ypr[2]);
-						UART_SendString(testing);
 
-						sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
-						UART_SendString(testing);
-						sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
-						UART_SendString(testing);
-						sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
-						UART_SendString(testing);
-						sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
-						UART_SendString(testing);
+						// sprintf(testing, " \nY: {%lf} | ", ypr[0]);
+						// UART_SendString(testing);
+						// sprintf(testing, " P: {%lf} | ", ypr[1]);
+						// UART_SendString(testing);
+						// sprintf(testing, " R: {%lf}          ", ypr[2]);
+						// UART_SendString(testing);
+						//
+						// sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
+						// UART_SendString(testing);
+						// sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
+						// UART_SendString(testing);
+						// sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
+						// UART_SendString(testing);
+						// sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
+						// UART_SendString(testing);
 
 						pid_print_flag = 0;
-					
+
 					}
 					else pid_print_flag ++;
 				#endif
 			/**/
 				clear_tick_timer_flag(PID_TIMER_ID);
 			}
-			#ifdef PID_TIME_TEST
-					led_off(DIGITAL_PIN_1);
-				#endif
 
 		#endif // PID_DEBUG
 
 
-		#ifdef PACKET	
+		#ifdef PACKET
 			if (tick_timer_flag(PACKET_TIMER_ID)) {
 				#ifdef LED_DEBUG
 					#ifdef LEDS
@@ -241,11 +240,13 @@ int main (void) {
 
 		#ifdef IR_CAM_DEBUG
 			if (tick_timer_flag(IR_CAM_TIMER_ID)) {
-				
+
 				D6T8L_UpdateData();
 				status_update_status_vector((uint64_t)D6T8L_GetAvgData());
 
 				clear_tick_timer_flag(IR_CAM_TIMER_ID);
+				sprintf(testing, " Temp: %d\n", D6T8L_GetAvgData());
+				UART_SendString(testing);
 			}
 		#endif
 

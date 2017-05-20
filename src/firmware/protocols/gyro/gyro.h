@@ -19,4 +19,6 @@ double Gyro_GetY(void);
 
 double Gyro_GetZ(void);
 
+double Gyro_GetTemp(void);
+
 #endif

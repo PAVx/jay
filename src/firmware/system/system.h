@@ -17,7 +17,7 @@
 //#define GPS (1)
 #define PID_CONTROLLER (1)
 #define BATTERY (1)
-//#define IR_CAM (1)
+#define IR_CAM (1)
 
 #ifdef IR_CAM
 	#define IR_CAM_TIMER_ID (2)
@@ -25,7 +25,7 @@
 #endif
 
 #ifdef IMU
-	//#define GYRO (1)
+	#define GYRO (1)
 	#define ACCEL (1)
 	//#define MAGNOMETER (1)
 	#ifdef GYRO
@@ -77,14 +77,15 @@
 
 			#define SOFTUART_TIMERTOP (F_CPU/TIMER0_PRESCALE/SOFTUART_BAUD_RATE/3 - 1)
 			#define TIMER0_PERIOD (SOFTUART_TIMERTOP)
-            #define TICK_PERIOD_us ((SOFTUART_TIMERTOP * TIMER0_PRESCALE * u_sec)/ F_CPU)
+            		#define TICK_PERIOD_us ((SOFTUART_TIMERTOP * TIMER0_PRESCALE * u_sec)/ F_CPU)
+
+			#define SYSTEM_TICK_OFFSET (1.062)	// actual us delay will be SYSTEM_TICK_OFFSET*EXPECTED_US_DELAY
 		#endif
 
 		#ifdef IMU
-			#define IMU_UPDATE_RATE (2000)
-			// timer0 is limited to 52 Hz -- DEAL WITH IT
-			#define IMU_UPDATE_PERIOD_SECONDS (0.002420) // measured with OScope
-			#define IMU_UPDATE_TIME_MS (500) //us
+			#define IMU_UPDATE_RATE (250)
+			#define IMU_UPDATE_PERIOD_SECONDS (0.004)//(0.002420) // measured with OScope -> 0.0033
+			#define IMU_UPDATE_TIME_MS (4000) //us
 			#define IMU_TIMER_ID (1)
 		#endif
 
@@ -93,11 +94,11 @@
 			#define PACKET_UPDATE_TIME_MS (200000)
 		#endif
 
-		#define PID_RATE (2777)	// Hz
+		#define PID_RATE (125)	// Hz
 		#define PID_PERIOD ((TICK_PERIOD_us * u_sec)/PID_RATE)
 		// timer0 is limited to 52 Hz -- DEAL WITH IT
-		#define PID_UPDATE_PERIOD_SECONDS (0.002420)
-		#define PID_TIMER_UPDATE_TIME_MS (666) //ms for timer
+		#define PID_UPDATE_PERIOD_SECONDS (0.008)
+		#define PID_TIMER_UPDATE_TIME_MS (8000) //ms for timer
 		#define PID_TIMER_ID (0)
 
 		#define TIMER_PERIOD ((TIMER0_PERIOD * 1000) / F_CPU)

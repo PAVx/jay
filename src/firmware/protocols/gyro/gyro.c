@@ -1,4 +1,4 @@
-/* 
+/*
 	PAVx -- Pod-Based Autonomous Vehicles
 	Library Created By: Sargis S Yonan
 	March 2017
@@ -31,4 +31,9 @@ double Gyro_GetY(void)
 double Gyro_GetZ(void)
 {
     return ITG3200_GetZ();
+}
+
+double Gyro_GetTemp(void)
+{
+    return ITG3200_GetTemp();
 }
