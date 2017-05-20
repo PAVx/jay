@@ -9,6 +9,7 @@
 #include <util/delay.h>
 
 #define LED_DEBUG
+//#define WAIT_FOR_SYSTEM_ACK
 //#define PACKET_DEBUG
 #ifdef BATTERY
 	#define BATTERY_DEBUG
@@ -50,6 +51,13 @@ static uint8_t o = 0;
 
 int main (void) {
 	system_initialize();
+
+
+	#ifdef WAIT_FOR_SYSTEM_ACK
+		while(!system_acknowledged()) {
+			send_initialization_packet();
+		}
+	#endif
 
 	AttituteAdjustSetDesired(0, 0, 0); // testing this attitude
  	AttitudeSetThrottle(0);
