@@ -10,11 +10,12 @@
 
 #define LED_DEBUG
 //#define WAIT_FOR_SYSTEM_ACK
-//#define PACKET_DEBUG
+#define PACKET_DEBUG
 #ifdef BATTERY
 	#define BATTERY_DEBUG
 #endif
 #define PID_DEBUG
+//#define KEYBOARD_DEBUG
 //#define PID_PRINT_DEBUG
 //#define PID_TIME_TEST
 //static uint8_t roll_static_count = 0;
@@ -31,7 +32,9 @@
 	static uint16_t altitude = 420;
 #endif
 
-static uint8_t ref_init = 0;
+#ifdef KEYBOARD_DEBUG
+	static uint8_t ref_init = 0;
+#endif
 
 char testing[30];
 char sys_print[32];
@@ -70,7 +73,7 @@ int main (void) {
 
 	for(;;) {
 
-		#ifdef UART
+		#ifdef KEYBOARD_DEBUG
 			if(!UART_IsEmpty()){
 				op_code = UART_GetByte();
 
@@ -88,15 +91,6 @@ int main (void) {
 				}
 			}
 		#endif
-
-		#ifdef PACKET_DEBUG
-		  	#ifdef COM
-		  		#ifdef UART
-					receive_packet();
-				#endif
-		  		packet_send();
-		  	#endif
-		#endif // PACKET_DEBUG
 
 		#ifdef GPS_DEBUG
 	        #ifdef GPS
@@ -230,10 +224,10 @@ int main (void) {
 
 		#endif // PID_DEBUG
 
+		#ifdef PACKET_DEBUG
+			packet_receiver();
 
-		#ifdef PACKET
 			if (tick_timer_flag(PACKET_TIMER_ID)) {
-
 				// update IR cam data
 				D6T8L_UpdateData();
 
@@ -260,7 +254,7 @@ int main (void) {
 					(uint64_t)((D6T8L_GetAvgData() 		<< 0)	& 0x00000000000000FF)
 					);
 
-				packet_send(STATUS_PACKET_TYPE);
+				//packet_send(STATUS_PACKET_TYPE);
 				clear_tick_timer_flag(PACKET_TIMER_ID);
 			}
 		#endif
