@@ -6,14 +6,14 @@
 
 // mag.c
 #include "mag.h"
-#include "hmc5883l_mag.h"
+#include "imu.h"
 
 void InitializeMag(void) {
-	HMC5883L_init();
+	HMC5883L_Init();
 }
 
 void Mag_Update(void) {
-	HMC5883L_Update();
+	HMC5883L_Read();
 }
 
 double Mag_GetX(void) {

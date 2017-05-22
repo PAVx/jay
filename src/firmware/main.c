@@ -10,19 +10,19 @@
 
 #define LED_DEBUG
 //#define WAIT_FOR_SYSTEM_ACK
-#define PACKET_DEBUG
+//#define PACKET_DEBUG
 #ifdef BATTERY
 	#define BATTERY_DEBUG
 #endif
 #define PID_DEBUG
-//#define KEYBOARD_DEBUG
-//#define PID_PRINT_DEBUG
-//#define PID_TIME_TEST
+#define KEYBOARD_DEBUG
+#define PID_PRINT_DEBUG
+#define PID_TIME_TEST
 //static uint8_t roll_static_count = 0;
 //static uint8_t pitch_static_count = 0;
 
 
-#define SEND_STATUS_PACKET
+//#define SEND_STATUS_PACKET
 
 #ifdef SEND_STATUS_PACKET
 	#ifdef IR_CAM
@@ -122,11 +122,13 @@ int main (void) {
  				#endif
 
 				Accel_Update();
-				//Mag_Update();
-				Gyro_GetTemp();
+				_delay_ms(10);
+				Mag_Update();
+				_delay_ms(10);
+				//Gyro_GetTemp();
 				//cli();
 
-				imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
+				imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
 /*
 				if (((abs(ypr[1]) - abs(last_ypr[1])) / IMU_UPDATE_PERIOD_SECONDS) > 400) {
 					pitch_static_count++;
@@ -197,12 +199,25 @@ int main (void) {
 						//sprintf(testing, " \nBATT: {%d} | ", (int)battery_get_voltage());
 						//UART_SendString(testing);
 
-						// sprintf(testing, " \nY: {%lf} | ", ypr[0]);
-						// UART_SendString(testing);
-						// sprintf(testing, " P: {%lf} | ", ypr[1]);
-						// UART_SendString(testing);
-						// sprintf(testing, " R: {%lf}          ", ypr[2]);
-						// UART_SendString(testing);
+						sprintf(testing, " \nY: {%lf} | ", ypr[0]);
+						UART_SendString(testing);
+						sprintf(testing, " P: {%lf} | ", ypr[1]);
+						UART_SendString(testing);
+						sprintf(testing, " R: {%lf}          ", ypr[2]);
+						UART_SendString(testing);
+
+						sprintf(testing, " \nax: {%lf} | ", Accel_GetX());
+						UART_SendString(testing);
+						sprintf(testing, " ay: {%lf} | ", Accel_GetY());
+						UART_SendString(testing);
+						sprintf(testing, " az: {%lf}          ", Accel_GetZ());
+						UART_SendString(testing);
+
+						sprintf(testing, " \nmx: {%lf} | ", Mag_GetX());
+						UART_SendString(testing);
+						sprintf(testing, " my: {%lf} | ", Mag_GetY());
+						UART_SendString(testing);
+
 						//
 						// sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
 						// UART_SendString(testing);

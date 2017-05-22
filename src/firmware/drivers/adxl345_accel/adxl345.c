@@ -20,8 +20,8 @@ void ADXL345_Calibrate(void);
 
 static double alpha = 0.2;
 
-static double ux = 0; 
-static double uy = 0; 
+static double ux = 0;
+static double uy = 0;
 static double uz = 0;
 
 void InitializeADXL345(void)
@@ -60,7 +60,7 @@ void InitializeADXL345(void)
     _lowpass_x = 0;
 
     _delay_ms(2); // Arbitrary delay amount
-    //ADXL345_Calibrate();
+    ADXL345_Calibrate();
 }
 
 void ADXL345_Calibrate(void)
