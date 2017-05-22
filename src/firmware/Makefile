@@ -42,6 +42,8 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/nmea
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/d6t8l_ir
 # ADC DRIVER
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adc
+# IMU DRIVER
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/imu
 
 ####################
 # PROTOCOL HEADERS #
@@ -130,6 +132,8 @@ CSOURCE						+= drivers/nmea/nmea.c
 CSOURCE						+= drivers/adc/adc.c
 # IR #
 CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
+# IMU #
+CSOURCE						+= drivers/imu/imu.c
 ####################
 
 ####################

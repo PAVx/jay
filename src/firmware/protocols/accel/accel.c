@@ -5,17 +5,17 @@
 */
 
 #include "accel.h"
-#include "adxl345.h"
+#include "imu.h"
 
 void InitializeAccel(void)
 {
-    InitializeADXL345();
+    ADXL345_Init();
 }
 
 void Accel_Update(void)
 {
     // TODO: make interrupt based
-    ADXL345_UpdateData();
+    ADXL345_Read();
 }
 
 double Accel_GetX(void)

@@ -39,23 +39,29 @@ void HMC5883L_init(void){
 
 void HMC5883L_Update(void) {
 
+	uint8_t buff[6];
+
 	i2c_start(HMC5883L_WRITE);
 	i2c_write(0x03); // set pointer to X axis MSB
 	i2c_stop();
 
-	i2c_start(HMC5883L_READ);
+	i2c_receive(HMC5883L_WRITE, buff, 6);
 
-	_m_x = ((uint8_t)i2c_read_ack())<<8;
-	_m_x |= i2c_read_ack();
+        _m_x = ((buff[0] << 8) | buff[1]);
+        _m_y = ((buff[2] << 8) | buff[3]);
+        _m_z = ((buff[4] << 8) | buff[5]);
 
-	_m_z = ((uint8_t)i2c_read_ack())<<8;
-	_m_z |= i2c_read_ack();
+	// _m_x = ((uint8_t)i2c_read_ack())<<8;
+	// _m_x |= i2c_read_ack();
+	//
+	// _m_z = ((uint8_t)i2c_read_ack())<<8;
+	// _m_z |= i2c_read_ack();
+	//
+	// _m_y = ((uint8_t)i2c_read_ack())<<8;
+	// _m_y |= i2c_read_nack();
 
-	_m_y = ((uint8_t)i2c_read_ack())<<8;
-	_m_y |= i2c_read_nack();
 
-
-	i2c_stop();
+	// i2c_stop();
 
 	HMC5883L_LowPass_Filter(_m_x, _m_y, _m_z);
 	_m_x = (int16_t)_lowpass_x;
