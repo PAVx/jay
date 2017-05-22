@@ -64,6 +64,8 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/accel
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/gps
 # BATTERY #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/battery
+# I2C Protocol #
+SEARCHABLE_HEADER_FILE_DIRS		+= -I protocols/i2c_protocol
 
 ####################
 # SYSTEM HEADERS #
@@ -152,6 +154,8 @@ CSOURCE						+= protocols/accel/accel.c
 CSOURCE                    	+= protocols/gps/gps.c
 # BATTERY #
 CSOURCE                    	+= protocols/battery/battery.c
+# I2C Protocol #
+CSOURCE						+= protocols/i2c_protocol/i2c.c
 ####################
 
 ####################
