@@ -10,15 +10,17 @@
 
 #define LED_DEBUG
 //#define WAIT_FOR_SYSTEM_ACK
-//#define PACKET_DEBUG
+#define PACKET_DEBUG
 #ifdef BATTERY
 	#define BATTERY_DEBUG
 #endif
 #define PID_DEBUG
+//#define KEYBOARD_DEBUG
 //#define PID_PRINT_DEBUG
 //#define PID_TIME_TEST
 //static uint8_t roll_static_count = 0;
 //static uint8_t pitch_static_count = 0;
+
 
 #define SEND_STATUS_PACKET
 
@@ -30,7 +32,9 @@
 	static uint16_t altitude = 420;
 #endif
 
-static uint8_t ref_init = 0;
+#ifdef KEYBOARD_DEBUG
+	static uint8_t ref_init = 0;
+#endif
 
 char testing[30];
 char sys_print[32];
@@ -69,7 +73,7 @@ int main (void) {
 
 	for(;;) {
 
-		#ifdef UART
+		#ifdef KEYBOARD_DEBUG
 			if(!UART_IsEmpty()){
 				op_code = UART_GetByte();
 
@@ -87,15 +91,6 @@ int main (void) {
 				}
 			}
 		#endif
-		
-		#ifdef PACKET_DEBUG
-		  	#ifdef COM
-		  		#ifdef UART
-					receive_packet();
-				#endif
-		  		packet_send();
-		  	#endif
-		#endif // PACKET_DEBUG
 
 		#ifdef GPS_DEBUG
 	        #ifdef GPS
@@ -117,16 +112,20 @@ int main (void) {
 	            }
 
 	        #endif
-	    #endif
+	    	#endif
 
 		#ifdef PID_DEBUG
 
 			if (tick_timer_flag(IMU_TIMER_ID)) {
+				#ifdef PID_TIME_TEST
+ 					led_on(DIGITAL_PIN_1);
+ 				#endif
+
 				Accel_Update();
 				//Mag_Update();
-
+				Gyro_GetTemp();
 				//cli();
-				
+
 				imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
 /*
 				if (((abs(ypr[1]) - abs(last_ypr[1])) / IMU_UPDATE_PERIOD_SECONDS) > 400) {
@@ -161,9 +160,12 @@ int main (void) {
 				}
 */
 				//sei();
-	
+
 				clear_tick_timer_flag(IMU_TIMER_ID);
-			} 
+				#ifdef PID_TIME_TEST
+					led_off(DIGITAL_PIN_1);
+				#endif
+			}
 
 			if(tick_timer_flag(PID_TIMER_ID)) {
 
@@ -171,11 +173,6 @@ int main (void) {
 		  			toggle_led(GP_LED1);
 			  	#endif
 
-		  		#ifdef PID_TIME_TEST
- 					led_on(DIGITAL_PIN_1);
- 				#endif
-
-		  		
 				AttituteAdjustUpdatePID(0, ypr[1], ypr[2]);
 
 				// Update Motors
@@ -199,41 +196,38 @@ int main (void) {
 					if(pid_print_flag == 10) {
 						//sprintf(testing, " \nBATT: {%d} | ", (int)battery_get_voltage());
 						//UART_SendString(testing);
-						
-						sprintf(testing, " \nY: {%lf} | ", ypr[0]);
-						UART_SendString(testing);
-						sprintf(testing, " P: {%lf} | ", ypr[1]);
-						UART_SendString(testing);
-						sprintf(testing, " R: {%lf}          ", ypr[2]);
-						UART_SendString(testing);
 
-						sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
-						UART_SendString(testing);
-						sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
-						UART_SendString(testing);
-						sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
-						UART_SendString(testing);
-						sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
-						UART_SendString(testing);
+						// sprintf(testing, " \nY: {%lf} | ", ypr[0]);
+						// UART_SendString(testing);
+						// sprintf(testing, " P: {%lf} | ", ypr[1]);
+						// UART_SendString(testing);
+						// sprintf(testing, " R: {%lf}          ", ypr[2]);
+						// UART_SendString(testing);
+						//
+						// sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
+						// UART_SendString(testing);
+						// sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
+						// UART_SendString(testing);
+						// sprintf(testing, " M3: {%d} | ", (int)motor_get_speed(MOTOR_THREE));
+						// UART_SendString(testing);
+						// sprintf(testing, " M4: {%d}          ", (int)motor_get_speed(MOTOR_FOUR));
+						// UART_SendString(testing);
 
 						pid_print_flag = 0;
-					
+
 					}
 					else pid_print_flag ++;
 				#endif
 			/**/
 				clear_tick_timer_flag(PID_TIMER_ID);
 			}
-			#ifdef PID_TIME_TEST
-					led_off(DIGITAL_PIN_1);
-				#endif
 
 		#endif // PID_DEBUG
 
+		#ifdef PACKET_DEBUG
+			packet_receiver();
 
-		#ifdef PACKET	
 			if (tick_timer_flag(PACKET_TIMER_ID)) {
-				
 				// update IR cam data
 				D6T8L_UpdateData();
 
@@ -251,28 +245,17 @@ int main (void) {
 				} else {
 					battery_level = 0x00;
 				}
-				
-				status_update_status_vector( 
-					(uint64_t)(((uint64_t)altitude 		<< 48) 	& 0xFFFF000000000000) | 
-					(uint64_t)(((uint64_t)ypr[2] 		<< 32) 	& 0x0000FFFF00000000) | 
-					(uint64_t)(((uint64_t)ypr[1] 		<< 16) 	& 0x00000000FFFF0000) | 
-					(uint64_t)(((uint64_t)battery_level << 8) 	& 0x000000000000FF00) | 
+
+				status_update_status_vector(
+					(uint64_t)(((uint64_t)altitude 		<< 48) 	& 0xFFFF000000000000) |
+					(uint64_t)(((uint64_t)ypr[2] 		<< 32) 	& 0x0000FFFF00000000) |
+					(uint64_t)(((uint64_t)ypr[1] 		<< 16) 	& 0x00000000FFFF0000) |
+					(uint64_t)(((uint64_t)battery_level << 8) 	& 0x000000000000FF00) |
 					(uint64_t)((D6T8L_GetAvgData() 		<< 0)	& 0x00000000000000FF)
 					);
 
-				packet_send(STATUS_PACKET_TYPE);
+				//packet_send(STATUS_PACKET_TYPE);
 				clear_tick_timer_flag(PACKET_TIMER_ID);
-			}
-		#endif
-
-		#ifdef IR_CAM_DEBUG
-			if (tick_timer_flag(IR_CAM_TIMER_ID)) {
-				
-				
-				
-				
-
-				clear_tick_timer_flag(IR_CAM_TIMER_ID);
 			}
 		#endif
 

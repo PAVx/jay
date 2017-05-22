@@ -27,7 +27,7 @@ uint8_t system_initialize(void) {
 		#ifdef UART
 			InitializeUART(HW_UART_BAUD);
 		#endif
-	
+
 		#ifdef PACKET
 			initialize_packet_handler();
 			inititialize_status_packet();
@@ -74,7 +74,7 @@ uint8_t system_initialize(void) {
 			#endif
 		#endif
 
-		set_tick_period(IMU_TIMER_ID, IMU_UPDATE_TIME_MS);
+		set_tick_period(IMU_TIMER_ID, IMU_UPDATE_TIME_US);
 	#endif
 
 	// initialize system components
@@ -83,7 +83,7 @@ uint8_t system_initialize(void) {
 		leds_init(GP_LED1);
 		leds_init(GP_LED2);
 
-		
+
 		led_on(GP_LED1);
 		led_off(GP_LED2);
 	#endif
@@ -92,14 +92,13 @@ uint8_t system_initialize(void) {
 	#ifdef PID_CONTROLLER
 		InitializeAttitudeAdjust();
 		// initialize timer
-		set_tick_period(PID_TIMER_ID, PID_TIMER_UPDATE_TIME_MS);
+		set_tick_period(PID_TIMER_ID, PID_TIMER_UPDATE_TIME_US);
 	#endif
 
 	#ifdef IR_CAM
 		InitializeD6T8L();
-		set_tick_period(IR_CAM_TIMER_ID, IR_CAM_TIMER_UPDATE_TIME_MS);
 	#endif
-	
+
 	clock_start();
 	sei();
 
@@ -111,6 +110,6 @@ uint8_t system_initialize(void) {
 	#endif
 
 
-	
+
 	return TRUE;
 }

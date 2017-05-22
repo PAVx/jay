@@ -106,6 +106,19 @@ void ITG3200_ReadGyro(double *temp, double *g_x, double *g_y, double *g_z)
     *temp = ((buff[0] << 8) | buff[1]);       // temperature
 }
 
+void ITG3200_ReadTemp(double *temp)
+{
+    uint8_t buff[8];
+
+    i2c_start(ITG3200_ADDR);
+    i2c_write(0x1B);
+    i2c_stop();
+
+    i2c_receive(ITG3200_ADDR, buff, 2);
+
+    *temp = ((buff[0] << 8) | buff[1]);       // temperature
+}
+
 void ITG3200_UpdateData(void)
 {
     double t, x, y, z;
@@ -146,7 +159,8 @@ double ITG3200_GetZ(void)
 
 double ITG3200_GetTemp(void)
 {
-    return _g_t;//_Calculate_G_Temp(_g_t);
+    ITG3200_ReadTemp(&_g_t);
+    return _Calculate_G_Temp(_g_t);
 }
 
 double _Calculate_G_Temp(double _t_raw)
