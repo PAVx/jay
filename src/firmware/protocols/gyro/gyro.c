@@ -6,16 +6,16 @@
 
 #include "gyro.h"
 #include "adxl345.h"
+#include "imu.h"
 
 void InitializeGyro(void)
 {
-    InitializeITG3200();
+    ITG3200_Init();
 }
 
 void Gyro_Update(void)
 {
-    // TODO: make interrupt based
-    ITG3200_UpdateData();
+    ITG3200_Read();
 }
 
 double Gyro_GetX(void)

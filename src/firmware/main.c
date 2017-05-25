@@ -131,6 +131,7 @@ int main (void) {
 				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS);
 				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
 
+
 				clear_tick_timer_flag(IMU_TIMER_ID);
 				#ifdef PID_TIME_TEST
 					led_off(DIGITAL_PIN_1);
@@ -173,7 +174,7 @@ int main (void) {
 						UART_SendString(testing);
 						sprintf(testing, " R: {%lf}          ", ypr[2]);
 						UART_SendString(testing);
-						//
+
 						// sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
 						// UART_SendString(testing);
 						// sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));

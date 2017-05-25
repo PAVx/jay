@@ -52,6 +52,7 @@ void HMC5883L_Update(void) {
 	//
 	// i2c_start(HMC5883L_READ);
 	//
+
 	// _m_x = ((uint8_t)i2c_read_ack())<<8;
 	// _m_x |= i2c_read_ack();
 	//
@@ -64,7 +65,6 @@ void HMC5883L_Update(void) {
 	_m_x = (uint8_t)buff[0]<<8 | buff[1];
 	_m_y = (uint8_t)buff[2]<<8 | buff[3];
 	_m_z = (uint8_t)buff[4]<<8 | buff[5];
-
 
 	// i2c_stop();
 

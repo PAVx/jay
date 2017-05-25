@@ -44,6 +44,7 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/d6t8l_ir
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adc
 # IMU DRIVER
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/gy85
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/imu
 
 ####################
 # PROTOCOL HEADERS #
@@ -68,6 +69,8 @@ SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/gps
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/battery
 # IMU #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/imu
+# I2C Protocol #
+SEARCHABLE_HEADER_FILE_DIRS		+= -I protocols/i2c_protocol
 
 ####################
 # SYSTEM HEADERS #
@@ -132,6 +135,9 @@ CSOURCE						+= drivers/nmea/nmea.c
 CSOURCE						+= drivers/adc/adc.c
 # IR #
 # CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
+CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
+# IMU #
+CSOURCE						+= drivers/imu/imu.c
 ####################
 CSOURCE						+= drivers/i2c_driver/i2cmaster.c drivers/i2c_driver/i2c.c
 # imu #
@@ -161,6 +167,8 @@ CSOURCE                    	+= protocols/gps/gps.c
 CSOURCE                    	+= protocols/battery/battery.c
 # BATTERY #
 CSOURCE                    	+= protocols/imu/imu.c
+# I2C Protocol #
+CSOURCE						+= protocols/i2c_protocol/i2c.c
 ####################
 
 ####################
