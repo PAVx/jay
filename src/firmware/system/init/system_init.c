@@ -41,36 +41,14 @@ uint8_t system_initialize(void) {
 
 	#ifdef IMU
 
-		#ifdef GYRO
-			InitializeGyro();
+		#if defined(GYRO) || defined(ACCEL) || defined(MAGNOMETER)
+			IMU_Init();
 			#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
 				_uart_driver_FlushTransmitBuffer();
 				UART_SendString(" i2c initialized...\n");
 				_uart_driver_FlushTransmitBuffer();
-				UART_SendString(" gyroscope initialized...\n");
+				UART_SendString(" imu initialized...\n");
 				_uart_driver_FlushTransmitBuffer();
-			#endif
-		#endif
-
-		#ifdef ACCEL
-			InitializeAccel();
-			#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-				#ifndef GYRO
-					_uart_driver_FlushTransmitBuffer();
-					UART_SendString(" i2c initialized...\n");
-				#endif
-				UART_SendString("accel initialized...\n");
-			#endif
-		#endif
-
-		#ifdef MAGNOMETER
-			InitializeMag();
-			#ifdef SYSTEM_INIT_DEBUG_PRINTOUTS
-				#ifndef GYRO
-					_uart_driver_FlushTransmitBuffer();
-					UART_SendString("i2c initialized...\n");
-				#endif
-				UART_SendString("magnometer initialized...\n");
 			#endif
 		#endif
 

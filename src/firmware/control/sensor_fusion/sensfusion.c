@@ -48,9 +48,9 @@ void IMUResetFlag(void) {
 #ifdef MADWICK_QUATERNION_IMU
   #define BETA_DEF     0.01    // 2 * proportional gain
 #else // MAHONY_QUATERNION_IMU
-	#define TWO_KP_DEF  (2.0 * 10) // 2 * proportional gain
+	#define TWO_KP_DEF  (2.0 * 15) // 2 * proportional gain
 	#define TWO_KI_DEF  (2.0 * 0.000001)//1) // 2 * integral gain
-	#define TWO_KD_DEF  (2.0 * 14.0)
+	#define TWO_KD_DEF  (0)//2.0 * 0)
 #endif
 
 #ifdef MADWICK_QUATERNION_IMU
@@ -65,7 +65,7 @@ void IMUResetFlag(void) {
   double derivativeFBx = 0.0;
   double derivativeFBy = 0.0;
   double derivativeFBz = 0.0;  // derivative error terms scaled by Kd
-  
+
 #endif
 
 double q0 = 1.0;
@@ -199,10 +199,11 @@ static void sensfusion6UpdateQImpl(double gx, double gy, double gz, double ax, d
 // 02/10/2011 SOH Madgwick  Optimised for reduced CPU load
 static void sensfusion6UpdateQImpl(double gx, double gy, double gz, double ax, double ay, double az, double dt)
 {
-	static double last_halfex = 0.0;
-	static double last_halfey = 0.0;
-	static double last_halfez = 0.0;
-
+	#if TWO_KD_DEF > 0
+		static double last_halfex = 0.0;
+		static double last_halfey = 0.0;
+		static double last_halfez = 0.0;
+	#endif
   double recipNorm = 0.0;
   double halfvx = 0.0;
   double halfvy = 0.0;
@@ -237,22 +238,22 @@ static void sensfusion6UpdateQImpl(double gx, double gy, double gz, double ax, d
 	halfey = (az * halfvx - ax * halfvz);
 	halfez = (ax * halfvy - ay * halfvx);
 
-	if (twoKd > 0.0) {
+	#if TWO_KD_DEF > 0
 	  derivativeFBx = (twoKd * halfex) * (twoKd * ((halfex - last_halfex) / dt));
 	  derivativeFBy = (twoKd * halfey) * (twoKd * ((halfey - last_halfey) / dt));
 	  derivativeFBz = (twoKd * halfez) * (twoKd * ((halfez - last_halfez) / dt));
-	
+
 	  if (derivativeFBx > 50 && derivativeFBy > 50 && derivativeFBz > 50) {
 		  gx += derivativeFBx;
 		  gy += derivativeFBy;
 		  gz += derivativeFBz;
 		}
-
-	} else {
+	#else
 	  derivativeFBx = 0.0;
 	  derivativeFBy = 0.0;
 	  derivativeFBz = 0.0;
-	}
+	#endif
+
 
 
 	// Compute and apply integral feedback if enabled
@@ -297,9 +298,11 @@ static void sensfusion6UpdateQImpl(double gx, double gy, double gz, double ax, d
   q2 *= recipNorm;
   q3 *= recipNorm;
 
+	#if TWO_KD_DEF > 0
   	last_halfex = halfex;
 	last_halfey = halfey;
 	last_halfez = halfez;
+	#endif
 }
 #endif
 
@@ -312,7 +315,7 @@ void sensfusion6GetEulerRPY(double* roll, double* pitch, double* yaw)
   if (gx>1) gx=1;
   if (gx<-1) gx=-1;
 
-  *yaw = 0;//atan2(2*(q0*q3 + q1*q2), q0*q0 + q1*q1 - q2*q2 - q3*q3) * 180 / M_PI_F;
+  *yaw = atan2(2*(q0*q3 + q1*q2), q0*q0 + q1*q1 - q2*q2 - q3*q3) * 180 / M_PI_F;
   *pitch = asin(gx) * 180 / M_PI_F; //Pitch seems to be inverted
   *roll = atan2(gy, gz) * 180 / M_PI_F;
 }

@@ -43,6 +43,7 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/d6t8l_ir
 # ADC DRIVER
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/adc
 # IMU DRIVER
+SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/gy85
 SEARCHABLE_HEADER_FILE_DIRS	+= -I drivers/imu
 
 ####################
@@ -66,6 +67,8 @@ SEARCHABLE_HEADER_FILE_DIRS	+= -I protocols/accel
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/gps
 # BATTERY #
 SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/battery
+# IMU #
+SEARCHABLE_HEADER_FILE_DIRS 	+= -I protocols/imu
 # I2C Protocol #
 SEARCHABLE_HEADER_FILE_DIRS		+= -I protocols/i2c_protocol
 
@@ -104,7 +107,7 @@ SEARCHABLE_HEADER_FILE_DIRS 	+= -I control/init_packets
 # COMPLIMENTARY FILTER #
 #SEARCHABLE_HEADER_FILE_DIRS	+= -I control/complimentary
 # SENSOR FUSION #
-#SEARCHABLE_HEADER_FILE_DIRS	+= -I control/sensor_fusion
+SEARCHABLE_HEADER_FILE_DIRS	+= -I control/sensor_fusion
 
 ######################################################
 
@@ -117,24 +120,28 @@ CSOURCE						+= drivers/softuart_driver/softuart.c
 # BUFFER #
 CSOURCE						+= drivers/buffer/buffer.c
 # I2C #
-CSOURCE						+= drivers/i2c_driver/i2c_driver.c
+# CSOURCE						+= drivers/i2c_driver/i2c_driver.c
 # ITG3200 #
-CSOURCE						+= drivers/itg3200_gyro/itg3200.c
+# CSOURCE						+= drivers/itg3200_gyro/itg3200.c
 # HMC5883L #
-CSOURCE						+= drivers/hmc5883l_mag/hmc5883l_mag.c
+# CSOURCE						+= drivers/hmc5883l_mag/hmc5883l_mag.c
 # PWM #
 CSOURCE						+= drivers/pwm/pwm_driver.c
 # ADXL345 #
-CSOURCE						+= drivers/adxl345_accel/adxl345.c
+# CSOURCE						+= drivers/adxl345_accel/adxl345.c
 # NMEA #
 CSOURCE						+= drivers/nmea/nmea.c
 # ADC #
 CSOURCE						+= drivers/adc/adc.c
 # IR #
+# CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
 CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
 # IMU #
 CSOURCE						+= drivers/imu/imu.c
 ####################
+CSOURCE						+= drivers/i2c_driver/i2cmaster.c drivers/i2c_driver/i2c.c
+# imu #
+CSOURCE						+= drivers/gy85/gy85.c
 
 ####################
 # PROTOCOL SOURCES #
@@ -143,21 +150,23 @@ CSOURCE						+= protocols/uart/uart.c
 # SOFTUART #
 CSOURCE						+= drivers/softuart_driver/softuart.c
 # MAG #
-CSOURCE						+= protocols/mag/mag.c
+# CSOURCE						+= protocols/mag/mag.c
 # GYRO #
-CSOURCE						+= protocols/gyro/gyro.c
+## CSOURCE						+= protocols/gyro/gyro.c
 # TEMP #
-CSOURCE						+= protocols/temperature/temperature.c
+# CSOURCE						+= protocols/temperature/temperature.c
 # MOTORS #
 CSOURCE						+= protocols/motors/motors.c
 # COMMUNICATION #
 CSOURCE						+= protocols/com/packet.c
 # ACCEL #
-CSOURCE						+= protocols/accel/accel.c
+# CSOURCE						+= protocols/accel/accel.c
 # GPS #
 CSOURCE                    	+= protocols/gps/gps.c
 # BATTERY #
 CSOURCE                    	+= protocols/battery/battery.c
+# BATTERY #
+CSOURCE                    	+= protocols/imu/imu.c
 # I2C Protocol #
 CSOURCE						+= protocols/i2c_protocol/i2c.c
 ####################
@@ -195,7 +204,7 @@ CSOURCE						+= control/init_packets/init_packet.c
 # COMPLIMENTARY FILTER #
 #CSOURCE						+= control/complimentary/comp_filter.c
 # SENSOR FUSION #
-#CSOURCE						+= control/sensor_fusion/sensfusion.c
+CSOURCE						+= control/sensor_fusion/sensfusion.c
 
 ######################################################
 

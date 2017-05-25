@@ -17,12 +17,12 @@
 //#define GPS (1)
 #define PID_CONTROLLER (1)
 #define BATTERY (1)
-#define IR_CAM (1)
+//#define IR_CAM (1)
 
 #ifdef IMU
 	#define GYRO (1)
 	#define ACCEL (1)
-	//#define MAGNOMETER (1)
+	#define MAGNOMETER (1)
 	#ifdef GYRO
 		#define TEMP_SENSOR
 	#endif
@@ -81,7 +81,7 @@
 
 		#ifdef IMU
 			#define IMU_UPDATE_RATE (250)
-			//#define IMU_UPDATE_PERIOD_SECONDS (0.004)//(0.002420) // measured with OScope -> 0.0033
+			#define IMU_UPDATE_PERIOD_SECONDS (0.004)//(0.002420) // measured with OScope -> 0.0033
 			#define IMU_UPDATE_TIME_US (4000) //us
 			#define IMU_TIMER_ID (1)
 		#endif

@@ -5,6 +5,7 @@
 */
 
 #include "gyro.h"
+#include "adxl345.h"
 #include "imu.h"
 
 void InitializeGyro(void)
@@ -19,17 +20,17 @@ void Gyro_Update(void)
 
 double Gyro_GetX(void)
 {
-    return ITG3200_GetX();
+    return Gyro_ADXL345_GetX();
 }
 
 double Gyro_GetY(void)
 {
-    return ITG3200_GetY();
+    return Gyro_ADXL345_GetY();
 }
 
 double Gyro_GetZ(void)
 {
-    return ITG3200_GetZ();
+    return Gyro_ADXL345_GetZ();
 }
 
 double Gyro_GetTemp(void)

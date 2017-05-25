@@ -1,8 +1,12 @@
-// ITG3200.h
-// gyro.h
-#ifndef _ITG3200_H_
-#define _ITG3200_H_
+// ADXL345.h
+// accel.h
+#ifndef _ADXL345_H_
+#define _ADXL345_H_
 
+// ACCEL DEFINES
+#define ADXL345_ADDR (0x53 << 1)
+
+// GYRO DEFINES
 #define GYRO_CALIBRATION_ITERATIONS (1500)
 #define GYRO_SENSITIVITY_RANGE (2000) // deg/sec
 #define GYRO_SENSITIVITY (14.375)
@@ -28,20 +32,28 @@
 #define G_Z_REG_HI (0x21)
 #define G_Z_REG_LO (0x22)
 
-#define ITG3200_REG_READ_TIMEOUT (50) //ms
+// Mag DEFINES
+#define HMC5883L_ADDR 0x3C
 
+void GY85_Init(void);
+void GY85_UpdateData(void);
 
-void InitializeITG3200(void);
+double Accel_GY85_GetX(void);
 
-void ITG3200_UpdateData(void);
+double Accel_GY85_GetY(void);
 
+double Accel_GY85_GetZ(void);
 
-double ITG3200_GetX(void);
+double Gyro_GY85_GetX(void);
 
-double ITG3200_GetY(void);
+double Gyro_GY85_GetY(void);
 
-double ITG3200_GetZ(void);
+double Gyro_GY85_GetZ(void);
 
-double ITG3200_GetTemp(void);
+double Mag_GY85_GetX(void);
+
+double Mag_GY85_GetY(void);
+
+double Mag_GY85_GetZ(void);
 
 #endif

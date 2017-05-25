@@ -17,7 +17,7 @@
 #define PID_DEBUG
 #define KEYBOARD_DEBUG
 #define PID_PRINT_DEBUG
-#define PID_TIME_TEST
+//#define PID_TIME_TEST
 //static uint8_t roll_static_count = 0;
 //static uint8_t pitch_static_count = 0;
 
@@ -121,47 +121,16 @@ int main (void) {
  					led_on(DIGITAL_PIN_1);
  				#endif
 
-				Accel_Update();
-				_delay_ms(10);
-				Mag_Update();
-				_delay_ms(10);
-				//Gyro_GetTemp();
+				IMU_Update();
+				//Mag_Update();
+				//Gyro_Update();
 				//cli();
 
-				imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Mag_GetX(), Mag_GetY());
-/*
-				if (((abs(ypr[1]) - abs(last_ypr[1])) / IMU_UPDATE_PERIOD_SECONDS) > 400) {
-					pitch_static_count++;
+				//imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Mag_GetX(), Mag_GetY());//Mag_GetX(), Mag_GetY());
+				//imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
+				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS);
+				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
 
-					if (pitch_static_count > (int)IMU_UPDATE_RATE * .5) {
-						last_ypr[1] = ypr[1];
-						pitch_static_count = 0;
-					} else {
-						ypr[1] = last_ypr[1];
-						pitch_static_count = 0;
-					}
-
-				} else {
-					last_ypr[1] = ypr[1];
-					pitch_static_count = 0;
-				}
-
-				if (((abs(ypr[2]) - abs(last_ypr[2])) / IMU_UPDATE_PERIOD_SECONDS) > 400) {
-					roll_static_count++;
-
-					if (roll_static_count > (int)IMU_UPDATE_RATE * .1) {
-						last_ypr[2] = ypr[2];
-						roll_static_count = 0;
-					} else {
-						ypr[2] = last_ypr[2];
-						roll_static_count = 0;
-					}
-				} else {
-					last_ypr[2] = ypr[2];
-					roll_static_count = 0;
-				}
-*/
-				//sei();
 
 				clear_tick_timer_flag(IMU_TIMER_ID);
 				#ifdef PID_TIME_TEST
@@ -206,19 +175,6 @@ int main (void) {
 						sprintf(testing, " R: {%lf}          ", ypr[2]);
 						UART_SendString(testing);
 
-						sprintf(testing, " \nax: {%lf} | ", Accel_GetX());
-						UART_SendString(testing);
-						sprintf(testing, " ay: {%lf} | ", Accel_GetY());
-						UART_SendString(testing);
-						sprintf(testing, " az: {%lf}          ", Accel_GetZ());
-						UART_SendString(testing);
-
-						sprintf(testing, " \nmx: {%lf} | ", Mag_GetX());
-						UART_SendString(testing);
-						sprintf(testing, " my: {%lf} | ", Mag_GetY());
-						UART_SendString(testing);
-
-						//
 						// sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
 						// UART_SendString(testing);
 						// sprintf(testing, " M2: {%d} | ", (int)motor_get_speed(MOTOR_TWO));
