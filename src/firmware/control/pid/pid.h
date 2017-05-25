@@ -14,14 +14,14 @@
 
 #include <stdint.h>
 
-#define PID_ROLL_KP  .45
-#define PID_ROLL_KI  0.0
-#define PID_ROLL_KD  1
+#define PID_ROLL_KP  .125
+#define PID_ROLL_KI  0.00001 // <-- increase this after meeting
+#define PID_ROLL_KD  0.05
 #define PID_ROLL_INTEGRATION_LIMIT    30.0
 
-#define PID_PITCH_KP  .3
-#define PID_PITCH_KI  0//0.00001
-#define PID_PITCH_KD  1
+#define PID_PITCH_KP  .11
+#define PID_PITCH_KI  0.00001
+#define PID_PITCH_KD  0.05
 #define PID_PITCH_INTEGRATION_LIMIT   30.0
 
 #define PID_YAW_KP  0.0

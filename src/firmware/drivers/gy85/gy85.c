@@ -74,7 +74,7 @@ void GY85_Init(void)
     // writeI2CReg(ADXL345_ADDR, 0x20, &zero, 1);
 
     //_delay_ms(2); // Arbitrary delay amount
-    //ADXL345_Calibrate();
+    ADXL345_Calibrate();
     #endif
 
     #ifdef GYRO
@@ -83,7 +83,7 @@ void GY85_Init(void)
     writeI2Cbyte(ITG3200_ADDR, 0x16, 0x1E);
     writeI2Cbyte(ITG3200_ADDR, 0x17, 0x00);
 
-    //ITG3200_Calibrate();
+    ITG3200_Calibrate();
     #endif
 
     #ifdef MAGNOMETER

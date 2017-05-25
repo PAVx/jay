@@ -19,7 +19,5 @@
 #include "nmea.h"
 #include "adc.h"
 #include "i2cmaster.h"
-#include "i2c.h"
 #include "gy85.h"
-#include "imu.h"
 #endif

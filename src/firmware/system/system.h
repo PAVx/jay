@@ -103,7 +103,7 @@
 #endif
 
 #ifdef MOTORS
-	//#define MOTORS_SPIN
+	#define MOTORS_SPIN
 #endif
 
 #ifdef SYSTEM_INIT_DEBUG_PRINTOUTS

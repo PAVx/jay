@@ -134,12 +134,9 @@ CSOURCE						+= drivers/nmea/nmea.c
 # ADC #
 CSOURCE						+= drivers/adc/adc.c
 # IR #
-# CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
 CSOURCE						+= drivers/d6t8l_ir/d6t8l.c
-# IMU #
-CSOURCE						+= drivers/imu/imu.c
 ####################
-CSOURCE						+= drivers/i2c_driver/i2cmaster.c drivers/i2c_driver/i2c.c
+CSOURCE						+= drivers/i2c_driver/i2cmaster.c
 # imu #
 CSOURCE						+= drivers/gy85/gy85.c
 
@@ -194,7 +191,7 @@ CSOURCE						+= control/control_packets/ctrl_pkt.c
 # MANUAL CONTROL #
 CSOURCE						+= control/manual/manual_control.c
 # ANGLES #
-CSOURCE						+= control/angles/angles.c
+#CSOURCE						+= control/angles/angles.c
 # ATTITUDE ADJUST #
 CSOURCE						+= control/attitude_adjust/attitude_adjust.c
 # PID #

@@ -16,6 +16,7 @@
 #include "temperature.h"
 #include "uart.h"
 #include "battery.h"
+#include "i2c.h"
 #include "imu.h"
 
 #endif

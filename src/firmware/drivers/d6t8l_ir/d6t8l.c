@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "d6t8l.h"
-#include "i2c_driver.h"
+#include "i2c.h"
 
 static uint8_t raw_data[19] = {0};
 static uint8_t heatmap[D6T8L_LEN] = {1};
@@ -17,19 +17,16 @@ void D6T8L_Heat_Avg(uint8_t *map);
 
 void InitializeD6T8L(void)
 {
-    i2c_init();
+    initI2C();
 }
 
 
 void D6T8L_ReadIR(void)
 {
-    i2c_start(D6T8L_ADDR);
-    i2c_write(D6T8L_CMD);
-    i2c_stop();
-
-    i2c_receive(D6T8L_ADDR, raw_data, 19);
-
     uint8_t i = 0;
+    
+    readI2CbyteArray(D6T8L_ADDR, D6T8L_CMD, raw_data, 19);
+
     t_PTAT = (raw_data[0] + (raw_data[1] << 8) ) * 0.1;
         for (i = 0; i < D6T8L_LEN; i++) {
           heatmap[i] = (raw_data[(i*2+2)] + (raw_data[(i*2+3)] << 8 )) * 0.1;
