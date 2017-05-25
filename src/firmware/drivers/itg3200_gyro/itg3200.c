@@ -1,12 +1,9 @@
 // i2g3200.c
 // gyro.c
 #include "itg3200.h"
-#include "i2c_driver.h"
+#include "i2c.h"
 #include <util/delay.h>
 #include <stdbool.h>
-
-
-#include "uart.h"
 
 double _g_t = 0;
 double _g_x = 0;
@@ -30,29 +27,33 @@ void ITG3200_ReadGyro(double *temp, double *g_x, double *g_y, double *g_z);
 
 void InitializeITG3200(void)
 {
-    i2c_init();
+    initI2C();
 
-    i2c_start(ITG3200_ADDR);
-    i2c_write(0x3E);
-    i2c_write(0x00);
-    i2c_stop();
+    writeI2Cbyte(ITG3200_ADDR, 0x3E, 0x00);
+    // i2c_start(ITG3200_ADDR);
+    // i2c_write(0x3E);
+    // i2c_write(0x00);
+    // i2c_stop();
 
-    i2c_start(ITG3200_ADDR);
-    i2c_write(0x15);
-    i2c_write(0x07);
-    i2c_stop();
+    writeI2Cbyte(ITG3200_ADDR, 0x15, 0x07);
+    // i2c_start(ITG3200_ADDR);
+    // i2c_write(0x15);
+    // i2c_write(0x07);
+    // i2c_stop();
 
-    i2c_start(ITG3200_ADDR);
-    i2c_write(0x16);
-    i2c_write(0x1E);
-    i2c_stop();
+    writeI2Cbyte(ITG3200_ADDR, 0x16, 0x1E);
+    // i2c_start(ITG3200_ADDR);
+    // i2c_write(0x16);
+    // i2c_write(0x1E);
+    // i2c_stop();
 
-    i2c_start(ITG3200_ADDR);
-    i2c_write(0x17);
-    i2c_write(0x00);
-    i2c_stop();
+    writeI2Cbyte(ITG3200_ADDR, 0x17, 0x00);
+    // i2c_start(ITG3200_ADDR);
+    // i2c_write(0x17);
+    // i2c_write(0x00);
+    // i2c_stop();
 
-    ITG3200_Calibrate();
+    //ITG3200_Calibrate();
 
     _g_t = 0.0;
     _g_x = 0.0;
@@ -94,11 +95,12 @@ void ITG3200_ReadGyro(double *temp, double *g_x, double *g_y, double *g_z)
 {
     uint8_t buff[8];
 
-    i2c_start(ITG3200_ADDR);
-    i2c_write(0x1B);
-    i2c_stop();
-
-    i2c_receive(ITG3200_ADDR, buff, 8);
+    readI2CbyteArray(ITG3200_ADDR, 0x1B, buff, 8);
+    // i2c_start(ITG3200_ADDR);
+    // i2c_write(0x1B);
+    // i2c_stop();
+    //
+    // i2c_receive(ITG3200_ADDR, buff, 8);
 
     *g_x = ((buff[2] << 8) | buff[3]) - g_offx;
     *g_y = ((buff[4] << 8) | buff[5]) - g_offy;
@@ -108,13 +110,14 @@ void ITG3200_ReadGyro(double *temp, double *g_x, double *g_y, double *g_z)
 
 void ITG3200_ReadTemp(double *temp)
 {
-    uint8_t buff[8];
+    uint8_t buff[2];
 
-    i2c_start(ITG3200_ADDR);
-    i2c_write(0x1B);
-    i2c_stop();
-
-    i2c_receive(ITG3200_ADDR, buff, 2);
+    readI2CbyteArray(ITG3200_ADDR, 0x1B, buff, 2);
+    // i2c_start(ITG3200_ADDR);
+    // i2c_write(0x1B);
+    // i2c_stop();
+    //
+    // i2c_receive(ITG3200_ADDR, buff, 2);
 
     *temp = ((buff[0] << 8) | buff[1]);       // temperature
 }

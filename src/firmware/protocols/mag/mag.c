@@ -7,6 +7,7 @@
 // mag.c
 #include "mag.h"
 #include "hmc5883l_mag.h"
+#include "adxl345.h"
 
 void InitializeMag(void) {
 	HMC5883L_init();
@@ -17,13 +18,13 @@ void Mag_Update(void) {
 }
 
 double Mag_GetX(void) {
-	return HMC5883L_GetX();
+	return Mag_ADXL345_GetX();
 }
 
 double Mag_GetY(void) {
-	return HMC5883L_GetY();
+	return Mag_ADXL345_GetY();
 }
 
 double Mag_GetZ(void) {
-	return HMC5883L_GetZ();
+	return Mag_ADXL345_GetZ();
 }

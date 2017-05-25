@@ -21,7 +21,7 @@ bool level_adjust = false;
 #define RADIAN_TO_DEGREE (57.296) // 180 / pi
 #define NEGATIVE_RADIAN_TO_DEGREE (-RADIAN_TO_DEGREE)
 
-#define GYRO_TO_ACCEL_RATIO (0.5)
+#define GYRO_TO_ACCEL_RATIO (0.9)
 #define ACCEL_TO_GYRO_RATIO (1 - GYRO_TO_ACCEL_RATIO)
 
 void imu2euler(double* ypr, double accX, double accY, double accZ, double gyroX, double gyroY, double gyroZ, double magX, double magY){
@@ -62,7 +62,7 @@ void imu2euler(double* ypr, double accX, double accY, double accZ, double gyroX,
                 roll_level_adjust = 0;
         }
 
-        ypr[0] = 0.0 * magY * magX;
+        ypr[0] = (atan2(magY,magX)*180.0)/M_PI;
         ypr[1] = pitch_gyro;
         ypr[2] = roll_gyro;
 }

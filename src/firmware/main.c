@@ -10,19 +10,19 @@
 
 #define LED_DEBUG
 //#define WAIT_FOR_SYSTEM_ACK
-#define PACKET_DEBUG
+//#define PACKET_DEBUG
 #ifdef BATTERY
 	#define BATTERY_DEBUG
 #endif
 #define PID_DEBUG
-//#define KEYBOARD_DEBUG
-//#define PID_PRINT_DEBUG
+#define KEYBOARD_DEBUG
+#define PID_PRINT_DEBUG
 //#define PID_TIME_TEST
 //static uint8_t roll_static_count = 0;
 //static uint8_t pitch_static_count = 0;
 
 
-#define SEND_STATUS_PACKET
+//#define SEND_STATUS_PACKET
 
 #ifdef SEND_STATUS_PACKET
 	#ifdef IR_CAM
@@ -121,45 +121,15 @@ int main (void) {
  					led_on(DIGITAL_PIN_1);
  				#endif
 
-				Accel_Update();
+				IMU_Update();
 				//Mag_Update();
-				Gyro_GetTemp();
+				//Gyro_Update();
 				//cli();
 
-				imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
-/*
-				if (((abs(ypr[1]) - abs(last_ypr[1])) / IMU_UPDATE_PERIOD_SECONDS) > 400) {
-					pitch_static_count++;
-
-					if (pitch_static_count > (int)IMU_UPDATE_RATE * .5) {
-						last_ypr[1] = ypr[1];
-						pitch_static_count = 0;
-					} else {
-						ypr[1] = last_ypr[1];
-						pitch_static_count = 0;
-					}
-
-				} else {
-					last_ypr[1] = ypr[1];
-					pitch_static_count = 0;
-				}
-
-				if (((abs(ypr[2]) - abs(last_ypr[2])) / IMU_UPDATE_PERIOD_SECONDS) > 400) {
-					roll_static_count++;
-
-					if (roll_static_count > (int)IMU_UPDATE_RATE * .1) {
-						last_ypr[2] = ypr[2];
-						roll_static_count = 0;
-					} else {
-						ypr[2] = last_ypr[2];
-						roll_static_count = 0;
-					}
-				} else {
-					last_ypr[2] = ypr[2];
-					roll_static_count = 0;
-				}
-*/
-				//sei();
+				//imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Mag_GetX(), Mag_GetY());//Mag_GetX(), Mag_GetY());
+				//imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
+				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS);
+				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
 
 				clear_tick_timer_flag(IMU_TIMER_ID);
 				#ifdef PID_TIME_TEST
@@ -197,12 +167,12 @@ int main (void) {
 						//sprintf(testing, " \nBATT: {%d} | ", (int)battery_get_voltage());
 						//UART_SendString(testing);
 
-						// sprintf(testing, " \nY: {%lf} | ", ypr[0]);
-						// UART_SendString(testing);
-						// sprintf(testing, " P: {%lf} | ", ypr[1]);
-						// UART_SendString(testing);
-						// sprintf(testing, " R: {%lf}          ", ypr[2]);
-						// UART_SendString(testing);
+						sprintf(testing, " \nY: {%lf} | ", ypr[0]);
+						UART_SendString(testing);
+						sprintf(testing, " P: {%lf} | ", ypr[1]);
+						UART_SendString(testing);
+						sprintf(testing, " R: {%lf}          ", ypr[2]);
+						UART_SendString(testing);
 						//
 						// sprintf(testing, "           M1: {%d} | ", (int)motor_get_speed(MOTOR_ONE));
 						// UART_SendString(testing);
