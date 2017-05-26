@@ -89,7 +89,7 @@ int main (void) {
 				op_code = UART_GetByte();
 
 				if ((op_code == 's') && (o == 0) && battery_charged()) {
-					AttitudeSetThrottle(4500);
+					AttitudeSetThrottle(5375);
 					ref_init = 0;
 					o = 1;
 				}
