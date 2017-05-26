@@ -80,9 +80,9 @@
 		#endif
 
 		#ifdef IMU
-			#define IMU_UPDATE_RATE (250)
-			#define IMU_UPDATE_PERIOD_SECONDS (0.004)//(0.002420) // measured with OScope -> 0.0033
-			#define IMU_UPDATE_TIME_US (4000) //us
+			#define IMU_UPDATE_RATE (150)
+			#define IMU_UPDATE_PERIOD_SECONDS (0.0133)//(0.002420) // measured with OScope -> 0.0033
+			#define IMU_UPDATE_TIME_US (13333.33) //us
 			#define IMU_TIMER_ID (1)
 		#endif
 
@@ -91,10 +91,10 @@
 			#define PACKET_UPDATE_TIME_MS (200000)
 		#endif
 
-		#define PID_RATE (125)	// Hz
+		#define PID_RATE (150)	// Hz
 		// timer0 is limited to 52 Hz -- DEAL WITH IT
-		#define PID_UPDATE_PERIOD_SECONDS (0.008)
-		#define PID_TIMER_UPDATE_TIME_US (8000) // us for timer
+		#define PID_UPDATE_PERIOD_SECONDS (0.0133)
+		#define PID_TIMER_UPDATE_TIME_US (13333.33) // us for timer
 		#define PID_TIMER_ID (0)
 
 		#define TIMER_PERIOD ((TIMER0_PERIOD * 1000) / F_CPU)

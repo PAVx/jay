@@ -16,7 +16,7 @@
 #endif
 #define PID_DEBUG
 #define KEYBOARD_DEBUG
-#define PID_PRINT_DEBUG
+//#define PID_PRINT_DEBUG
 //#define PID_TIME_TEST
 //static uint8_t roll_static_count = 0;
 //static uint8_t pitch_static_count = 0;
@@ -109,7 +109,7 @@ int main (void) {
 	                    UART_SendByte(gpsbuffer[i]);
 	                    i++;
 	                }
-	            }
+		}
 
 	        #endif
 	    	#endif
@@ -117,6 +117,32 @@ int main (void) {
 		#ifdef PID_DEBUG
 
 			if (tick_timer_flag(IMU_TIMER_ID)) {
+				// #ifdef PID_TIME_TEST
+ 			// 		led_on(DIGITAL_PIN_1);
+ 			// 	#endif
+				//
+				// IMU_Update();
+				// //Mag_Update();
+				// //Gyro_Update();
+				// //cli();
+				//
+				// //imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Mag_GetX(), Mag_GetY());//Mag_GetX(), Mag_GetY());
+				// //imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
+				// sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS*SYSTEM_TICK_OFFSET);
+				// sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
+
+				clear_tick_timer_flag(IMU_TIMER_ID);
+
+			}
+
+			if(tick_timer_flag(PID_TIMER_ID)) {
+
+				#ifdef LEDS
+		  			toggle_led(GP_LED1);
+			  	#endif
+
+				//////////////////
+
 				#ifdef PID_TIME_TEST
  					led_on(DIGITAL_PIN_1);
  				#endif
@@ -128,21 +154,10 @@ int main (void) {
 
 				//imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Mag_GetX(), Mag_GetY());//Mag_GetX(), Mag_GetY());
 				//imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
-				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS);
+				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS*SYSTEM_TICK_OFFSET);
 				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
 
-
-				clear_tick_timer_flag(IMU_TIMER_ID);
-				#ifdef PID_TIME_TEST
-					led_off(DIGITAL_PIN_1);
-				#endif
-			}
-
-			if(tick_timer_flag(PID_TIMER_ID)) {
-
-				#ifdef LEDS
-		  			toggle_led(GP_LED1);
-			  	#endif
+				//////////////////
 
 				AttituteAdjustUpdatePID(0, ypr[1], ypr[2]);
 
@@ -189,7 +204,11 @@ int main (void) {
 					}
 					else pid_print_flag ++;
 				#endif
-			/**/
+
+				#ifdef PID_TIME_TEST
+					led_off(DIGITAL_PIN_1);
+				#endif
+
 				clear_tick_timer_flag(PID_TIMER_ID);
 			}
 
