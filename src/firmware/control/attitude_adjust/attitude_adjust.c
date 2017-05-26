@@ -7,14 +7,9 @@
 // attitude_adjust.c
 
 #include "attitude_adjust.h"
-#include "pid.h"
 #include "system.h"
 
 #define IMU_UPDATE_DT (PID_UPDATE_PERIOD_SECONDS)
-
-PID_t pidRoll;
-PID_t pidPitch;
-PID_t pidYaw;
 
 static int32_t _throttle = 0;
 
@@ -29,6 +24,7 @@ static uint8_t pid_print_flag = 0;
 uint8_t InitializeAttitudeAdjust(void) {
 
 	_throttle = 0;
+
 	PIDInit(&pidRoll, 0, PID_ROLL_KP, PID_ROLL_KI, PID_ROLL_KD, IMU_UPDATE_DT);
 	PIDInit(&pidPitch, 0, PID_PITCH_KP, PID_PITCH_KI, PID_PITCH_KD, IMU_UPDATE_DT);
 	PIDInit(&pidYaw, 0, PID_YAW_KP, PID_YAW_KI, PID_YAW_KD, IMU_UPDATE_DT);

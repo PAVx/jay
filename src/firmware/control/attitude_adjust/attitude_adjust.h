@@ -10,6 +10,11 @@
 
 #include <stdint.h>
 #include "motors.h"
+#include "pid.h"
+
+PID_t pidRoll;
+PID_t pidPitch;
+PID_t pidYaw;
 
 // Feedback Control Functions
 

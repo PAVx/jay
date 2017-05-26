@@ -16,11 +16,15 @@
 #endif
 #define PID_DEBUG
 #define KEYBOARD_DEBUG
+#define LIVE_PID_TUNER
 //#define PID_PRINT_DEBUG
 //#define PID_TIME_TEST
 //static uint8_t roll_static_count = 0;
 //static uint8_t pitch_static_count = 0;
 
+#ifdef LIVE_PID_TUNER
+	#include "attitude_adjust.h"
+#endif
 
 //#define SEND_STATUS_PACKET
 
@@ -71,6 +75,13 @@ int main (void) {
  		led_off(DIGITAL_PIN_1);
  	#endif
 
+ 	#ifdef LIVE_PID_TUNER
+ 		uint8_t pid_selector = 0;
+ 		uint8_t gain_selector = 0;
+ 		float MAG = 0.001;
+ 	#endif
+
+
 	for(;;) {
 
 		#ifdef KEYBOARD_DEBUG
@@ -89,6 +100,146 @@ int main (void) {
 					motor_set(MOTOR_FOUR, 0);
 					o = 0;
 				}
+
+
+				#define p_select (1)
+				#define i_select (2)
+				#define d_select (3)
+				#define pitch_pid (4)
+				#define roll_pid (5)
+				#define yaw_pid (6)
+
+				switch(op_code) {
+					case '1':
+						pid_selector = pitch_pid;
+						break;
+					case '2':
+						pid_selector = roll_pid;
+						break;
+					case '3':
+						pid_selector = yaw_pid;
+						break;
+					case '8':
+						MAG *= 10;
+						break;
+					case '7':
+						MAG /= 10;
+						break;
+					case 'p':
+						gain_selector = p_select;
+						break;
+					case 'i':
+						gain_selector = i_select;
+						break;
+					case 'd':
+						gain_selector = d_select;
+						break;
+
+					case 'u':
+						if (pid_selector == pitch_pid) {
+							if (gain_selector == p_select) {
+								PIDSetKp(&pidPitch, pidPitch.kp + MAG);
+							}
+							else if (gain_selector == i_select) {
+								PIDSetKi(&pidPitch, pidPitch.ki + MAG);
+							}
+							else if (gain_selector == d_select) {
+								PIDSetKd(&pidPitch, pidPitch.kd + MAG);
+							}
+						}
+						else if (pid_selector == roll_pid) {
+							if (gain_selector == p_select) {
+								PIDSetKp(&pidRoll, pidRoll.kp + MAG);
+							}
+							else if (gain_selector == i_select) {
+								PIDSetKi(&pidRoll, pidRoll.ki + MAG);
+							}
+							else if (gain_selector == d_select) {
+								PIDSetKd(&pidRoll, pidRoll.kd + MAG);
+							}
+						}
+						else if (pid_selector == yaw_pid) {
+							if (gain_selector == p_select) {
+								PIDSetKp(&pidYaw, pidYaw.kp + MAG);
+							}
+							else if (gain_selector == i_select) {
+								PIDSetKi(&pidYaw, pidYaw.ki + MAG);
+							}
+							else if (gain_selector == d_select) {
+								PIDSetKd(&pidYaw, pidYaw.kd + MAG);
+							}
+						}
+						break;
+
+					case 'j':
+						if (pid_selector == pitch_pid) {
+							if (gain_selector == p_select) {
+								PIDSetKp(&pidPitch, pidPitch.kp - MAG);
+							}
+							else if (gain_selector == i_select) {
+								PIDSetKi(&pidPitch, pidPitch.ki - MAG);
+							}
+							else if (gain_selector == d_select) {
+								PIDSetKd(&pidPitch, pidPitch.kd - MAG);
+							}
+						}
+						else if (pid_selector == roll_pid) {
+							if (gain_selector == p_select) {
+								PIDSetKp(&pidRoll, pidRoll.kp - MAG);
+							}
+							else if (gain_selector == i_select) {
+								PIDSetKi(&pidRoll, pidRoll.ki - MAG);
+							}
+							else if (gain_selector == d_select) {
+								PIDSetKd(&pidRoll, pidRoll.kd - MAG);
+							}
+						}
+						else if (pid_selector == yaw_pid) {
+							if (gain_selector == p_select) {
+								PIDSetKp(&pidYaw, pidYaw.kp - MAG);
+							}
+							else if (gain_selector == i_select) {
+								PIDSetKi(&pidYaw, pidYaw.ki - MAG);
+							}
+							else if (gain_selector == d_select) {
+								PIDSetKd(&pidYaw, pidYaw.kd - MAG);
+							}
+						}
+						break;
+					default:
+						break;
+				}
+
+				sprintf(testing, " \n\nMAG = %lf", MAG);
+				UART_SendString(testing);
+
+				sprintf(testing, " \nROLL:\t");
+				UART_SendString(testing);
+				sprintf(testing, " Kp = %lf\t", (double)(pidRoll.kp));
+				UART_SendString(testing);
+				sprintf(testing, " Ki = %lf\t", (double)(pidRoll.ki));
+				UART_SendString(testing);
+				sprintf(testing, " Kd = %lf\t", (double)(pidRoll.kd));
+				UART_SendString(testing);
+					
+				sprintf(testing, " \nPITCH:\t");
+				UART_SendString(testing);
+				sprintf(testing, " Kp = %lf\t", (double)(pidPitch.kp));
+				UART_SendString(testing);
+				sprintf(testing, " Ki = %lf\t", (double)(pidPitch.ki));
+				UART_SendString(testing);
+				sprintf(testing, " Kd = %lf\t", (double)(pidPitch.kd));
+				UART_SendString(testing);
+
+				sprintf(testing, " \nYAW:\t");
+				UART_SendString(testing);
+				sprintf(testing, " Kp = %lf\t", (double)(pidYaw.kp));
+				UART_SendString(testing);
+				sprintf(testing, " Ki = %lf\t", (double)(pidYaw.ki));
+				UART_SendString(testing);
+				sprintf(testing, " Kd = %lf\t", (double)(pidYaw.kd));
+				UART_SendString(testing);
+
 			}
 		#endif
 
