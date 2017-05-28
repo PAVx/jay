@@ -310,7 +310,7 @@ int main (void) {
 
 				//////////////////
 
-				AttituteAdjustUpdatePID(0, ypr[1], ypr[2]);
+				AttituteAdjustUpdatePID(Gyro_GetY(), Gyro_GetX(), 0, ypr[1], ypr[2]);
 
 				// Update Motors
 				AttitudeAdjustGetError(motor_delta);
