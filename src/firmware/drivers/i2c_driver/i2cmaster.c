@@ -9,7 +9,7 @@
 #include <inttypes.h>
 #include <compat/twi.h>
 
-#include <i2cmaster.h>
+#include "i2cmaster.h"
 
 /* I2C clock in Hz */
 #define SCL_CLOCK  100000L

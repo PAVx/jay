@@ -16,6 +16,10 @@ void IMU_Update(void) {
 	GY85_UpdateData();
 }
 
+void IMU_Calibrate(void){
+	GY85_Calibrate();
+}
+
 double Accel_GetX(void) {
 	return Accel_GY85_GetX();
 }

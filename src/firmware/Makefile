@@ -1,4 +1,6 @@
 # MICROCONTROLELR DEFINITIONS #
+SHELL := /bin/bash
+
 CC						= avr-gcc
 BURNER						= avrdude
 CC_AVR						= atmega328p
@@ -12,6 +14,9 @@ BAUDRATE					= 115200
 
 # CC GLOBAL DEFINES
 CC_GLOBAL_DEFINES 				= -D F_CPU=${F_CPU}
+CC_GLOBAL_DEFINES 				+= -D ACCEL_CALIBRATE_EEPROM_START_ADDR=0x04
+CC_GLOBAL_DEFINES 				+= -D GYRO_CALIBRATE_EEPROM_START_ADDR=0x10
+CC_GLOBAL_DEFINES				+= -D DEVICE_ID_EEPROM_ADDRESS=0x00
 
 ###########################################
 # MAIN SOURCE
@@ -162,7 +167,7 @@ CSOURCE						+= protocols/com/packet.c
 CSOURCE                    	+= protocols/gps/gps.c
 # BATTERY #
 CSOURCE                    	+= protocols/battery/battery.c
-# BATTERY #
+# IMU #
 CSOURCE                    	+= protocols/imu/imu.c
 # I2C Protocol #
 CSOURCE						+= protocols/i2c_protocol/i2c.c
@@ -209,6 +214,7 @@ C_STD						= gnu99
 
 OBJECTS	 					= ./*.o
 EXECUTABLE					= jay
+INIT_EXECUTABLE				= init
 
 ########### COMPILER OPTIONS ##############
 CFLAGS						+= -Wall
@@ -241,6 +247,19 @@ CC_LN_OPTIONS				+= -lprintf_flt
 CC_LN_OPTIONS				+= -o${EXECUTABLE}.elf
 CC_LN_OPTIONS				+= ${OBJECTS}
 
+# INITIALIZATION #
+INIT_SEARCH_PATH			= -I drivers/i2c_driver
+INIT_SEARCH_PATH			+= -I protocols/i2c_protocol
+INIT_SEARCH_PATH			+= -I drivers/gy85
+INIT_SEARCH_PATH			+= -I protocols/imu
+INIT_SEARCH_PATH			+= -I system/leds
+
+INIT_SOURCES				= init_controller.c
+INIT_SOURCES				+= drivers/i2c_driver/i2cmaster.c
+INIT_SOURCES				+= protocols/i2c_protocol/i2c.c
+INIT_SOURCES				+= drivers/gy85/gy85.c
+INIT_SOURCES                += protocols/imu/imu.c
+INIT_SOURCES				+= system/leds/leds.c
 
 all:
 	${CC} ${CC_COMP_OPTIONS}
@@ -250,9 +269,16 @@ all:
 	${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 	#${BURNER} -F -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${EXECUTABLE}.hex
 
-fusebits328p:
+bringupboard:
 	# sets fuse bits to use the external 16MHz XTAL on the Atmega 328P
-	avrdude -p m328p -c usbasp -U lfuse:w:0xce:m
+	sudo touch fake.o
+	rm -f *.o
+	avrdude -p m328p -c usbasp -U lfuse:w:0xCE:m -U hfuse:w:0xD1:m
+	${CC} -mmcu=${CC_AVR} ${CC_GLOBAL_DEFINES} -D NO_SYSTEM_H -DDEVICE_ID=$(shell date +%s) -Wextra -Wimplicit -std=${C_STD} -I ${INIT_SEARCH_PATH} -c ${INIT_SOURCES}
+	${CC} -mmcu=${CC_AVR} -o${INIT_EXECUTABLE}.elf ${OBJECTS}
+
+	${OBJECT_COPY} -j .text -j .data -O ihex ${INIT_EXECUTABLE}.elf ${INIT_EXECUTABLE}.hex
+	${BURNER} -V -P ${COMPILER_PATH} -p ${BURNER_AVR} -c ${BURNER_PROGRAMMER} -e -b ${BAUDRATE} -U flash:w:${INIT_EXECUTABLE}.hex
 
 clean:
 	rm *.elf *.hex *.o

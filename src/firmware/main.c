@@ -81,6 +81,23 @@ int main (void) {
  		float MAG = 0.001;
  	#endif
 
+	double kpid = 5.5;
+	double nv_kpid = 0.0;
+	uint32_t ll;
+
+	eeprom_write_block(&kpid, (uint8_t *)0x18, sizeof(double));
+	eeprom_read_block(&nv_kpid, (uint8_t *)0x18, sizeof(double));
+
+	memcpy(&ll, &nv_kpid, 4);
+
+	if(kpid == nv_kpid){
+		led_on(GP_LED2);
+	}
+
+	sprintf(testing, " \nOut:\t%lX", ll);
+	UART_SendString(testing);
+
+
 
 	for(;;) {
 
@@ -221,7 +238,7 @@ int main (void) {
 				UART_SendString(testing);
 				sprintf(testing, " Kd = %lf\t", (double)(pidRoll.kd));
 				UART_SendString(testing);
-					
+
 				sprintf(testing, " \nPITCH:\t");
 				UART_SendString(testing);
 				sprintf(testing, " Kp = %lf\t", (double)(pidPitch.kp));

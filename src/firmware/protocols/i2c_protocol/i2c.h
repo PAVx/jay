@@ -9,6 +9,7 @@
 #define _I2C_FUCKERY
 
 #include <stdint.h>
+#include "../../drivers/i2c_driver/i2cmaster.h"
 
 extern void initI2C(void);
 extern void writeI2Cbyte(uint8_t address, uint8_t location, uint8_t value);

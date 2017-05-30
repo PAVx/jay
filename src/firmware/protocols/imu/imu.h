@@ -9,6 +9,7 @@
 
 void IMU_Init(void);
 void IMU_Update(void);
+void IMU_Calibrate(void);
 
 double Accel_GetX(void);
 double Accel_GetY(void);

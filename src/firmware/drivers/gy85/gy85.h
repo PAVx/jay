@@ -37,6 +37,7 @@
 
 void GY85_Init(void);
 void GY85_UpdateData(void);
+void GY85_Calibrate(void);
 
 double Accel_GY85_GetX(void);
 
