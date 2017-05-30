@@ -14,6 +14,10 @@ double _a_x = 0;
 double _a_y = 0;
 double _a_z = 0;
 
+double a_offx = 0.0;
+double a_offy = 0.0;
+double a_offz = 0.0;
+
 double _g_x = 0;
 double _g_y = 0;
 double _g_z = 0;
@@ -66,7 +70,7 @@ void GY85_Init(void)
     // writeI2CReg(ADXL345_ADDR, 0x20, &zero, 1);
 
     //_delay_ms(2); // Arbitrary delay amount
-    ADXL345_Calibrate();
+   // ADXL345_Calibrate();
     #endif
 
     #ifdef GYRO
@@ -141,22 +145,22 @@ void GY85_Calibrate(void){
     g_offy = tmpy_gyro / GYRO_CALIBRATION_ITERATIONS;
     g_offz = tmpz_gyro / GYRO_CALIBRATION_ITERATIONS;
 
-    eeprom_write_block(&a_offx, 0x4, sizeof(double));
-    eeprom_write_block(&a_offy, 0x8, sizeof(double));
-    eeprom_write_block(&a_offy, 0xC, sizeof(double));
+    eeprom_write_block(&a_offx, (unsigned int*)0x4, sizeof(double));
+    eeprom_write_block(&a_offy, (unsigned int*)0x8, sizeof(double));
+    eeprom_write_block(&a_offz, (unsigned int*)0xC, sizeof(double));
 
 
-    eeprom_write_block(&g_offx, 0x10, sizeof(double));
-    eeprom_write_block(&g_offy, 0x14, sizeof(double));
-    eeprom_write_block(&g_offy, 0x18, sizeof(double));
+    eeprom_write_block(&g_offx, (unsigned int*)0x10, sizeof(double));
+    eeprom_write_block(&g_offy, (unsigned int*)0x14, sizeof(double));
+    eeprom_write_block(&g_offz, (unsigned int*)0x18, sizeof(double));
 
 }
 
 void ADXL345_Calibrate(void)
 {
-    uint8_t a_offx = 0;
-    uint8_t a_offy = 0;
-    uint8_t a_offz = 0;
+    double a_offx = 0;
+    double a_offy = 0;
+    double a_offz = 0;
 
     #ifdef ACCEL_CALIBRATE
         double tmpx = 0;
@@ -176,24 +180,26 @@ void ADXL345_Calibrate(void)
 
         // Each LSB of output in full-resolution is one-quarter of an
         // LSB of the offset register. (Datasheet: Offset Calibration)
-        a_offx = -round(tmpx / 1000 / 4);
-        a_offy = -round(tmpy / 1000 / 4) ;
-        a_offz = -round(((tmpz / 1000) - 256) / 4) ;
+        a_offx = -1 * round(tmpx / 1000 / 4);
+        a_offy = -1 * round(tmpy / 1000 / 4) ;
+        a_offz = -1 * round(((tmpz / 1000) - 256) / 4) ;
 
-        eeprom_write_block(&a_offx, 0x4, sizeof(double));
-        eeprom_write_block(&a_offy, 0x8, sizeof(double));
-        eeprom_write_block(&a_offy, 0xC, sizeof(double));
+        eeprom_write_block(&a_offx, (uint8_t*)0x4, sizeof(double));
+        eeprom_write_block(&a_offy, (uint8_t*)0x8, sizeof(double));
+        eeprom_write_block(&a_offz, (uint8_t*)0xC, sizeof(double));
     #else
-        eeprom_read_block(&a_offx, 0x4, sizeof(double));
-        eeprom_read_block(&a_offy, 0x8, sizeof(double));
-        eeprom_read_block(&a_offz, 0xC, sizeof(double));
+        eeprom_read_block(&a_offx, (uint8_t*)0x4, sizeof(double));
+        eeprom_read_block(&a_offy, (uint8_t*)0x8, sizeof(double));
+        eeprom_read_block(&a_offz, (uint8_t*)0xC, sizeof(double));
     #endif
 
 
     // Set calibrated offset values
+  /*
     writeI2CReg(ADXL345_ADDR, 0x1E, &a_offx, 1);
     writeI2CReg(ADXL345_ADDR, 0x1F, &a_offy, 1);
     writeI2CReg(ADXL345_ADDR, 0x20, &a_offz, 1);
+    */
 }
 
 void ITG3200_Calibrate(void)
@@ -220,7 +226,7 @@ void ITG3200_Calibrate(void)
 
         eeprom_write_block(&g_offx, (uint8_t *)0x10, sizeof(double));
         eeprom_write_block(&g_offy, (uint8_t *)0x14, sizeof(double));
-        eeprom_write_block(&g_offy, (uint8_t *)0x18, sizeof(double));
+        eeprom_write_block(&g_offz, (uint8_t *)0x18, sizeof(double));
     #else
         eeprom_read_block(&g_offx, (uint8_t *)0x10, sizeof(double));
         eeprom_read_block(&g_offy, (uint8_t *)0x14, sizeof(double));
@@ -315,17 +321,17 @@ void Mag_LowPass_Filter(double *x, double *y, double *z)
 
 double Accel_GY85_GetX(void)
 {
-    return _a_x / 256;
+    return (_a_x - a_offx) / 256;
 }
 
 double Accel_GY85_GetY(void)
 {
-    return _a_y / 256;
+    return (_a_y - a_offy) / 256;
 }
 
 double Accel_GY85_GetZ(void)
 {
-    return _a_z / 256;
+    return (_a_z - a_offx) / 256;
 }
 
 double Gyro_GY85_GetX(void)

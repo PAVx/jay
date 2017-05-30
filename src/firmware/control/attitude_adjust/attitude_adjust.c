@@ -50,7 +50,8 @@ void AttituteAdjustSetDesired(double yawDesired, double pitchDesired, double rol
 	PIDSetDesired(&pidRoll, rollDesired);
 }
 
-void AttituteAdjustUpdatePID(double pitchRate, double rollRate, double yawActual, double pitchActual, double rollActual){
+void AttituteAdjustUpdatePID(double pitchRate, double rollRate, 
+	double yawActual, double pitchActual, double rollActual){
 	
 	/*
 	if (pitchActual < (0.05 + pidPitch.desired) && pitchActual > (pidPitch.desired - 0.05)) {
@@ -65,11 +66,11 @@ void AttituteAdjustUpdatePID(double pitchRate, double rollRate, double yawActual
 	*/
 	
 	yawError = PIDUpdate(&pidYaw, yawActual, UPDATE_ERROR);
-	pitchError = PIDUpdate(&pidPitch, pitchActual, UPDATE_ERROR);
-	rollError = PIDUpdate(&pidRoll, rollActual, UPDATE_ERROR);
+	//pitchError = PIDUpdate(&pidPitch, pitchActual, UPDATE_ERROR);
+	//rollError = PIDUpdate(&pidRoll, rollActual, UPDATE_ERROR);
 
-	PIDSetDesired(&pidPitchRate, pitchError);
-	PIDSetDesired(&pidRollRate, rollError);
+	PIDSetDesired(&pidPitchRate, 0 - pitchActual);//pitchError);
+	PIDSetDesired(&pidRollRate, 0 - rollActual);//rollError);
 	
 	
 	pitchError = PIDUpdate(&pidPitchRate, pitchRate, UPDATE_ERROR);

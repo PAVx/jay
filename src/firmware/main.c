@@ -155,35 +155,35 @@ int main (void) {
 					case 'u':
 						if (pid_selector == pitch_pid) {
 							if (gain_selector == p_select) {
-								PIDSetKp(&pidPitch, pidPitch.kp + MAG);
+								PIDSetKp(&pidPitchRate, pidPitchRate.kp + MAG);
 							}
 							else if (gain_selector == i_select) {
-								PIDSetKi(&pidPitch, pidPitch.ki + MAG);
+								PIDSetKi(&pidPitchRate, pidPitchRate.ki + MAG);
 							}
 							else if (gain_selector == d_select) {
-								PIDSetKd(&pidPitch, pidPitch.kd + MAG);
+								PIDSetKd(&pidPitchRate, pidPitchRate.kd + MAG);
 							}
 						}
 						else if (pid_selector == roll_pid) {
 							if (gain_selector == p_select) {
-								PIDSetKp(&pidRoll, pidRoll.kp + MAG);
+								PIDSetKp(&pidRollRate, pidRollRate.kp + MAG);
 							}
 							else if (gain_selector == i_select) {
-								PIDSetKi(&pidRoll, pidRoll.ki + MAG);
+								PIDSetKi(&pidRollRate, pidRollRate.ki + MAG);
 							}
 							else if (gain_selector == d_select) {
-								PIDSetKd(&pidRoll, pidRoll.kd + MAG);
+								PIDSetKd(&pidRollRate, pidRollRate.kd + MAG);
 							}
 						}
 						else if (pid_selector == yaw_pid) {
 							if (gain_selector == p_select) {
-								PIDSetKp(&pidYaw, pidYaw.kp + MAG);
+								PIDSetKp(&pidYawRate, pidYawRate.kp + MAG);
 							}
 							else if (gain_selector == i_select) {
-								PIDSetKi(&pidYaw, pidYaw.ki + MAG);
+								PIDSetKi(&pidYawRate, pidYawRate.ki + MAG);
 							}
 							else if (gain_selector == d_select) {
-								PIDSetKd(&pidYaw, pidYaw.kd + MAG);
+								PIDSetKd(&pidYawRate, pidYawRate.kd + MAG);
 							}
 						}
 						break;
@@ -191,35 +191,35 @@ int main (void) {
 					case 'j':
 						if (pid_selector == pitch_pid) {
 							if (gain_selector == p_select) {
-								PIDSetKp(&pidPitch, pidPitch.kp - MAG);
+								PIDSetKp(&pidPitchRate, pidPitchRate.kp - MAG);
 							}
 							else if (gain_selector == i_select) {
-								PIDSetKi(&pidPitch, pidPitch.ki - MAG);
+								PIDSetKi(&pidPitchRate, pidPitchRate.ki - MAG);
 							}
 							else if (gain_selector == d_select) {
-								PIDSetKd(&pidPitch, pidPitch.kd - MAG);
+								PIDSetKd(&pidPitchRate, pidPitchRate.kd - MAG);
 							}
 						}
 						else if (pid_selector == roll_pid) {
 							if (gain_selector == p_select) {
-								PIDSetKp(&pidRoll, pidRoll.kp - MAG);
+								PIDSetKp(&pidRollRate, pidRollRate.kp - MAG);
 							}
 							else if (gain_selector == i_select) {
-								PIDSetKi(&pidRoll, pidRoll.ki - MAG);
+								PIDSetKi(&pidRollRate, pidRollRate.ki - MAG);
 							}
 							else if (gain_selector == d_select) {
-								PIDSetKd(&pidRoll, pidRoll.kd - MAG);
+								PIDSetKd(&pidRollRate, pidRollRate.kd - MAG);
 							}
 						}
 						else if (pid_selector == yaw_pid) {
 							if (gain_selector == p_select) {
-								PIDSetKp(&pidYaw, pidYaw.kp - MAG);
+								PIDSetKp(&pidYawRate, pidYawRate.kp - MAG);
 							}
 							else if (gain_selector == i_select) {
-								PIDSetKi(&pidYaw, pidYaw.ki - MAG);
+								PIDSetKi(&pidYawRate, pidYawRate.ki - MAG);
 							}
 							else if (gain_selector == d_select) {
-								PIDSetKd(&pidYaw, pidYaw.kd - MAG);
+								PIDSetKd(&pidYawRate, pidYawRate.kd - MAG);
 							}
 						}
 						break;
@@ -232,29 +232,29 @@ int main (void) {
 
 				sprintf(testing, " \nROLL:\t");
 				UART_SendString(testing);
-				sprintf(testing, " Kp = %lf\t", (double)(pidRoll.kp));
+				sprintf(testing, " Kp = %lf\t", (double)(pidRollRate.kp));
 				UART_SendString(testing);
-				sprintf(testing, " Ki = %lf\t", (double)(pidRoll.ki));
+				sprintf(testing, " Ki = %lf\t", (double)(pidRollRate.ki));
 				UART_SendString(testing);
-				sprintf(testing, " Kd = %lf\t", (double)(pidRoll.kd));
+				sprintf(testing, " Kd = %lf\t", (double)(pidRollRate.kd));
 				UART_SendString(testing);
 
 				sprintf(testing, " \nPITCH:\t");
 				UART_SendString(testing);
-				sprintf(testing, " Kp = %lf\t", (double)(pidPitch.kp));
+				sprintf(testing, " Kp = %lf\t", (double)(pidPitchRate.kp));
 				UART_SendString(testing);
-				sprintf(testing, " Ki = %lf\t", (double)(pidPitch.ki));
+				sprintf(testing, " Ki = %lf\t", (double)(pidPitchRate.ki));
 				UART_SendString(testing);
-				sprintf(testing, " Kd = %lf\t", (double)(pidPitch.kd));
+				sprintf(testing, " Kd = %lf\t", (double)(pidPitchRate.kd));
 				UART_SendString(testing);
 
 				sprintf(testing, " \nYAW:\t");
 				UART_SendString(testing);
-				sprintf(testing, " Kp = %lf\t", (double)(pidYaw.kp));
+				sprintf(testing, " Kp = %lf\t", (double)(pidYawRate.kp));
 				UART_SendString(testing);
-				sprintf(testing, " Ki = %lf\t", (double)(pidYaw.ki));
+				sprintf(testing, " Ki = %lf\t", (double)(pidYawRate.ki));
 				UART_SendString(testing);
-				sprintf(testing, " Kd = %lf\t", (double)(pidYaw.kd));
+				sprintf(testing, " Kd = %lf\t", (double)(pidYawRate.kd));
 				UART_SendString(testing);
 
 			}
