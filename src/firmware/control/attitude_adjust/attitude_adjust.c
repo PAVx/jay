@@ -28,9 +28,18 @@ uint8_t InitializeAttitudeAdjust(void) {
 	PIDInit(&pidRoll, 0, PID_ROLL_KP, PID_ROLL_KI, PID_ROLL_KD, IMU_UPDATE_DT);
 	PIDInit(&pidPitch, 0, PID_PITCH_KP, PID_PITCH_KI, PID_PITCH_KD, IMU_UPDATE_DT);
 	PIDInit(&pidYaw, 0, PID_YAW_KP, PID_YAW_KI, PID_YAW_KD, IMU_UPDATE_DT);
+	
+	PIDInit(&pidRollRate, 0, PID_ROLL_RATE_KP, PID_ROLL_RATE_KI, PID_ROLL_RATE_KD, IMU_UPDATE_DT);
+	PIDInit(&pidPitchRate, 0, PID_PITCH_RATE_KP, PID_PITCH_RATE_KI, PID_PITCH_RATE_KD, IMU_UPDATE_DT);
+	PIDInit(&pidYawRate, 0, PID_YAW_RATE_KP, PID_YAW_RATE_KI, PID_YAW_RATE_KD, IMU_UPDATE_DT);
+	
 	PIDSetIntegralLimit(&pidRoll, PID_ROLL_INTEGRATION_LIMIT);
 	PIDSetIntegralLimit(&pidPitch, PID_PITCH_INTEGRATION_LIMIT);
 	PIDSetIntegralLimit(&pidYaw, PID_YAW_INTEGRATION_LIMIT);
+
+	PIDSetIntegralLimit(&pidRollRate, PID_ROLL_RATE_INTEGRATION_LIMIT);
+	PIDSetIntegralLimit(&pidPitchRate, PID_PITCH_RATE_INTEGRATION_LIMIT);
+	PIDSetIntegralLimit(&pidYawRate, PID_YAW_RATE_INTEGRATION_LIMIT);
 
 	return 1;
 }
@@ -41,14 +50,30 @@ void AttituteAdjustSetDesired(double yawDesired, double pitchDesired, double rol
 	PIDSetDesired(&pidRoll, rollDesired);
 }
 
-void AttituteAdjustUpdatePID(double yawActual, double pitchActual, double rollActual){
+void AttituteAdjustUpdatePID(double pitchRate, double rollRate, double yawActual, double pitchActual, double rollActual){
+	
+	/*
 	if (pitchActual < (0.05 + pidPitch.desired) && pitchActual > (pidPitch.desired - 0.05)) {
 		pitchActual = pidPitch.desired;
 		PIDReset(&pidPitch);
 	}
+
+	if (rollActual < (0.05 + pidRoll.desired) && rollActual > (pidRoll.desired - 0.05)) {
+		rollActual = pidRoll.desired;
+		PIDReset(&pidRoll);
+	}
+	*/
+	
 	yawError = PIDUpdate(&pidYaw, yawActual, UPDATE_ERROR);
 	pitchError = PIDUpdate(&pidPitch, pitchActual, UPDATE_ERROR);
 	rollError = PIDUpdate(&pidRoll, rollActual, UPDATE_ERROR);
+
+	PIDSetDesired(&pidPitchRate, pitchError);
+	PIDSetDesired(&pidRollRate, rollError);
+	
+	
+	pitchError = PIDUpdate(&pidPitchRate, pitchRate, UPDATE_ERROR);
+	rollError = PIDUpdate(&pidRollRate, rollRate, UPDATE_ERROR);
 }
 
 void AttitudeSetThrottle(int32_t throttle) {
