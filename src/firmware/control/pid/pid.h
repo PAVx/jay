@@ -9,19 +9,21 @@
 // Some PID concepts borrowed the bitcraze/crazieflie-firmware repository
 // https://www.bitcraze.io
 
+
+
 #ifndef _PID_H_
 #define _PID_H_
 
 #include <stdint.h>
 
-#define PID_ROLL_KP  1.1
-#define PID_ROLL_KI  0.0
-#define PID_ROLL_KD  0.8
+#define PID_ROLL_KP  5.5
+#define PID_ROLL_KI  0.001
+#define PID_ROLL_KD  1.8
 #define PID_ROLL_INTEGRATION_LIMIT    30.0
 
-#define PID_PITCH_KP  1.1
+#define PID_PITCH_KP  4.0
 #define PID_PITCH_KI  0.0
-#define PID_PITCH_KD  0.8
+#define PID_PITCH_KD  1.0
 #define PID_PITCH_INTEGRATION_LIMIT   30.0
 
 #define PID_YAW_KP  0.0
@@ -29,12 +31,12 @@
 #define PID_YAW_KD  0.0
 #define PID_YAW_INTEGRATION_LIMIT     360.0
 
-#define PID_ROLL_RATE_KP  .33
-#define PID_ROLL_RATE_KI  0.0 
+#define PID_ROLL_RATE_KP  0.1
+#define PID_ROLL_RATE_KI  0.0
 #define PID_ROLL_RATE_KD  0.0
 #define PID_ROLL_RATE_INTEGRATION_LIMIT    30.0
 
-#define PID_PITCH_RATE_KP  .33
+#define PID_PITCH_RATE_KP  0.1
 #define PID_PITCH_RATE_KI  0.0
 #define PID_PITCH_RATE_KD  0.0
 #define PID_PITCH_RATE_INTEGRATION_LIMIT   30.0
@@ -42,7 +44,7 @@
 #define PID_YAW_RATE_KP  0.0
 #define PID_YAW_RATE_KI  0.0
 #define PID_YAW_RATE_KD  0.0
-#define PID_YAW_RATE_INTEGRATION_LIMIT     360.0
+#define PID_YAW_RATE_INTEGRATION_LIMIT     30.0
 
 #define PID_INACTIVE_LOWER_THRESHOLD (0.000001)
 #define DEFAULT_PID_INTEGRATION_LIMIT  30.0

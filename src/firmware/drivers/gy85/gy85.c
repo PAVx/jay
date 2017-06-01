@@ -6,6 +6,8 @@
 #include <util/delay.h>
 #include <stdbool.h>
 
+#define LOWPASS_ACTIVE
+
 #ifndef NO_SYSTEM_H
     #include "system.h"
 #endif
@@ -31,27 +33,32 @@ double _m_x = 0;
 double _m_y = 0;
 double _m_z = 0;
 
-double _accel_lowpass_x = 0;
-double _accel_lowpass_y = 0;
-double _accel_lowpass_z = 0;
+#ifdef LOWPASS_ACTIVE
+    double _accel_lowpass_x = 0;
+    double _accel_lowpass_y = 0;
+    double _accel_lowpass_z = 0;
 
-double _gyro_lowpass_x = 0;
-double _gyro_lowpass_y = 0;
-double _gyro_lowpass_z = 0;
+    double _gyro_lowpass_x = 0;
+    double _gyro_lowpass_y = 0;
+    double _gyro_lowpass_z = 0;
 
-double _mag_lowpass_x = 0;
-double _mag_lowpass_y = 0;
-double _mag_lowpass_z = 0;
+    double _mag_lowpass_x = 0;
+    double _mag_lowpass_y = 0;
+    double _mag_lowpass_z = 0;
 
-static double alpha = 0.2;
-
+    static double alpha = 0.85;
+#endif
 
 void GY85_Read(double *a_x, double *a_y, double *a_z,
         double *g_x, double *g_y, double *g_z, double *g_t,
         double *m_x, double *m_y, double *m_z);
-void Accel_LowPass_Filter(double *x, double *y, double *z);
-void Gyro_LowPass_Filter(double *x, double *y, double *z);
-void Mag_LowPass_Filter(double *x, double *y, double *z);
+
+#ifdef LOWPASS_ACTIVE
+    void Accel_LowPass_Filter(double *x, double *y, double *z);
+    void Gyro_LowPass_Filter(double *x, double *y, double *z);
+    void Mag_LowPass_Filter(double *x, double *y, double *z);
+#endif
+
 void ADXL345_Calibrate(void);
 void ITG3200_Calibrate(void);
 
@@ -274,30 +281,39 @@ void GY85_Read(double *a_x, double *a_y, double *a_z,
 void GY85_UpdateData(void)
 {
         GY85_Read(&_a_x, &_a_y, &_a_z, &_g_x, &_g_y, &_g_z, &_g_t, &_m_x, &_m_y, &_m_z);
-        Accel_LowPass_Filter(&_a_x, &_a_y, &_a_z);
-        Gyro_LowPass_Filter(&_g_x, &_g_y, &_g_z);
-        Mag_LowPass_Filter(&_m_x, &_m_y, &_m_z);
 
-        #ifdef IMU_UPSIDEDOWN
+        #ifdef LOWPASS_ACTIVE
+            Accel_LowPass_Filter(&_a_x, &_a_y, &_a_z);
+            Gyro_LowPass_Filter(&_g_x, &_g_y, &_g_z);
+            Mag_LowPass_Filter(&_m_x, &_m_y, &_m_z);
+
+            #ifdef IMU_UPSIDEDOWN
                 _a_x = -1 * _accel_lowpass_x;
                 _a_z = -1 * _accel_lowpass_z;
-        #else
+            #else
                 _a_x = _accel_lowpass_x;
                 _a_z = _accel_lowpass_z;
+            #endif
+
+            _a_y = _accel_lowpass_y;
+
+            _g_x = _gyro_lowpass_x;
+            _g_y = _gyro_lowpass_y;
+            _g_z = _gyro_lowpass_z;
+            _g_t = _g_t;
+
+            _m_x = _mag_lowpass_x;
+            _m_y = _mag_lowpass_y;
+            _m_z = _mag_lowpass_z;
+        #else
+            #ifdef IMU_UPSIDEDOWN
+                _a_x *= -1;
+                _a_z *= -1;
+            #endif
         #endif
-
-        _a_y = _accel_lowpass_y;
-
-        _g_x = _gyro_lowpass_x;
-        _g_y = _gyro_lowpass_y;
-        _g_z = _gyro_lowpass_z;
-        _g_t = _g_t;
-
-        _m_x = _mag_lowpass_x;
-        _m_y = _mag_lowpass_y;
-        _m_z = _mag_lowpass_z;
 }
 
+#ifdef LOWPASS_ACTIVE
 void Accel_LowPass_Filter(double *x, double *y, double *z)
 {
   _accel_lowpass_x = (*x) * alpha + (_accel_lowpass_x * (1.0 - alpha));
@@ -318,6 +334,7 @@ void Mag_LowPass_Filter(double *x, double *y, double *z)
   _mag_lowpass_y = (*y) * alpha + (_mag_lowpass_y * (1.0 - alpha));
   _mag_lowpass_z = (*z) * alpha + (_mag_lowpass_z * (1.0 - alpha));
 }
+#endif
 
 double Accel_GY85_GetX(void)
 {

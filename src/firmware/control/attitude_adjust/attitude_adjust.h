@@ -24,7 +24,8 @@ PID_t pidYawRate;
 
 uint8_t InitializeAttitudeAdjust(void);
 void AttituteAdjustSetDesired(double yawDesired, double pitchDesired, double rollDesired);
-void AttituteAdjustUpdatePID(double pitchRate, double rollRate, double yawActual, double pitchActual, double rollActual);
+void AttituteAdjustUpdatePID(double pitchRate, double rollRate,
+	double yawActual, double pitchActual, double rollActual);
 void AttitudeSetThrottle(int32_t throttle);
 void AttitudeAdjustGetError(int motor_changes[NUM_MOTORS]);
 void AttitudeAdjustSetActuation(int motor_changes[NUM_MOTORS]);

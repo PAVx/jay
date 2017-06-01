@@ -8,6 +8,8 @@
 #include <string.h>
 #include <util/delay.h>
 
+int freeRam ();
+
 #define LED_DEBUG
 //#define WAIT_FOR_SYSTEM_ACK
 //#define PACKET_DEBUG
@@ -18,7 +20,7 @@
 #define KEYBOARD_DEBUG
 #define LIVE_PID_TUNER
 //#define PID_PRINT_DEBUG
-//#define PID_TIME_TEST
+#define PID_TIME_TEST
 //static uint8_t roll_static_count = 0;
 //static uint8_t pitch_static_count = 0;
 
@@ -41,12 +43,15 @@
 #endif
 
 char testing[30];
-char sys_print[32];
 char op_code;
-
 static uint8_t o = 0;
 
 #ifdef PID_DEBUG
+	// double alpha = 0.2;
+	// double lowpass_yaw = 0.0;
+	// double lowpass_pitch = 0.0;
+	// double lowpass_roll = 0.0;
+
 	double ypr[3] = {0};
 	double last_ypr[3] = {0};
 	int motor_delta[4];
@@ -81,24 +86,6 @@ int main (void) {
  		float MAG = 0.001;
  	#endif
 
-	double kpid = 5.5;
-	double nv_kpid = 0.0;
-	uint32_t ll;
-
-	eeprom_write_block(&kpid, (uint8_t *)0x18, sizeof(double));
-	eeprom_read_block(&nv_kpid, (uint8_t *)0x18, sizeof(double));
-
-	memcpy(&ll, &nv_kpid, 4);
-
-	if(kpid == nv_kpid){
-		led_on(GP_LED2);
-	}
-
-	sprintf(testing, " \nOut:\t%lX", ll);
-	UART_SendString(testing);
-
-
-
 	for(;;) {
 
 		#ifdef KEYBOARD_DEBUG
@@ -106,7 +93,7 @@ int main (void) {
 				op_code = UART_GetByte();
 
 				if ((op_code == 's') && (o == 0) && battery_charged()) {
-					AttitudeSetThrottle(5375);
+					AttitudeSetThrottle(6000);
 					ref_init = 0;
 					o = 1;
 				}
@@ -155,35 +142,35 @@ int main (void) {
 					case 'u':
 						if (pid_selector == pitch_pid) {
 							if (gain_selector == p_select) {
-								PIDSetKp(&pidPitchRate, pidPitchRate.kp + MAG);
+								PIDSetKp(&pidPitch, pidPitch.kp + MAG);
 							}
 							else if (gain_selector == i_select) {
-								PIDSetKi(&pidPitchRate, pidPitchRate.ki + MAG);
+								PIDSetKi(&pidPitch, pidPitch.ki + MAG);
 							}
 							else if (gain_selector == d_select) {
-								PIDSetKd(&pidPitchRate, pidPitchRate.kd + MAG);
+								PIDSetKd(&pidPitch, pidPitch.kd + MAG);
 							}
 						}
 						else if (pid_selector == roll_pid) {
 							if (gain_selector == p_select) {
-								PIDSetKp(&pidRollRate, pidRollRate.kp + MAG);
+								PIDSetKp(&pidRoll, pidRoll.kp + MAG);
 							}
 							else if (gain_selector == i_select) {
-								PIDSetKi(&pidRollRate, pidRollRate.ki + MAG);
+								PIDSetKi(&pidRoll, pidRoll.ki + MAG);
 							}
 							else if (gain_selector == d_select) {
-								PIDSetKd(&pidRollRate, pidRollRate.kd + MAG);
+								PIDSetKd(&pidRoll, pidRoll.kd + MAG);
 							}
 						}
 						else if (pid_selector == yaw_pid) {
 							if (gain_selector == p_select) {
-								PIDSetKp(&pidYawRate, pidYawRate.kp + MAG);
+								PIDSetKp(&pidYaw, pidYaw.kp + MAG);
 							}
 							else if (gain_selector == i_select) {
-								PIDSetKi(&pidYawRate, pidYawRate.ki + MAG);
+								PIDSetKi(&pidYaw, pidYaw.ki + MAG);
 							}
 							else if (gain_selector == d_select) {
-								PIDSetKd(&pidYawRate, pidYawRate.kd + MAG);
+								PIDSetKd(&pidYaw, pidYaw.kd + MAG);
 							}
 						}
 						break;
@@ -191,35 +178,35 @@ int main (void) {
 					case 'j':
 						if (pid_selector == pitch_pid) {
 							if (gain_selector == p_select) {
-								PIDSetKp(&pidPitchRate, pidPitchRate.kp - MAG);
+								PIDSetKp(&pidPitch, pidPitch.kp - MAG);
 							}
 							else if (gain_selector == i_select) {
-								PIDSetKi(&pidPitchRate, pidPitchRate.ki - MAG);
+								PIDSetKi(&pidPitch, pidPitch.ki - MAG);
 							}
 							else if (gain_selector == d_select) {
-								PIDSetKd(&pidPitchRate, pidPitchRate.kd - MAG);
+								PIDSetKd(&pidPitch, pidPitch.kd - MAG);
 							}
 						}
 						else if (pid_selector == roll_pid) {
 							if (gain_selector == p_select) {
-								PIDSetKp(&pidRollRate, pidRollRate.kp - MAG);
+								PIDSetKp(&pidRoll, pidRoll.kp - MAG);
 							}
 							else if (gain_selector == i_select) {
-								PIDSetKi(&pidRollRate, pidRollRate.ki - MAG);
+								PIDSetKi(&pidRoll, pidRoll.ki - MAG);
 							}
 							else if (gain_selector == d_select) {
-								PIDSetKd(&pidRollRate, pidRollRate.kd - MAG);
+								PIDSetKd(&pidRoll, pidRoll.kd - MAG);
 							}
 						}
 						else if (pid_selector == yaw_pid) {
 							if (gain_selector == p_select) {
-								PIDSetKp(&pidYawRate, pidYawRate.kp - MAG);
+								PIDSetKp(&pidYaw, pidYaw.kp - MAG);
 							}
 							else if (gain_selector == i_select) {
-								PIDSetKi(&pidYawRate, pidYawRate.ki - MAG);
+								PIDSetKi(&pidYaw, pidYaw.ki - MAG);
 							}
 							else if (gain_selector == d_select) {
-								PIDSetKd(&pidYawRate, pidYawRate.kd - MAG);
+								PIDSetKd(&pidYaw, pidYaw.kd - MAG);
 							}
 						}
 						break;
@@ -232,29 +219,29 @@ int main (void) {
 
 				sprintf(testing, " \nROLL:\t");
 				UART_SendString(testing);
-				sprintf(testing, " Kp = %lf\t", (double)(pidRollRate.kp));
+				sprintf(testing, " Kp = %lf\t", (double)(pidRoll.kp));
 				UART_SendString(testing);
-				sprintf(testing, " Ki = %lf\t", (double)(pidRollRate.ki));
+				sprintf(testing, " Ki = %lf\t", (double)(pidRoll.ki));
 				UART_SendString(testing);
-				sprintf(testing, " Kd = %lf\t", (double)(pidRollRate.kd));
+				sprintf(testing, " Kd = %lf\t", (double)(pidRoll.kd));
 				UART_SendString(testing);
 
 				sprintf(testing, " \nPITCH:\t");
 				UART_SendString(testing);
-				sprintf(testing, " Kp = %lf\t", (double)(pidPitchRate.kp));
+				sprintf(testing, " Kp = %lf\t", (double)(pidPitch.kp));
 				UART_SendString(testing);
-				sprintf(testing, " Ki = %lf\t", (double)(pidPitchRate.ki));
+				sprintf(testing, " Ki = %lf\t", (double)(pidPitch.ki));
 				UART_SendString(testing);
-				sprintf(testing, " Kd = %lf\t", (double)(pidPitchRate.kd));
+				sprintf(testing, " Kd = %lf\t", (double)(pidPitch.kd));
 				UART_SendString(testing);
 
 				sprintf(testing, " \nYAW:\t");
 				UART_SendString(testing);
-				sprintf(testing, " Kp = %lf\t", (double)(pidYawRate.kp));
+				sprintf(testing, " Kp = %lf\t", (double)(pidYaw.kp));
 				UART_SendString(testing);
-				sprintf(testing, " Ki = %lf\t", (double)(pidYawRate.ki));
+				sprintf(testing, " Ki = %lf\t", (double)(pidYaw.ki));
 				UART_SendString(testing);
-				sprintf(testing, " Kd = %lf\t", (double)(pidYawRate.kd));
+				sprintf(testing, " Kd = %lf\t", (double)(pidYaw.kd));
 				UART_SendString(testing);
 
 			}
@@ -277,7 +264,7 @@ int main (void) {
 	                    UART_SendByte(gpsbuffer[i]);
 	                    i++;
 	                }
-		}
+				}
 
 	        #endif
 	    	#endif
@@ -285,19 +272,21 @@ int main (void) {
 		#ifdef PID_DEBUG
 
 			if (tick_timer_flag(IMU_TIMER_ID)) {
-				// #ifdef PID_TIME_TEST
- 			// 		led_on(DIGITAL_PIN_1);
- 			// 	#endif
-				//
-				// IMU_Update();
-				// //Mag_Update();
-				// //Gyro_Update();
-				// //cli();
-				//
-				// //imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Mag_GetX(), Mag_GetY());//Mag_GetX(), Mag_GetY());
-				// //imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
-				// sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS*SYSTEM_TICK_OFFSET);
-				// sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
+
+				#ifdef PID_TIME_TEST
+ 					led_on(DIGITAL_PIN_1);
+ 				#endif
+
+				IMU_Update();
+
+				imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Mag_GetX(), Mag_GetY());//Mag_GetX(), Mag_GetY());
+				//imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
+				//sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS*SYSTEM_TICK_OFFSET);
+				//sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
+
+				#ifdef PID_TIME_TEST
+					led_off(DIGITAL_PIN_1);
+				#endif
 
 				clear_tick_timer_flag(IMU_TIMER_ID);
 
@@ -309,23 +298,23 @@ int main (void) {
 		  			toggle_led(GP_LED1);
 			  	#endif
 
-				//////////////////
-
-				#ifdef PID_TIME_TEST
- 					led_on(DIGITAL_PIN_1);
- 				#endif
-
-				IMU_Update();
-				//Mag_Update();
-				//Gyro_Update();
-				//cli();
-
-				//imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Mag_GetX(), Mag_GetY());//Mag_GetX(), Mag_GetY());
-				//imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
-				sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS*SYSTEM_TICK_OFFSET);
-				sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
-
-				//////////////////
+				// // //////////////////
+				//
+				// IMU_Update();
+				//
+				// //imu2euler(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Mag_GetX(), Mag_GetY());//Mag_GetX(), Mag_GetY());
+				// imu2euler_simple(ypr, Accel_GetX(), Accel_GetY(), Accel_GetZ(), 0, 0);
+				// //sensfusion6UpdateQ(Gyro_GetX(), Gyro_GetY(), Gyro_GetZ(), Accel_GetX(), Accel_GetY(), Accel_GetZ(), IMU_UPDATE_PERIOD_SECONDS*SYSTEM_TICK_OFFSET);
+				// //sensfusion6GetEulerRPY(&ypr[2], &ypr[1], &ypr[0]);
+				//
+				// // lowpass_yaw = (ypr[0]) * alpha + (lowpass_yaw * (1.0 - alpha));
+				// // lowpass_pitch = (ypr[1]) * alpha + (lowpass_pitch * (1.0 - alpha));
+				// // lowpass_roll = (ypr[2]) * alpha + (lowpass_roll * (1.0 - alpha));
+				// // ypr[0] = lowpass_yaw;
+				// // ypr[1] = lowpass_pitch;
+				// // ypr[2] = lowpass_roll;
+				//
+				// // //////////////////
 
 				AttituteAdjustUpdatePID(Gyro_GetY(), Gyro_GetX(), 0, ypr[1], ypr[2]);
 
@@ -347,7 +336,7 @@ int main (void) {
 				*/
 
 				#ifdef PID_PRINT_DEBUG
-					if(pid_print_flag == 10) {
+					if(pid_print_flag == 1) {
 						//sprintf(testing, " \nBATT: {%d} | ", (int)battery_get_voltage());
 						//UART_SendString(testing);
 
@@ -371,10 +360,6 @@ int main (void) {
 
 					}
 					else pid_print_flag ++;
-				#endif
-
-				#ifdef PID_TIME_TEST
-					led_off(DIGITAL_PIN_1);
 				#endif
 
 				clear_tick_timer_flag(PID_TIMER_ID);
@@ -419,4 +404,12 @@ int main (void) {
 
 	}
 
+}
+
+int freeRam ()
+{
+  	extern int __heap_start, *__brkval;
+  	int v = 0;
+	int out = (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+  	return out;
 }
