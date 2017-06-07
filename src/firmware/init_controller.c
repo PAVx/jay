@@ -1,10 +1,8 @@
-// #include <inttypes.h>
-// #include <avr/io.h>
-// #include <stdlib.h>
-// #include <stdint.h>
-// #include <stdio.h>
-// #include <string.h>
-// #include <util/delay.h>
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
+	Library Created By: Niraj Raniga
+	June 2017
+*/
 
 #include <avr/eeprom.h>
 #include <avr/io.h>
