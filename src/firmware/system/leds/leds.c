@@ -1,8 +1,8 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
-	Library Created By: Sargis S Yonan
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
+	Library Created By: Niraj Raniga
 	March 2017
-*/ 
+*/
 
 // leds.c
 

@@ -1,5 +1,4 @@
 #include "system.h"
-
 #include <inttypes.h>
 #include <avr/io.h>
 #include <stdlib.h>

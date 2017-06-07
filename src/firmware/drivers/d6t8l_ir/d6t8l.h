@@ -1,3 +1,9 @@
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
+	Library Created By: Niraj Raniga
+	March 2017
+*/
+
 // d6t8l.h
 
 #ifndef _D6T8L_H_

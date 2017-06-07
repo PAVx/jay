@@ -1,25 +1,18 @@
-//***********************************************************
-//* i2c.c
-//***********************************************************
+/*
+    PAVx -- Pod-Based Autonomous Vehicles
+    Library Created By: Niraj Raniga
+    March 2017
+*/
 
-//***********************************************************
-//* Includes
-//***********************************************************
-
+// Includes
 #include <avr/io.h>
 #include "i2c.h"
 #include <stdint.h>
 
-//************************************************************
 // Prototypes
-//************************************************************
-
 void writeI2Cbyte(uint8_t address, uint8_t location, uint8_t value);
 void readI2CbyteArray(uint8_t address, uint8_t location, uint8_t *array,uint8_t size);
 
-//************************************************************
-// KK2.1 gyro-specifc code
-//************************************************************
 void initI2C(void)
 {
     i2c_init();

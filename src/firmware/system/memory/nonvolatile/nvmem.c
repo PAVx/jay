@@ -1,6 +1,8 @@
-// nvram.c
-// Sargis S Yonan
-// April 2017
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
+	Library Created By: Niraj Raniga
+	April 2017
+*/
 
 #include "nvmem.h"
 

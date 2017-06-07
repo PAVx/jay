@@ -1,3 +1,9 @@
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
+	Library Created By: Niraj Raniga
+	March 2017
+*/
+
 // softuart.c
 // AVR-port of the generic software uart written in C
 //

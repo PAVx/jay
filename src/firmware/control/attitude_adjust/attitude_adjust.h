@@ -1,7 +1,7 @@
 /*
-    PAVx -- Pod-Based Autonomous Vehicles
-    Library Created By: Sargis S Yonan
-    March 2017
+	PAVx -- Pod-Based Autonomous Vehicles
+	Library Created By: Niraj Raniga
+	March 2017
 */
 
 // attitude_adjust.h

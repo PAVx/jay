@@ -1,5 +1,9 @@
-// adxl345.c
-// accel.c
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
+	Library Created By: Niraj Raniga
+	March 2017
+*/
+
 #include "gy85.h"
 #include "i2c.h"
 #include <avr/eeprom.h>

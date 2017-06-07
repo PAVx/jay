@@ -1,5 +1,9 @@
-// ADXL345.h
-// accel.h
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
+	Library Created By: Niraj Raniga
+	March 2017
+*/
+
 #ifndef _ADXL345_H_
 #define _ADXL345_H_
 

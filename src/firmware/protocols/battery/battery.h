@@ -1,3 +1,9 @@
+/*
+    PAVx -- Pod-Based Autonomous Vehicles
+    Library Created By: Niraj Raniga
+    March 2017
+*/
+
 #ifndef _BATTERY_H_
 #define _BATTERY_H_
 

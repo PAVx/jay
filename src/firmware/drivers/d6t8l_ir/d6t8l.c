@@ -1,4 +1,11 @@
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
+	Library Created By: Niraj Raniga
+	March 2017
+*/
+
 // d6t8l.c
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -24,7 +31,7 @@ void InitializeD6T8L(void)
 void D6T8L_ReadIR(void)
 {
     uint8_t i = 0;
-    
+
     readI2CbyteArray(D6T8L_ADDR, D6T8L_CMD, raw_data, 19);
 
     t_PTAT = (raw_data[0] + (raw_data[1] << 8) ) * 0.1;

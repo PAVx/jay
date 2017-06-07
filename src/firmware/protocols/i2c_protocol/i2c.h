@@ -1,12 +1,12 @@
-/*********************************************************************
- * i2c.h
- ********************************************************************/
+/*
+    PAVx -- Pod-Based Autonomous Vehicles
+    Library Created By: Niraj Raniga
+    March 2017
+*/
 
-//***********************************************************
-//* Externals
-//***********************************************************
-#ifndef _I2C_FUCKERY
-#define _I2C_FUCKERY
+// Externals
+#ifndef _I2C_PROTOCOL
+#define _I2C_PROTOCOL
 
 #include <stdint.h>
 #include "../../drivers/i2c_driver/i2cmaster.h"

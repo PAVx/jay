@@ -1,8 +1,8 @@
-/* 
-	PAVx -- Pod-Based Autonomous Vehicles 
-	Library Created By: Sargis S Yonan
+/*
+	PAVx -- Pod-Based Autonomous Vehicles
+	Library Created By: Niraj Raniga, Sargis S Yonan
 	March 2017
-*/ 
+*/
 
 // system_init.h
 #ifndef _SYSTEM_INIT_H_
